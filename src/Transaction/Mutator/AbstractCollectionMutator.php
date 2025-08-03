@@ -40,7 +40,15 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
      */
     public function rewind()
     {
-        $this->set->rewind();
+        if ($this->set instanceof \ArrayIterator) {
+            $this->set->rewind();
+        } elseif ($this->set instanceof \SplFixedArray) {
+            $array = $this->set->toArray();
+            $this->set = new \ArrayIterator($array);
+            $this->set->rewind();
+        } else {
+            throw new \LogicException('Unsupported collection type for rewind');
+        }
     }
 
     /**
