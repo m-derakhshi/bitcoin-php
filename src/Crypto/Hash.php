@@ -6,7 +6,6 @@ namespace BitWasp\Bitcoin\Crypto;
 
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use lastguest\Murmur;
 
 class Hash
 {
