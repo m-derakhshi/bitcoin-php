@@ -3,8 +3,6 @@
 namespace BitWasp\Bitcoin\ETHAddress;
 
 use Exception;
-use function mb_strlen;
-use function mb_substr;
 
 final class Keccak
 {
