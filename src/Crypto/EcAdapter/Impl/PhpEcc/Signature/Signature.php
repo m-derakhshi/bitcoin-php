@@ -28,9 +28,9 @@ class Signature extends Serializable implements SignatureInterface, \Mdanter\Ecc
     private $ecAdapter;
 
     /**
-     * @param EcAdapter $ecAdapter
-     * @param \GMP $r
-     * @param \GMP $s
+     * @param  EcAdapter  $ecAdapter
+     * @param  \GMP  $r
+     * @param  \GMP  $s
      */
     public function __construct(EcAdapter $ecAdapter, \GMP $r, \GMP $s)
     {
@@ -58,18 +58,19 @@ class Signature extends Serializable implements SignatureInterface, \Mdanter\Ecc
     }
 
     /**
-     * @param Signature $signature
+     * @param  Signature  $signature
      * @return bool
      */
     public function doEquals(Signature $signature): bool
     {
         $math = $this->ecAdapter->getMath();
+
         return $math->equals($this->getR(), $signature->getR())
             && $math->equals($this->getS(), $signature->getS());
     }
 
     /**
-     * @param SignatureInterface $signature
+     * @param  SignatureInterface  $signature
      * @return bool
      */
     public function equals(SignatureInterface $signature): bool
@@ -84,5 +85,10 @@ class Signature extends Serializable implements SignatureInterface, \Mdanter\Ecc
     public function getBuffer(): BufferInterface
     {
         return (new DerSignatureSerializer($this->ecAdapter))->serialize($this);
+    }
+
+    public function getSignatureType(): string
+    {
+        return 'ecdsa';
     }
 }
