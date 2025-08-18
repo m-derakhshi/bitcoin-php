@@ -18,21 +18,14 @@ class PublicKeySerializer implements PublicKeySerializerInterface
      */
     private $ecAdapter;
 
-    /**
-     * @param EcAdapter $ecAdapter
-     */
     public function __construct(EcAdapter $ecAdapter)
     {
         $this->ecAdapter = $ecAdapter;
     }
 
-    /**
-     * @param PublicKey $publicKey
-     * @return string
-     */
     public function getPrefix(PublicKey $publicKey): string
     {
-        if (null === $publicKey->getPrefix()) {
+        if ($publicKey->getPrefix() === null) {
             return $publicKey->isCompressed()
                 ? $this->ecAdapter->getMath()->isEven($publicKey->getPoint()->getY())
                     ? PublicKey::KEY_COMPRESSED_EVEN
@@ -43,17 +36,13 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         }
     }
 
-    /**
-     * @param PublicKey $publicKey
-     * @return BufferInterface
-     */
     private function doSerialize(PublicKey $publicKey): BufferInterface
     {
         $point = $publicKey->getPoint();
 
         $length = 33;
-        $data = $this->getPrefix($publicKey) . Buffer::int(gmp_strval($point->getX(), 10), 32)->getBinary();
-        if (!$publicKey->isCompressed()) {
+        $data = $this->getPrefix($publicKey).Buffer::int(gmp_strval($point->getX(), 10), 32)->getBinary();
+        if (! $publicKey->isCompressed()) {
             $length = 65;
             $data .= Buffer::int(gmp_strval($point->getY(), 10), 32)->getBinary();
         }
@@ -61,10 +50,6 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         return new Buffer($data, $length);
     }
 
-    /**
-     * @param PublicKeyInterface $publicKey
-     * @return BufferInterface
-     */
     public function serialize(PublicKeyInterface $publicKey): BufferInterface
     {
         /** @var PublicKey $publicKey */
@@ -72,18 +57,17 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     }
 
     /**
-     * @param BufferInterface $buffer
-     * @return PublicKeyInterface
      * @throws \Exception
      */
     public function parse(BufferInterface $buffer): PublicKeyInterface
     {
-        if (!in_array($buffer->getSize(), [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED], true)) {
+        if (! in_array($buffer->getSize(), [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED], true)) {
             throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');
         }
 
         /** @var PublicKey $key */
         $key = $this->ecAdapter->publicKeyFromBuffer($buffer);
+
         return $key;
     }
 }

@@ -28,11 +28,9 @@ class NetworkFactoryTest extends AbstractTestCase
     }
 
     /**
-     * @param string $method
-     * @param string $expectedClass
      * @dataProvider getFactoryMethodAndClass
      */
-    public function testNetworkFactory(string $method, string $expectedClass)
+    public function test_network_factory(string $method, string $expectedClass)
     {
         $this->assertInstanceOf($expectedClass, call_user_func([NetworkFactory::class, $method]));
     }

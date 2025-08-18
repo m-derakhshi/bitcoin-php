@@ -15,9 +15,5 @@ interface ScriptWitnessInterface extends CollectionInterface, SerializableInterf
      */
     public function all(): array;
 
-    /**
-     * @param ScriptWitnessInterface $witness
-     * @return bool
-     */
     public function equals(ScriptWitnessInterface $witness): bool;
 }

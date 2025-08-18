@@ -18,17 +18,11 @@ class Checker extends CheckerBase
      */
     protected $sigHashCache = [];
 
-    /**
-     * @param ScriptInterface $script
-     * @param int $sigHashType
-     * @param int $sigVersion
-     * @return BufferInterface
-     */
     public function getSigHash(ScriptInterface $script, int $sigHashType, int $sigVersion): BufferInterface
     {
-        $cacheCheck = $sigVersion . $sigHashType . $script->getBuffer()->getBinary();
-        if (!isset($this->sigHashCache[$cacheCheck])) {
-            if (SigHash::V1 === $sigVersion) {
+        $cacheCheck = $sigVersion.$sigHashType.$script->getBuffer()->getBinary();
+        if (! isset($this->sigHashCache[$cacheCheck])) {
+            if ($sigVersion === SigHash::V1) {
                 $hasher = new V1Hasher($this->transaction, $this->amount);
             } else {
                 $hasher = new Hasher($this->transaction);

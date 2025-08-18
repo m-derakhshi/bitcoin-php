@@ -15,55 +15,33 @@ use BitWasp\Buffertools\Buffertools;
 
 class OutputScriptFactory
 {
-    /**
-     * @param PublicKeyInterface $publicKey
-     * @return ScriptInterface
-     */
     public function p2pk(PublicKeyInterface $publicKey): ScriptInterface
     {
         return $this->payToPubKey($publicKey);
     }
 
-    /**
-     * @param BufferInterface $pubKeyHash
-     * @return ScriptInterface
-     */
     public function p2pkh(BufferInterface $pubKeyHash): ScriptInterface
     {
         return $this->payToPubKeyHash($pubKeyHash);
     }
 
-    /**
-     * @param BufferInterface $scriptHash
-     * @return ScriptInterface
-     */
     public function p2sh(BufferInterface $scriptHash): ScriptInterface
     {
         return $this->payToScriptHash($scriptHash);
     }
 
-    /**
-     * @param BufferInterface $witnessScriptHash
-     * @return ScriptInterface
-     */
     public function p2wsh(BufferInterface $witnessScriptHash): ScriptInterface
     {
         return $this->witnessScriptHash($witnessScriptHash);
     }
 
-    /**
-     * @param BufferInterface $witnessKeyHash
-     * @return ScriptInterface
-     */
     public function p2wkh(BufferInterface $witnessKeyHash): ScriptInterface
     {
         return $this->witnessKeyHash($witnessKeyHash);
     }
+
     /**
      * Create a Pay to pubkey output
-     *
-     * @param PublicKeyInterface  $publicKey
-     * @return ScriptInterface
      */
     public function payToPubKey(PublicKeyInterface $publicKey): ScriptInterface
     {
@@ -72,9 +50,6 @@ class OutputScriptFactory
 
     /**
      * Create a P2PKH output script
-     *
-     * @param BufferInterface $pubKeyHash
-     * @return ScriptInterface
      */
     public function payToPubKeyHash(BufferInterface $pubKeyHash): ScriptInterface
     {
@@ -88,9 +63,6 @@ class OutputScriptFactory
     /**
     /**
      * Create a P2SH output script
-     *
-     * @param BufferInterface $scriptHash
-     * @return ScriptInterface
      */
     public function payToScriptHash(BufferInterface $scriptHash): ScriptInterface
     {
@@ -102,10 +74,8 @@ class OutputScriptFactory
     }
 
     /**
-     * @param int $m
-     * @param PublicKeyInterface[] $keys
-     * @param bool|true $sort
-     * @return ScriptInterface
+     * @param  PublicKeyInterface[]  $keys
+     * @param  bool|true  $sort
      */
     public function multisig(int $m, array $keys = [], bool $sort = true): ScriptInterface
     {
@@ -115,10 +85,7 @@ class OutputScriptFactory
     }
 
     /**
-     * @param int $m
-     * @param BufferInterface[] $keys
-     * @param bool $sort
-     * @return ScriptInterface
+     * @param  BufferInterface[]  $keys
      */
     public function multisigKeyBuffers(int $m, array $keys = [], bool $sort = true): ScriptInterface
     {
@@ -143,7 +110,7 @@ class OutputScriptFactory
         $new->int($m);
         foreach ($keys as $key) {
             if ($key->getSize() !== PublicKey::LENGTH_COMPRESSED && $key->getSize() !== PublicKey::LENGTH_UNCOMPRESSED) {
-                throw new \RuntimeException("Invalid length for public key buffer");
+                throw new \RuntimeException('Invalid length for public key buffer');
             }
 
             $new->push($key);
@@ -152,10 +119,6 @@ class OutputScriptFactory
         return $new->int($n)->opcode(Opcodes::OP_CHECKMULTISIG)->getScript();
     }
 
-    /**
-     * @param BufferInterface $keyHash
-     * @return ScriptInterface
-     */
     public function witnessKeyHash(BufferInterface $keyHash): ScriptInterface
     {
         if ($keyHash->getSize() !== 20) {
@@ -165,10 +128,6 @@ class OutputScriptFactory
         return ScriptFactory::sequence([Opcodes::OP_0, $keyHash]);
     }
 
-    /**
-     * @param BufferInterface $scriptHash
-     * @return ScriptInterface
-     */
     public function witnessScriptHash(BufferInterface $scriptHash): ScriptInterface
     {
         if ($scriptHash->getSize() !== 32) {
@@ -178,10 +137,6 @@ class OutputScriptFactory
         return ScriptFactory::sequence([Opcodes::OP_0, $scriptHash]);
     }
 
-    /**
-     * @param BufferInterface $commitment
-     * @return ScriptInterface
-     */
     public function witnessCoinbaseCommitment(BufferInterface $commitment): ScriptInterface
     {
         if ($commitment->getSize() !== 32) {
@@ -190,7 +145,7 @@ class OutputScriptFactory
 
         return ScriptFactory::sequence([
             Opcodes::OP_RETURN,
-            new Buffer("\xaa\x21\xa9\xed" . $commitment->getBinary())
+            new Buffer("\xaa\x21\xa9\xed".$commitment->getBinary()),
         ]);
     }
 }

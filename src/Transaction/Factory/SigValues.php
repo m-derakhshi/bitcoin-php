@@ -21,8 +21,6 @@ class SigValues
 
     /**
      * SigValues constructor.
-     * @param ScriptInterface $scriptSig
-     * @param ScriptWitnessInterface $scriptWitness
      */
     public function __construct(ScriptInterface $scriptSig, ScriptWitnessInterface $scriptWitness)
     {
@@ -30,17 +28,11 @@ class SigValues
         $this->scriptWitness = $scriptWitness;
     }
 
-    /**
-     * @return ScriptInterface
-     */
     public function getScriptSig(): ScriptInterface
     {
         return $this->scriptSig;
     }
 
-    /**
-     * @return ScriptWitnessInterface
-     */
     public function getScriptWitness(): ScriptWitnessInterface
     {
         return $this->scriptWitness;

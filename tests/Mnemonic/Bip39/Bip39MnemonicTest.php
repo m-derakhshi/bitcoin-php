@@ -14,12 +14,8 @@ class Bip39MnemonicTest extends AbstractBip39Case
 {
     /**
      * @dataProvider getBip39Vectors
-     * @param Bip39Mnemonic $bip39
-     * @param BufferInterface $entropy
-     * @param string $eMnemonic
-     * @param BufferInterface $eSeed
      */
-    public function testEntropyToMnemonic(Bip39Mnemonic $bip39, BufferInterface $entropy, string $eMnemonic, BufferInterface $eSeed)
+    public function test_entropy_to_mnemonic(Bip39Mnemonic $bip39, BufferInterface $entropy, string $eMnemonic, BufferInterface $eSeed)
     {
         $mnemonic = $bip39->entropyToMnemonic($entropy);
         $this->assertEquals($eMnemonic, $mnemonic);
@@ -27,12 +23,8 @@ class Bip39MnemonicTest extends AbstractBip39Case
 
     /**
      * @dataProvider getBip39Vectors
-     * @param Bip39Mnemonic $bip39
-     * @param BufferInterface $eEntropy
-     * @param string $mnemonic
-     * @param BufferInterface $eSeed
      */
-    public function testMnemonicToEntropy(Bip39Mnemonic $bip39, BufferInterface $eEntropy, string $mnemonic, BufferInterface $eSeed)
+    public function test_mnemonic_to_entropy(Bip39Mnemonic $bip39, BufferInterface $eEntropy, string $mnemonic, BufferInterface $eSeed)
     {
         $entropy = $bip39->mnemonicToEntropy($mnemonic);
         $this->assertEquals($eEntropy->getBinary(), $entropy->getBinary());
@@ -40,53 +32,58 @@ class Bip39MnemonicTest extends AbstractBip39Case
 
     /**
      * @expectedException \InvalidArgumentException
+     *
      * @expectedExceptionMessage Invalid mnemonic
      */
-    public function testIncorrectWordCount()
+    public function test_incorrect_word_count()
     {
-        $bip39 = new Bip39Mnemonic(Bitcoin::getEcAdapter(), new EnglishWordList());
+        $bip39 = new Bip39Mnemonic(Bitcoin::getEcAdapter(), new EnglishWordList);
         $mnemonic = 'letter advice';
         $bip39->mnemonicToEntropy($mnemonic);
     }
 
     /**
      * @expectedException \InvalidArgumentException
+     *
      * @expectedExceptionMessage Checksum does not match
      */
-    public function testFailsOnInvalidChecksum()
+    public function test_fails_on_invalid_checksum()
     {
-        $bip39 = new Bip39Mnemonic(Bitcoin::getEcAdapter(), new EnglishWordList());
+        $bip39 = new Bip39Mnemonic(Bitcoin::getEcAdapter(), new EnglishWordList);
         $mnemonic = 'jelly better achieve collect unaware mountain thought cargo oxygen act hood oxygen';
         $bip39->mnemonicToEntropy($mnemonic);
     }
 
     /**
      * @expectedException \InvalidArgumentException
+     *
      * @expectedExceptionMessage Invalid entropy length
      */
-    public function testFailsOnEntropyMod4()
+    public function test_fails_on_entropy_mod4()
     {
-        $bip39 = new Bip39Mnemonic(Bitcoin::getEcAdapter(), new EnglishWordList());
+        $bip39 = new Bip39Mnemonic(Bitcoin::getEcAdapter(), new EnglishWordList);
         $bip39->entropyToMnemonic(Buffer::hex(str_repeat('00', 5)));
     }
 
     /**
      * @expectedException \InvalidArgumentException
+     *
      * @expectedExceptionMessage Invalid entropy length
      */
-    public function testFailsOnEntropyTooLong()
+    public function test_fails_on_entropy_too_long()
     {
-        $bip39 = new Bip39Mnemonic(Bitcoin::getEcAdapter(), new EnglishWordList());
+        $bip39 = new Bip39Mnemonic(Bitcoin::getEcAdapter(), new EnglishWordList);
         $bip39->entropyToMnemonic(Buffer::hex(str_repeat('00', 1028)));
     }
 
     /**
      * @expectedException \InvalidArgumentException
+     *
      * @expectedExceptionMessage Invalid mnemonic - entropy size is invalid
      */
-    public function testFailsOnMnemonicOfEntropyTooLong()
+    public function test_fails_on_mnemonic_of_entropy_too_long()
     {
-        $bip39 = new Bip39Mnemonic(Bitcoin::getEcAdapter(), new EnglishWordList());
+        $bip39 = new Bip39Mnemonic(Bitcoin::getEcAdapter(), new EnglishWordList);
         $mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about end grace oxygen maze bright face loan ticket trial leg cruel lizard bread worry reject journey perfect chef section caught neither install industry';
         $bip39->mnemonicToEntropy($mnemonic);
     }

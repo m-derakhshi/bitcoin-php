@@ -12,9 +12,9 @@ use BitWasp\Buffertools\Buffer;
 
 class PathTracerTest extends AbstractTestCase
 {
-    public function testTraceNoOperations()
+    public function test_trace_no_operations()
     {
-        $tracer = new PathTracer();
+        $tracer = new PathTracer;
         $result = $tracer->done();
 
         $this->assertInternalType('array', $result);
@@ -24,11 +24,11 @@ class PathTracerTest extends AbstractTestCase
         $this->assertSame($result, $resultAgain);
     }
 
-    public function testTraceJustOneOperation()
+    public function test_trace_just_one_operation()
     {
-        $op0 = new Operation(Opcodes::OP_0, new Buffer());
+        $op0 = new Operation(Opcodes::OP_0, new Buffer);
 
-        $tracer = new PathTracer();
+        $tracer = new PathTracer;
         $tracer->operation($op0);
 
         $result = $tracer->done();
@@ -42,7 +42,7 @@ class PathTracerTest extends AbstractTestCase
         $op1 = new Operation(Opcodes::OP_1, new Buffer("\x01"));
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("Cannot add operation to finished PathTracer");
+        $this->expectExceptionMessage('Cannot add operation to finished PathTracer');
 
         $tracer->operation($op1);
     }

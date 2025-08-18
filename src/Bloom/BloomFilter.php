@@ -16,14 +16,21 @@ use BitWasp\Buffertools\BufferInterface;
 class BloomFilter extends Serializable
 {
     const LN2SQUARED = '0.4804530139182014246671025263266649717305529515945455';
+
     const LN2 = '0.6931471805599453094172321214581765680755001343602552';
+
     const MAX_HASH_FUNCS = '50';
+
     const MAX_FILTER_SIZE = 36000; // bytes
+
     const TWEAK_START = 0xFBA4C795;
 
     const UPDATE_NONE = 0;
+
     const UPDATE_ALL = 1;
+
     const UPDATE_P2PUBKEY_ONLY = 2;
+
     const UPDATE_MASK = 3;
 
     /**
@@ -61,13 +68,6 @@ class BloomFilter extends Serializable
      */
     private $flags;
 
-    /**
-     * @param Math $math
-     * @param array $vFilter
-     * @param int $numHashFuncs
-     * @param int $nTweak
-     * @param int $flags
-     */
     public function __construct(Math $math, array $vFilter, int $numHashFuncs, int $nTweak, int $flags)
     {
         $this->math = $math;
@@ -78,10 +78,6 @@ class BloomFilter extends Serializable
         $this->updateEmptyFull();
     }
 
-    /**
-     * @param int $size
-     * @return array
-     */
     public static function emptyFilter(int $size): array
     {
         return str_split(str_pad('', $size, '0'), 1);
@@ -90,13 +86,6 @@ class BloomFilter extends Serializable
     /**
      * Create the Bloom Filter given the number of elements, a false positive rate,
      * and the flags governing how the filter should be updated.
-     *
-     * @param Math $math
-     * @param int $nElements
-     * @param float $nFpRate
-     * @param int $nTweak
-     * @param int $flags
-     * @return BloomFilter
      */
     public static function create(Math $math, int $nElements, float $nFpRate, int $nTweak, int $flags): BloomFilter
     {
@@ -111,83 +100,51 @@ class BloomFilter extends Serializable
         );
     }
 
-    /**
-     * @return bool
-     */
     public function isUpdateNone(): bool
     {
-        return (($this->flags & self::UPDATE_MASK) === self::UPDATE_NONE);
+        return ($this->flags & self::UPDATE_MASK) === self::UPDATE_NONE;
     }
 
-    /**
-     * @return bool
-     */
     public function isUpdateAll(): bool
     {
-        return (($this->flags & self::UPDATE_MASK) === self::UPDATE_ALL);
+        return ($this->flags & self::UPDATE_MASK) === self::UPDATE_ALL;
     }
 
-    /**
-     * @return bool
-     */
     public function isUpdatePubKeyOnly(): bool
     {
-        return (($this->flags & self::UPDATE_MASK) === self::UPDATE_P2PUBKEY_ONLY);
+        return ($this->flags & self::UPDATE_MASK) === self::UPDATE_P2PUBKEY_ONLY;
     }
 
-    /**
-     * @return bool
-     */
     public function isEmpty(): bool
     {
         return $this->empty;
     }
 
-    /**
-     * @return bool
-     */
     public function isFull(): bool
     {
         return $this->full;
     }
 
-    /**
-     * @return array
-     */
     public function getData(): array
     {
         return $this->vFilter;
     }
 
-    /**
-     * @return int
-     */
     public function getNumHashFuncs(): int
     {
         return $this->numHashFuncs;
     }
 
-    /**
-     * @return int
-     */
     public function getTweak(): int
     {
         return $this->nTweak;
     }
 
-    /**
-     * @return int
-     */
     public function getFlags(): int
     {
         return $this->flags;
     }
 
-    /**
-     * @param int $nElements
-     * @param float $fpRate
-     * @return int
-     */
     public static function idealSize(int $nElements, float $fpRate): int
     {
         return (int) floor(
@@ -214,8 +171,6 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @param int $filterSize
-     * @param int $nElements
      * @return int
      */
     public static function idealNumHashFuncs(int $filterSize, int $nElements)
@@ -240,21 +195,16 @@ class BloomFilter extends Serializable
         );
     }
 
-    /**
-     * @param int $nHashNum
-     * @param BufferInterface $data
-     * @return string
-     */
     public function hash(int $nHashNum, BufferInterface $data): string
     {
-        $hash = Hash::murmur3($data, ($nHashNum * self::TWEAK_START + $this->nTweak) & 0xffffffff)->getInt();
+        $hash = Hash::murmur3($data, ($nHashNum * self::TWEAK_START + $this->nTweak) & 0xFFFFFFFF)->getInt();
         $hash = gmp_init($hash, 10);
         $hash = $this->math->mod($hash, gmp_init(count($this->vFilter) * 8));
+
         return gmp_strval($hash, 10);
     }
 
     /**
-     * @param BufferInterface $data
      * @return $this
      */
     public function insertData(BufferInterface $data)
@@ -269,22 +219,15 @@ class BloomFilter extends Serializable
         }
 
         $this->updateEmptyFull();
+
         return $this;
     }
 
-    /**
-     * @param OutPointInterface $outPoint
-     * @return BloomFilter
-     */
     public function insertOutPoint(OutPointInterface $outPoint): BloomFilter
     {
         return $this->insertData($outPoint->getBuffer());
     }
 
-    /**
-     * @param BufferInterface $data
-     * @return bool
-     */
     public function containsData(BufferInterface $data): bool
     {
         if ($this->isFull()) {
@@ -298,7 +241,7 @@ class BloomFilter extends Serializable
         for ($i = 0; $i < $this->numHashFuncs; $i++) {
             $index = $this->hash($i, $data);
 
-            if (!($this->vFilter[($index >> 3)] & (1 << (7 & $index)))) {
+            if (! ($this->vFilter[($index >> 3)] & (1 << (7 & $index)))) {
                 return false;
             }
         }
@@ -306,27 +249,16 @@ class BloomFilter extends Serializable
         return true;
     }
 
-    /**
-     * @param OutPointInterface $outPoint
-     * @return bool
-     */
     public function containsOutPoint(OutPointInterface $outPoint): bool
     {
         return $this->containsData($outPoint->getBuffer());
     }
 
-    /**
-     * @return bool
-     */
     public function hasAcceptableSize(): bool
     {
         return count($this->vFilter) <= self::MAX_FILTER_SIZE && $this->numHashFuncs <= self::MAX_HASH_FUNCS;
     }
 
-    /**
-     * @param TransactionInterface $tx
-     * @return bool
-     */
     public function isRelevantAndUpdate(TransactionInterface $tx): bool
     {
         $this->updateEmptyFull();
@@ -345,8 +277,8 @@ class BloomFilter extends Serializable
             $found = true;
         }
 
-        $classifier = new OutputClassifier();
-        
+        $classifier = new OutputClassifier;
+
         // Check for relevant output scripts. We add the outpoint to the filter if found.
         foreach ($tx->getOutputs() as $vout => $output) {
             $script = $output->getScript();
@@ -356,7 +288,7 @@ class BloomFilter extends Serializable
                     $found = true;
                     if ($this->isUpdateAll()) {
                         $this->insertOutPoint($tx->makeOutPoint($vout));
-                    } else if ($this->isUpdatePubKeyOnly()) {
+                    } elseif ($this->isUpdatePubKeyOnly()) {
                         if ($classifier->isMultisig($script) || $classifier->isPayToPublicKey($script)) {
                             $this->insertOutPoint($tx->makeOutPoint($vout));
                         }
@@ -385,28 +317,22 @@ class BloomFilter extends Serializable
         return false;
     }
 
-    /**
-     *
-     */
     public function updateEmptyFull()
     {
         $full = true;
         $empty = true;
         for ($i = 0, $size = count($this->vFilter); $i < $size; $i++) {
             $byte = (int) $this->vFilter[$i];
-            $full &= ($byte === 0xff);
+            $full &= ($byte === 0xFF);
             $empty &= ($byte === 0x0);
         }
 
-        $this->full = (bool)$full;
-        $this->empty = (bool)$empty;
+        $this->full = (bool) $full;
+        $this->empty = (bool) $empty;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getBuffer(): BufferInterface
     {
-        return (new BloomFilterSerializer())->serialize($this);
+        return (new BloomFilterSerializer)->serialize($this);
     }
 }

@@ -30,15 +30,14 @@ class TransactionTest extends AbstractTestCase
         parent::__construct($name, $data, $dataName);
 
         static $rpcFactory = null;
-        if (null === $rpcFactory) {
-            $rpcFactory = new RegtestBitcoinFactory();
+        if ($rpcFactory === null) {
+            $rpcFactory = new RegtestBitcoinFactory;
         }
         $this->rpcFactory = $rpcFactory;
     }
 
     /**
      * Produces scripts for signing
-     * @return array
      */
     public function getScriptVectors(): array
     {
@@ -47,13 +46,12 @@ class TransactionTest extends AbstractTestCase
 
     /**
      * Produces ALL vectors
-     * @return array
      */
     public function getVectors(): array
     {
         $vectors = [];
         foreach ($this->getScriptVectors() as $fixture) {
-            if ($fixture['id'] === "1a47e53c26efe81aaf7fceedf447d965b0d5cb26b35d3a9a2b32aa89ae9a979f") {
+            if ($fixture['id'] === '1a47e53c26efe81aaf7fceedf447d965b0d5cb26b35d3a9a2b32aa89ae9a979f') {
                 continue;
             }
             $vectors[] = [$this->stripTestData($fixture)];
@@ -62,10 +60,6 @@ class TransactionTest extends AbstractTestCase
         return $vectors;
     }
 
-    /**
-     * @param array $fixture
-     * @return array
-     */
     public function stripTestData(array $fixture): array
     {
         foreach (['hex'] as $key) {
@@ -78,13 +72,12 @@ class TransactionTest extends AbstractTestCase
             unset($input['index']);
             unset($input['value']);
         }
+
         return $fixture;
     }
 
     /**
-     * @param ScriptInterface $script
-     * @param int $value
-     * @return Utxo
+     * @param  int  $value
      */
     public function fundOutput(RpcServer $server, ScriptInterface $script, $value = 100000000): Utxo
     {
@@ -93,16 +86,16 @@ class TransactionTest extends AbstractTestCase
 
         while ($bestHeight < 150 || $chainInfo['result']['bip9_softforks']['segwit']['status'] !== 'active') {
             // ought to finish in 1!
-            $server->makeRpcRequest("generate", [435]);
+            $server->makeRpcRequest('generate', [435]);
             $chainInfo = $server->makeRpcRequest('getblockchaininfo');
             $bestHeight = $chainInfo['result']['blocks'];
         }
 
-        $builder = new TxBuilder();
+        $builder = new TxBuilder;
         $builder->output($value, $script);
         $hex = $builder->get()->getHex();
 
-        $result = $server->makeRpcRequest('fundrawtransaction', [$hex, ['feeRate'=>0.0001]]);
+        $result = $server->makeRpcRequest('fundrawtransaction', [$hex, ['feeRate' => 0.0001]]);
         $unsigned = $result['result']['hex'];
         $result = $server->makeRpcRequest('signrawtransaction', [$unsigned]);
         $signedHex = $result['result']['hex'];
@@ -115,28 +108,27 @@ class TransactionTest extends AbstractTestCase
         }
 
         if ($outIdx === -1) {
-            throw new \RuntimeException("Sanity check failed, should have found the output we funded");
+            throw new \RuntimeException('Sanity check failed, should have found the output we funded');
         }
 
         $result = $server->makeRpcRequest('sendrawtransaction', [$signedHex]);
         $txid = $result['result'];
-        $server->makeRpcRequest("generate", [1]);
+        $server->makeRpcRequest('generate', [1]);
 
         return new Utxo(new OutPoint(Buffer::hex($txid), $outIdx), new TransactionOutput($value, $script));
     }
 
     /**
-     * @param array $fixture
      * @dataProvider getVectors
      */
-    public function testCases(array $fixture)
+    public function test_cases(array $fixture)
     {
         $bitcoind = $this->rpcFactory->startBitcoind();
         $this->assertTrue($bitcoind->isRunning());
 
         $defaultPolicy = Interpreter::VERIFY_NONE | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_WITNESS | Interpreter::VERIFY_CHECKLOCKTIMEVERIFY | Interpreter::VERIFY_CHECKSEQUENCEVERIFY;
-        ;
-        $txBuilder = new TxBuilder();
+
+        $txBuilder = new TxBuilder;
         if (array_key_exists('version', $fixture['raw'])) {
             $txBuilder->version((int) $fixture['raw']['version']);
         }
@@ -160,14 +152,14 @@ class TransactionTest extends AbstractTestCase
             $value = array_key_exists('value', $input) ? (int) $input['value'] : $totalOut;
             $utxo = $this->fundOutput($bitcoind, $scriptPubKey, $value);
 
-            $sequence = array_key_exists('sequence', $input) ? (int) $input['sequence'] : 0xffffffff;
+            $sequence = array_key_exists('sequence', $input) ? (int) $input['sequence'] : 0xFFFFFFFF;
             $txBuilder->spendOutPoint($utxo->getOutPoint(), null, $sequence);
 
-            $signData = new SignData();
-            if (array_key_exists('redeemScript', $input) && "" !== $input['redeemScript']) {
+            $signData = new SignData;
+            if (array_key_exists('redeemScript', $input) && $input['redeemScript'] !== '') {
                 $signData->p2sh(ScriptFactory::fromHex($input['redeemScript']));
             }
-            if (array_key_exists('witnessScript', $input) && "" !== $input['witnessScript']) {
+            if (array_key_exists('witnessScript', $input) && $input['witnessScript'] !== '') {
                 $signData->p2wsh(ScriptFactory::fromHex($input['witnessScript']));
             }
 
@@ -181,7 +173,7 @@ class TransactionTest extends AbstractTestCase
         $txBuilder->locktime(isset($fixture['raw']['locktime']) ? $fixture['raw']['locktime'] : 0);
 
         $signer = new Signer($txBuilder->get());
-        $privFactory = new PrivateKeyFactory();
+        $privFactory = new PrivateKeyFactory;
         foreach ($fixture['raw']['ins'] as $i => $input) {
             $iSigner = $signer->input($i, $utxos[$i]->getOutput(), $signDatas[$i]);
             foreach ($input['keys'] as $key) {
@@ -196,7 +188,7 @@ class TransactionTest extends AbstractTestCase
         $tx = $signer->get();
         $result = $bitcoind->makeRpcRequest('sendrawtransaction', [$tx->getHex(), true]);
         $this->assertEquals(null, $result['error']);
-        
+
         $txid = $result['result'];
         $this->assertEquals(64, strlen($txid));
 

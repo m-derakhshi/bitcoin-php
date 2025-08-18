@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class OpcodesTest extends AbstractTestCase
 {
-    public function testGetOpByName()
+    public function test_get_op_by_name()
     {
         $op = new Opcodes;
         $expected = 0;
@@ -22,15 +22,16 @@ class OpcodesTest extends AbstractTestCase
 
     /**
      * @expectedException \RuntimeException
+     *
      * @expectedExceptionMessage Opcode by that name not found
      */
-    public function testGetOpByNameFail()
+    public function test_get_op_by_name_fail()
     {
-        $op = new Opcodes();
+        $op = new Opcodes;
         $op->getOpByName('OP_DEADBEEF');
     }
 
-    public function testGetOp()
+    public function test_get_op()
     {
         $op = new Opcodes;
         // Check getRegisteredOpCode returns the right operation
@@ -42,9 +43,10 @@ class OpcodesTest extends AbstractTestCase
 
     /**
      * @expectedException \RuntimeException
+     *
      * @expectedExceptionMessage Opcode not found
      */
-    public function testGetOpCodeException()
+    public function test_get_op_code_exception()
     {
         $op = new Opcodes;
         $op->getOp(3);
@@ -53,24 +55,24 @@ class OpcodesTest extends AbstractTestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testNoWriteSet()
+    public function test_no_write_set()
     {
-        $op = new Opcodes();
+        $op = new Opcodes;
         $op[1] = 2;
     }
-    
+
     /**
      * @expectedException \RuntimeException
      */
-    public function testNoWriteUnSet()
+    public function test_no_write_un_set()
     {
-        $op = new Opcodes();
+        $op = new Opcodes;
         unset($op[Opcodes::OP_1]);
     }
 
-    public function testDebugInfo()
+    public function test_debug_info()
     {
-        $op = new Opcodes();
+        $op = new Opcodes;
         $this->assertEquals([], $op->__debugInfo());
     }
 }

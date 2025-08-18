@@ -16,25 +16,23 @@ class AmountTest extends AbstractTestCase
             ['1.12345678', 112345678],
             ['21000000', 2100000000000000],
             ['0', 0],
-            ['0.0', 0]
+            ['0.0', 0],
         ];
     }
 
     /**
-     * @param string $btc
-     * @param int $satoshis
      * @dataProvider getVectors
      */
-    public function testAmount(string $btc, int $satoshis)
+    public function test_amount(string $btc, int $satoshis)
     {
-        $amount = new Amount();
+        $amount = new Amount;
         $this->assertEquals($btc, $amount->toBtc($satoshis));
         $this->assertEquals($satoshis, $amount->toSatoshis($btc));
     }
 
-    public function testIgnoresLowValues()
+    public function test_ignores_low_values()
     {
-        $amount = new Amount();
+        $amount = new Amount;
         $value = '1.123456789';
         $expected = 112345678;
         $this->assertEquals($expected, ($amount->toSatoshis($value)));

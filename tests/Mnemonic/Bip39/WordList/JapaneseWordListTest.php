@@ -8,9 +8,9 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class JapaneseWordListTest extends AbstractTestCase
 {
-    public function testGetWordList()
+    public function test_get_word_list()
     {
-        $wl = new \BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist\JapaneseWordList();
+        $wl = new \BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist\JapaneseWordList;
         $this->assertEquals(2048, count($wl));
         $this->assertEquals(2048, count($wl->getWords()));
     }
@@ -18,18 +18,18 @@ class JapaneseWordListTest extends AbstractTestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testUnknownWord()
+    public function test_unknown_word()
     {
-        $wl = new \BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist\JapaneseWordList();
+        $wl = new \BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist\JapaneseWordList;
         $wl->getWord(101010101);
     }
 
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testExceptionOutOfRange()
+    public function test_exception_out_of_range()
     {
-        $wl = new \BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist\JapaneseWordList();
+        $wl = new \BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist\JapaneseWordList;
 
         $word = $wl->getIndex('あいだ');
         $this->assertInternalType('integer', $word);

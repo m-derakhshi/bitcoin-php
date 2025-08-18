@@ -30,7 +30,7 @@ class EcAdapterTest extends AbstractTestCase
                     $adapter[0],
                     $vector['priv'],
                     $vector['public'],
-                    $vector['compressed']
+                    $vector['compressed'],
                 ];
             }
         }
@@ -40,13 +40,14 @@ class EcAdapterTest extends AbstractTestCase
 
     /**
      * @dataProvider getPrivVectors
-     * @param EcAdapterInterface $ec
-     * @param string $privHex
-     * @param string $pubHex
-     * @param string $compressedHex
+     *
+     * @param  string  $privHex
+     * @param  string  $pubHex
+     * @param  string  $compressedHex
+     *
      * @throws \Exception
      */
-    public function testPrivateToPublic(EcAdapterInterface $ec, $privHex, $pubHex, $compressedHex)
+    public function test_private_to_public(EcAdapterInterface $ec, $privHex, $pubHex, $compressedHex)
     {
         $ucFactory = new PrivateKeyFactory($ec);
         $priv = $ucFactory->fromHexUncompressed($privHex);
@@ -60,9 +61,8 @@ class EcAdapterTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testIsValidKey(EcAdapterInterface $ecAdapter)
+    public function test_is_valid_key(EcAdapterInterface $ecAdapter)
     {
         // Keys must be < the order of the curve
         // Order of secp256k1 - 1
@@ -70,7 +70,7 @@ class EcAdapterTest extends AbstractTestCase
             'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140',
             '4141414141414141414141414141414141414141414141414141414141414141',
             '8000000000000000000000000000000000000000000000000000000000000000',
-            '8000000000000000000000000000000000000000000000000000000000000001'
+            '8000000000000000000000000000000000000000000000000000000000000001',
         ];
 
         foreach ($valid as $key) {
@@ -80,7 +80,7 @@ class EcAdapterTest extends AbstractTestCase
 
         $invalid = [
             'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141',
-            '0000000000000000000000000000000000000000000000000000000000000000'
+            '0000000000000000000000000000000000000000000000000000000000000000',
         ];
 
         foreach ($invalid as $key) {
@@ -91,9 +91,8 @@ class EcAdapterTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testIsValidPublicKey(EcAdapterInterface $ecAdapter)
+    public function test_is_valid_public_key(EcAdapterInterface $ecAdapter)
     {
         $json = json_decode($this->dataFile('publickey.compressed.json'));
         $pubKeyFactory = new PublicKeyFactory($ecAdapter);
@@ -110,9 +109,8 @@ class EcAdapterTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testDeterministicSign(EcAdapterInterface $ecAdapter)
+    public function test_deterministic_sign(EcAdapterInterface $ecAdapter)
     {
         $json = json_decode($this->dataFile('hmacdrbg.json'));
         $math = $ecAdapter->getMath();
@@ -131,7 +129,7 @@ class EcAdapterTest extends AbstractTestCase
             // R and S should be correct
             $rHex = $math->decHex(gmp_strval($sig->getR(), 10));
             $sHex = $math->decHex(gmp_strval($sig->getS(), 10));
-            $this->assertSame($test->expectedRSLow, $rHex . $sHex);
+            $this->assertSame($test->expectedRSLow, $rHex.$sHex);
 
             $this->assertTrue($privateKey->getPublicKey()->verify($messageHash, $sig));
         }
@@ -139,15 +137,14 @@ class EcAdapterTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testPrivateKeySign(EcAdapterInterface $ecAdapter)
+    public function test_private_key_sign(EcAdapterInterface $ecAdapter)
     {
-        $random = new Random();
+        $random = new Random;
         $pk = $ecAdapter->getPrivateKey(gmp_init('4141414141414141414141414141414141414141414141414141414141414141'), false);
 
         $hash = $random->bytes(32);
-        $sig = $pk->sign($hash, new Random());
+        $sig = $pk->sign($hash, new Random);
 
         $this->assertInstanceOf(SignatureInterface::class, $sig);
         $this->assertTrue($pk->getPublicKey()->verify($hash, $sig));

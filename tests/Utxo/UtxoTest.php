@@ -13,11 +13,11 @@ use BitWasp\Buffertools\Buffer;
 
 class UtxoTest extends AbstractTestCase
 {
-    public function testUtxo()
+    public function test_utxo()
     {
         $output = new TransactionOutput(
             50,
-            new Script()
+            new Script
         );
 
         $outpoint = new OutPoint(

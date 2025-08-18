@@ -19,21 +19,19 @@ class SignDataTest extends AbstractTestCase
             $vectors[] = [
                 $fixture['redeemScript'] !== '' ? ScriptFactory::fromHex($fixture['redeemScript']) : null,
                 $fixture['witnessScript'] !== '' ? ScriptFactory::fromHex($fixture['witnessScript']) : null,
-                $fixture['signaturePolicy'] !== '' ? $this->getScriptFlagsFromString($fixture['signaturePolicy']) : null
+                $fixture['signaturePolicy'] !== '' ? $this->getScriptFlagsFromString($fixture['signaturePolicy']) : null,
             ];
         }
+
         return $vectors;
     }
 
     /**
-     * @param ScriptInterface|null $rs
-     * @param ScriptInterface|null $ws
-     * @param int|null $flags
      * @dataProvider getVectors
      */
-    public function testCase(ScriptInterface $rs = null, ScriptInterface $ws = null, int $flags = null)
+    public function test_case(?ScriptInterface $rs = null, ?ScriptInterface $ws = null, ?int $flags = null)
     {
-        $signData = new SignData();
+        $signData = new SignData;
         $this->assertFalse($signData->hasRedeemScript());
         $this->assertFalse($signData->hasWitnessScript());
         $this->assertFalse($signData->hasSignaturePolicy());
@@ -44,7 +42,7 @@ class SignDataTest extends AbstractTestCase
             $this->assertEquals($rs, $signData->getRedeemScript());
         }
 
-        if ($ws!== null) {
+        if ($ws !== null) {
             $signData->p2wsh($ws);
             $this->assertTrue($signData->hasWitnessScript());
             $this->assertEquals($ws, $signData->getWitnessScript());
@@ -59,31 +57,34 @@ class SignDataTest extends AbstractTestCase
 
     /**
      * @expectedException \RuntimeException
+     *
      * @expectedExceptionMessage Witness script requested but not set
      */
-    public function testThrowsIfUnknownWSRequested()
+    public function test_throws_if_unknown_ws_requested()
     {
-        $signData = new SignData();
+        $signData = new SignData;
         $signData->getWitnessScript();
     }
 
     /**
      * @expectedException \RuntimeException
+     *
      * @expectedExceptionMessage Redeem script requested but not set
      */
-    public function testThrowsIfUnknownRSRequested()
+    public function test_throws_if_unknown_rs_requested()
     {
-        $signData = new SignData();
+        $signData = new SignData;
         $signData->getRedeemScript();
     }
 
     /**
      * @expectedException \RuntimeException
+     *
      * @expectedExceptionMessage Signature policy requested but not set
      */
-    public function testThrowsIfUnknownSignaturePolicyRequested()
+    public function test_throws_if_unknown_signature_policy_requested()
     {
-        $signData = new SignData();
+        $signData = new SignData;
         $signData->getSignaturePolicy();
     }
 }

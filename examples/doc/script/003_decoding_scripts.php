@@ -3,7 +3,7 @@
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 
-require __DIR__ . "/../../../vendor/autoload.php";
+require __DIR__.'/../../../vendor/autoload.php';
 
 $scriptPubKey = ScriptFactory::create()->int(1)->opcode(Opcodes::OP_ADD)->int(2)->opcode(Opcodes::OP_EQUAL)->getScript();
 $opcodes = $scriptPubKey->getOpcodes();

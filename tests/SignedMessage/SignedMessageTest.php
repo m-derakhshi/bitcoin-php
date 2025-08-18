@@ -29,19 +29,18 @@ hi
 -----BEGIN SIGNATURE-----
 IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+FogOoz/M=
 -----END BITCOIN SIGNED MESSAGE-----',
-                NetworkFactory::bitcoinTestnet()
+                NetworkFactory::bitcoinTestnet(),
             ];
     }
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testParsesMessage(EcAdapterInterface $ecAdapter)
+    public function test_parses_message(EcAdapterInterface $ecAdapter)
     {
-        list ($message, $addressString, $content, $network) = $this->sampleMessage();
+        [$message, $addressString, $content, $network] = $this->sampleMessage();
 
-        $addrCreator = new AddressCreator();
+        $addrCreator = new AddressCreator;
         /** @var PayToPubKeyHashAddress $address */
         $address = $addrCreator->fromString($addressString, $network);
         $serializer = new SignedMessageSerializer(
@@ -62,9 +61,8 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testInvalidMessage1(EcAdapterInterface $ecAdapter)
+    public function test_invalid_message1(EcAdapterInterface $ecAdapter)
     {
         $invalid = '-----BEGIN SIGNED MESSAGE-----
 hi
@@ -77,16 +75,15 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         );
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("Message must begin with -----BEGIN BITCOIN SIGNED MESSAGE-----");
+        $this->expectExceptionMessage('Message must begin with -----BEGIN BITCOIN SIGNED MESSAGE-----');
 
         $serializer->parse($invalid);
     }
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testInvalidMessage2(EcAdapterInterface $ecAdapter)
+    public function test_invalid_message2(EcAdapterInterface $ecAdapter)
     {
         $invalid = '-----BEGIN BITCOIN SIGNED MESSAGE-----
 hi
@@ -99,16 +96,15 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         );
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("Message must end with -----END BITCOIN SIGNED MESSAGE-----");
+        $this->expectExceptionMessage('Message must end with -----END BITCOIN SIGNED MESSAGE-----');
 
         $serializer->parse($invalid);
     }
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testInvalidMessage3(EcAdapterInterface $ecAdapter)
+    public function test_invalid_message3(EcAdapterInterface $ecAdapter)
     {
         $invalid = '-----BEGIN BITCOIN SIGNED MESSAGE-----
 hi
@@ -121,25 +117,25 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         );
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("Unable to find start of signature");
+        $this->expectExceptionMessage('Unable to find start of signature');
 
         $serializer->parse($invalid);
     }
 
-    public function testLitecoinFixture()
+    public function test_litecoin_fixture()
     {
         $network = NetworkFactory::litecoin();
-        $addressCreator = new AddressCreator();
-        $address = $addressCreator->fromString("LKueBopPJdhhniURL373SCQ3vx9evQbVSt", $network);
-        $message = "hey there";
+        $addressCreator = new AddressCreator;
+        $address = $addressCreator->fromString('LKueBopPJdhhniURL373SCQ3vx9evQbVSt', $network);
+        $message = 'hey there';
 
-        $cpctSig = new Buffer(base64_decode("H7tlmAm+BRVYmFaNClCN096E+29GOVzy0sH0ev/AbPu4cIDD31G8BIfDghPP+G4tI3Nd0n3VWBB2t1dGtxhoGCQ="));
+        $cpctSig = new Buffer(base64_decode('H7tlmAm+BRVYmFaNClCN096E+29GOVzy0sH0ev/AbPu4cIDD31G8BIfDghPP+G4tI3Nd0n3VWBB2t1dGtxhoGCQ='));
         /** @var CompactSignatureSerializerInterface $compactSigSerializer */
         $compactSigSerializer = EcSerializer::getSerializer(CompactSignatureSerializerInterface::class);
         $parsed = $compactSigSerializer->parse($cpctSig);
         $signedMessage = new SignedMessage($message, $parsed);
 
-        $signer = new MessageSigner();
+        $signer = new MessageSigner;
         $result = $signer->verify($signedMessage, $address, $network);
         $this->assertTrue($result);
     }

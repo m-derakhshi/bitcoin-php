@@ -20,33 +20,27 @@ use BitWasp\Buffertools\BufferInterface;
 class BlockFactory
 {
     /**
-     * @param string $string
-     * @param Math|null $math
-     * @return BlockInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
-    public static function fromHex(string $string, Math $math = null): BlockInterface
+    public static function fromHex(string $string, ?Math $math = null): BlockInterface
     {
         return self::fromBuffer(Buffer::hex($string), $math);
     }
 
     /**
-     * @param BufferInterface $buffer
-     * @param Math|null $math
-     * @return BlockInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
-    public static function fromBuffer(BufferInterface $buffer, Math $math = null): BlockInterface
+    public static function fromBuffer(BufferInterface $buffer, ?Math $math = null): BlockInterface
     {
-        $opcodes = new Opcodes();
+        $opcodes = new Opcodes;
         $serializer = new BlockSerializer(
             $math ?: Bitcoin::getMath(),
-            new BlockHeaderSerializer(),
+            new BlockHeaderSerializer,
             new TransactionSerializer(
-                new TransactionInputSerializer(new OutPointSerializer(), $opcodes),
+                new TransactionInputSerializer(new OutPointSerializer, $opcodes),
                 new TransactionOutputSerializer($opcodes),
-                new ScriptWitnessSerializer()
+                new ScriptWitnessSerializer
             )
         );
 

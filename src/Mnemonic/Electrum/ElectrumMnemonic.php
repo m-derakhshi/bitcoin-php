@@ -21,10 +21,6 @@ class ElectrumMnemonic implements MnemonicInterface
      */
     private $wordList;
 
-    /**
-     * @param EcAdapterInterface $ecAdapter
-     * @param ElectrumWordListInterface $wordList
-     */
     public function __construct(EcAdapterInterface $ecAdapter, ElectrumWordListInterface $wordList)
     {
         $this->ecAdapter = $ecAdapter;
@@ -32,8 +28,8 @@ class ElectrumMnemonic implements MnemonicInterface
     }
 
     /**
-     * @param BufferInterface $entropy
      * @return string[]
+     *
      * @throws \Exception
      */
     public function entropyToWords(BufferInterface $entropy): array
@@ -44,7 +40,7 @@ class ElectrumMnemonic implements MnemonicInterface
 
         $chunks = $entropy->getSize() / 4;
         for ($i = 0; $i < $chunks; $i++) {
-            $x = $entropy->slice(4*$i, 4)->getGmp();
+            $x = $entropy->slice(4 * $i, 4)->getGmp();
             $index1 = $math->mod($x, $n);
             $index2 = $math->mod($math->add($math->div($x, $n), $index1), $n);
             $index3 = $math->mod($math->add($math->div($math->div($x, $n), $n), $index2), $n);
@@ -57,19 +53,11 @@ class ElectrumMnemonic implements MnemonicInterface
         return $wordArray;
     }
 
-    /**
-     * @param BufferInterface $entropy
-     * @return string
-     */
     public function entropyToMnemonic(BufferInterface $entropy): string
     {
         return implode(' ', $this->entropyToWords($entropy));
     }
 
-    /**
-     * @param string $mnemonic
-     * @return BufferInterface
-     */
     public function mnemonicToEntropy(string $mnemonic): BufferInterface
     {
         $math = $this->ecAdapter->getMath();
@@ -80,7 +68,7 @@ class ElectrumMnemonic implements MnemonicInterface
         $out = '';
 
         for ($i = 0; $i < $thirdWordCount; $i++) {
-            list ($index1, $index2, $index3) = array_map(function ($v) use ($wordList) {
+            [$index1, $index2, $index3] = array_map(function ($v) use ($wordList) {
                 return gmp_init($wordList->getIndex($v), 10);
             }, array_slice($words, 3 * $i, 3));
 
@@ -100,7 +88,7 @@ class ElectrumMnemonic implements MnemonicInterface
                     )
                 )
             );
-            
+
             $out .= str_pad(gmp_strval($x, 16), 8, '0', STR_PAD_LEFT);
         }
 

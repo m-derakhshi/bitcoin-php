@@ -13,8 +13,7 @@ use BitWasp\Buffertools\Buffer;
 
 class InputCollectionMutatorTest extends AbstractTestCase
 {
-
-    public function testMutatesInputCollection()
+    public function test_mutates_input_collection()
     {
         $txid1 = Buffer::hex('ab', 32);
         $txid2 = Buffer::hex('aa', 32);
@@ -23,8 +22,8 @@ class InputCollectionMutatorTest extends AbstractTestCase
         $script2 = new Script(new Buffer('1'));
 
         $collection = [
-            new TransactionInput(new OutPoint($txid1, 0), new Script()),
-            new TransactionInput(new OutPoint($txid2, 0), new Script()),
+            new TransactionInput(new OutPoint($txid1, 0), new Script),
+            new TransactionInput(new OutPoint($txid2, 0), new Script),
         ];
 
         $mutator = new InputCollectionMutator($collection);
@@ -36,24 +35,23 @@ class InputCollectionMutatorTest extends AbstractTestCase
         $this->assertEquals($script2, $new[1]->getScript());
     }
 
-
     /**
      * @expectedException \RuntimeException
      */
-    public function testInvalidSlice()
+    public function test_invalid_slice()
     {
         $collection = [
         ];
-        
+
         $mutator = new InputCollectionMutator($collection);
         $mutator->slice(0, 1);
     }
 
-    public function testNull()
+    public function test_null()
     {
         $collection = [
-            new TransactionInput(new OutPoint(Buffer::hex('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 5), new Script()),
-            new TransactionInput(new OutPoint(Buffer::hex('baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 10), new Script()),
+            new TransactionInput(new OutPoint(Buffer::hex('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 5), new Script),
+            new TransactionInput(new OutPoint(Buffer::hex('baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 10), new Script),
         ];
 
         $mutator = new InputCollectionMutator($collection);

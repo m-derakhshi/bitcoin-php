@@ -15,23 +15,16 @@ interface InputSignerInterface
 {
     /**
      * Calculates the signature hash for the input for the given $sigHashType.
-     *
-     * @param int $sigHashType
-     * @return BufferInterface
      */
     public function getSigHash(int $sigHashType): BufferInterface;
 
     /**
      * Returns whether all required signatures have been provided.
-     *
-     * @return bool
      */
     public function isFullySigned(): bool;
 
     /**
      * Returns the required number of signatures for this input.
-     *
-     * @return int
      */
     public function getRequiredSigs(): int;
 
@@ -53,8 +46,6 @@ interface InputSignerInterface
 
     /**
      * OutputData for the txOut script.
-     *
-     * @return FullyQualifiedScript
      */
     public function getInputScripts(): FullyQualifiedScript;
 
@@ -64,15 +55,11 @@ interface InputSignerInterface
     public function getSteps();
 
     /**
-     * @param int $idx
      * @return Checksig[]|Conditional[]
      */
     public function step(int $idx);
 
     /**
-     * @param int $idx
-     * @param PrivateKeyInterface $privateKey
-     * @param int $sigHashType
      * @return mixed
      */
     public function signStep(int $idx, PrivateKeyInterface $privateKey, int $sigHashType = SigHash::ALL);
@@ -80,8 +67,6 @@ interface InputSignerInterface
     /**
      * Sign the input using $key and $sigHashTypes
      *
-     * @param PrivateKeyInterface $privateKey
-     * @param int $sigHashType
      * @return $this
      */
     public function sign(PrivateKeyInterface $privateKey, int $sigHashType = SigHash::ALL);
@@ -89,16 +74,11 @@ interface InputSignerInterface
     /**
      * Verifies the input using $flags for script verification, otherwise
      * uses the default, or that passed from SignData.
-     *
-     * @param int $flags
-     * @return bool
      */
-    public function verify(int $flags = null): bool;
+    public function verify(?int $flags = null): bool;
 
     /**
      * Produces a SigValues instance containing the scriptSig & script witness
-     *
-     * @return SigValues
      */
     public function serializeSignatures(): SigValues;
 }

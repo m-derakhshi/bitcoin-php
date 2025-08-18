@@ -16,43 +16,43 @@ class ScriptCountSigOpsTest extends AbstractTestCase
 {
     public function getCountTestVectors()
     {
-        $s1 = ScriptFactory::create()->opcode(Opcodes::OP_1)->push(new Buffer())->push(new Buffer())->opcode(Opcodes::OP_2, Opcodes::OP_CHECKMULTISIG)->getScript();
+        $s1 = ScriptFactory::create()->opcode(Opcodes::OP_1)->push(new Buffer)->push(new Buffer)->opcode(Opcodes::OP_2, Opcodes::OP_CHECKMULTISIG)->getScript();
         $s2 = ScriptFactory::create($s1->getBuffer())->opcode(Opcodes::OP_IF, Opcodes::OP_CHECKSIG, Opcodes::OP_ENDIF)->getScript();
 
         return [
             [
-                new Script(),
+                new Script,
                 false,
-                0
+                0,
             ],
             [
-                new Script(),
+                new Script,
                 true,
-                0
+                0,
             ],
             [
                 $s1,
                 true,
-                2
+                2,
             ],
             [
                 $s2,
                 true,
-                3
+                3,
             ],
             [
                 $s2,
                 false,
-                21
-            ]
+                21,
+            ],
         ];
     }
 
-    public function testP2sh()
+    public function test_p2sh()
     {
         $innerScript = ScriptFactory::create()
             ->opcode(Opcodes::OP_1)
-            ->data(new Buffer(), new Buffer())
+            ->data(new Buffer, new Buffer)
             ->opcode(Opcodes::OP_2)
             ->opcode(Opcodes::OP_CHECKMULTISIG)
             ->getScript();
@@ -66,9 +66,9 @@ class ScriptCountSigOpsTest extends AbstractTestCase
         $this->assertEquals(2, $count);
     }
 
-    public function testMultisig()
+    public function test_multisig()
     {
-        $pubKeyFactory = new PublicKeyFactory();
+        $pubKeyFactory = new PublicKeyFactory;
         $pk = [];
         $pk[] = $pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
         $pk[] = $pk[0]->tweakAdd(gmp_init(1));
@@ -84,7 +84,7 @@ class ScriptCountSigOpsTest extends AbstractTestCase
 
         $scriptSig = ScriptFactory::create()
             ->opcode(Opcodes::OP_1)
-            ->data(new Buffer(), new Buffer())
+            ->data(new Buffer, new Buffer)
             ->push($p2shScript->getBuffer())
             ->getScript();
 
@@ -92,24 +92,21 @@ class ScriptCountSigOpsTest extends AbstractTestCase
     }
 
     /**
-     * @param Script $script
-     * @param bool $fAccurate
-     * @param int $eSigOpCount
      * @dataProvider getCountTestVectors
      */
-    public function testSigOpCount(Script $script, bool $fAccurate, int $eSigOpCount)
+    public function test_sig_op_count(Script $script, bool $fAccurate, int $eSigOpCount)
     {
         $this->assertEquals($eSigOpCount, $script->countSigOps($fAccurate));
     }
 
-    public function testWhenNotP2sh()
+    public function test_when_not_p2sh()
     {
         $p2pkh = ScriptFactory::create()
             ->opcode(Opcodes::OP_DUP, Opcodes::OP_HASH160)
-            ->push(new Buffer())
+            ->push(new Buffer)
             ->opcode(Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG)->getScript();
 
-        $empty = new Script();
+        $empty = new Script;
         $this->assertEquals(1, $p2pkh->countP2shSigOps($empty));
 
         $p2shPubKey = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($empty->getBuffer()));

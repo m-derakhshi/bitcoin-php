@@ -22,27 +22,16 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      */
     private $ecAdapter;
 
-    /**
-     * @param EcAdapter $ecAdapter
-     */
     public function __construct(EcAdapter $ecAdapter)
     {
         $this->ecAdapter = $ecAdapter;
     }
 
-    /**
-     * @param PrivateKey $privateKey
-     * @return BufferInterface
-     */
     private function doSerialize(PrivateKey $privateKey): BufferInterface
     {
         return new Buffer($privateKey->getSecretBinary(), 32);
     }
 
-    /**
-     * @param PrivateKeyInterface $privateKey
-     * @return BufferInterface
-     */
     public function serialize(PrivateKeyInterface $privateKey): BufferInterface
     {
         /** @var PrivateKey $privateKey */
@@ -50,9 +39,6 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     }
 
     /**
-     * @param Parser $parser
-     * @param bool $compressed
-     * @return PrivateKeyInterface
      * @throws \Exception
      */
     public function fromParser(Parser $parser, bool $compressed): PrivateKeyInterface
@@ -61,9 +47,6 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     }
 
     /**
-     * @param BufferInterface $data
-     * @param bool $compressed
-     * @return PrivateKeyInterface
      * @throws \Exception
      */
     public function parse(BufferInterface $data, bool $compressed): PrivateKeyInterface

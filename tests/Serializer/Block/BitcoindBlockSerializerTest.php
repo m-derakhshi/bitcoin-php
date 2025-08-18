@@ -16,11 +16,11 @@ use BitWasp\Buffertools\Parser;
 
 class BitcoindBlockSerializerTest extends AbstractTestCase
 {
-    public function testGenesis()
+    public function test_genesis()
     {
-        $math = new Math();
-        $bhs = new BlockHeaderSerializer();
-        $txs = new TransactionSerializer();
+        $math = new Math;
+        $bhs = new BlockHeaderSerializer;
+        $txs = new TransactionSerializer;
         $bs = new BlockSerializer($math, $bhs, $txs);
 
         $network = NetworkFactory::bitcoin();
@@ -37,18 +37,18 @@ class BitcoindBlockSerializerTest extends AbstractTestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testWithInvalidNetBytes()
+    public function test_with_invalid_net_bytes()
     {
-        $math = new Math();
-        $bhs = new BlockHeaderSerializer();
-        $txs = new TransactionSerializer();
+        $math = new Math;
+        $bhs = new BlockHeaderSerializer;
+        $txs = new TransactionSerializer;
         $bs = new BlockSerializer($math, $bhs, $txs);
 
         $network = NetworkFactory::bitcoin();
         $bds = new BitcoindBlockSerializer($network, $bs);
 
         $buffer = new Buffer('\x00\x00\x00\x00'.substr($this->dataFile('genesis.dat'), 4));
-        //echo $buffer->getHex() . "\n";
+        // echo $buffer->getHex() . "\n";
         $parser = new Parser($buffer);
 
         $block = $bds->fromParser($parser);
@@ -56,12 +56,11 @@ class BitcoindBlockSerializerTest extends AbstractTestCase
         $this->assertEquals('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $block->getHeader()->getHash()->getHex());
     }
 
-
-    public function testParseSerialize()
+    public function test_parse_serialize()
     {
-        $math = new Math();
-        $bhs = new BlockHeaderSerializer();
-        $txs = new TransactionSerializer();
+        $math = new Math;
+        $bhs = new BlockHeaderSerializer;
+        $txs = new TransactionSerializer;
         $bs = new BlockSerializer($math, $bhs, $txs);
 
         $network = NetworkFactory::bitcoin();

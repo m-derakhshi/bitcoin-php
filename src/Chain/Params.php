@@ -43,12 +43,14 @@ class Params implements ParamsInterface
 
     /**
      * = 14 * 24 * 60 * 60
+     *
      * @var int
      */
     protected static $powTargetTimespan = 1209600;
 
     /**
      * = 10 * 60
+     *
      * @var int
      */
     protected static $powTargetSpacing = 600;
@@ -65,6 +67,7 @@ class Params implements ParamsInterface
 
     /**
      * Hex: 1d00ffff
+     *
      * @var int
      */
     protected static $powBitsLimit = 486604799;
@@ -79,23 +82,16 @@ class Params implements ParamsInterface
      */
     protected static $majorityEnforceBlockUpgrade = 750;
 
-
     /**
      * @var Math
      */
     protected $math;
 
-    /**
-     * @param Math $math
-     */
     public function __construct(Math $math)
     {
         $this->math = $math;
     }
 
-    /**
-     * @return BlockHeaderInterface
-     */
     public function getGenesisBlockHeader(): BlockHeaderInterface
     {
         return new BlockHeader(
@@ -103,14 +99,11 @@ class Params implements ParamsInterface
             Buffer::hex('00', 32),
             Buffer::hex('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', 32),
             1231006505,
-            0x1d00ffff,
+            0x1D00FFFF,
             2083236893
         );
     }
 
-    /**
-     * @return BlockInterface
-     */
     public function getGenesisBlock(): BlockInterface
     {
         $timestamp = new Buffer('The Times 03/Jan/2009 Chancellor on brink of second bailout for banks');
@@ -127,120 +120,78 @@ class Params implements ParamsInterface
             $this->getGenesisBlockHeader(),
             (new TxBuilder)
                 ->version(1)
-                ->input(new Buffer('', 32), 0xffffffff, $inputScript)
+                ->input(new Buffer('', 32), 0xFFFFFFFF, $inputScript)
                 ->output(5000000000, ScriptFactory::sequence([$publicKey, Opcodes::OP_CHECKSIG]))
                 ->locktime(0)
                 ->get()
         );
     }
 
-    /**
-     * @return int
-     */
     public function maxBlockSizeBytes(): int
     {
         return static::$maxBlockSizeBytes;
     }
 
-    /**
-     * @return int
-     */
     public function subsidyHalvingInterval(): int
     {
         return static::$subsidyHalvingInterval;
     }
 
-    /**
-     * @return int
-     */
     public function coinbaseMaturityAge(): int
     {
         return static::$coinbaseMaturityAge;
     }
 
-    /**
-     * @return int
-     */
     public function maxMoney(): int
     {
         return static::$maxMoney;
     }
 
-    /**
-     * @return int
-     */
     public function powTargetTimespan(): int
     {
-        return static::$powTargetTimespan ;
+        return static::$powTargetTimespan;
     }
 
-    /**
-     * @return int
-     */
     public function powTargetSpacing(): int
     {
         return static::$powTargetSpacing;
     }
 
-    /**
-     * @return int
-     */
     public function powRetargetInterval(): int
     {
         return static::$powRetargetInterval;
     }
 
-    /**
-     * @return string
-     */
     public function powTargetLimit(): string
     {
         return static::$powTargetLimit;
     }
 
-    /**
-     * @return int
-     */
     public function powBitsLimit(): int
     {
         return static::$powBitsLimit;
     }
 
-    /**
-     * @return int
-     */
     public function majorityEnforceBlockUpgrade(): int
     {
         return static::$majorityEnforceBlockUpgrade;
     }
 
-    /**
-     * @return int
-     */
     public function majorityWindow(): int
     {
         return static::$majorityWindow;
     }
 
-    /**
-     * @return int
-     */
     public function p2shActivateTime(): int
     {
         return static::$p2shActivateTime;
     }
 
-    /**
-     * @return int
-     */
     public function getMaxBlockSigOps(): int
     {
         return $this->maxBlockSizeBytes() / 50;
     }
-    
-    /**
-     * @return int
-     */
+
     public function getMaxTxSigOps(): int
     {
         return $this->getMaxBlockSigOps() / 5;

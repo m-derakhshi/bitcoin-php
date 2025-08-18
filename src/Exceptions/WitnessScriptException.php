@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class WitnessScriptException extends \Exception
-{
-
-}
+class WitnessScriptException extends \Exception {}

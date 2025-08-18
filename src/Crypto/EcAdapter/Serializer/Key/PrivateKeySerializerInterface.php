@@ -9,16 +9,7 @@ use BitWasp\Buffertools\BufferInterface;
 
 interface PrivateKeySerializerInterface
 {
-    /**
-     * @param PrivateKeyInterface $privateKey
-     * @return BufferInterface
-     */
     public function serialize(PrivateKeyInterface $privateKey): BufferInterface;
 
-    /**
-     * @param BufferInterface $data
-     * @param bool $compressed
-     * @return PrivateKeyInterface
-     */
     public function parse(BufferInterface $data, bool $compressed): PrivateKeyInterface;
 }

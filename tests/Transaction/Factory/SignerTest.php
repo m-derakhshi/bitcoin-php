@@ -46,10 +46,9 @@ use BitWasp\Buffertools\Buffer;
 
 class SignerTest extends AbstractTestCase
 {
-
     /**
      * Produces scripts for signing
-     * @param EcAdapterInterface $ecAdapter
+     *
      * @return array
      */
     public function getScriptVectors(EcAdapterInterface $ecAdapter)
@@ -68,7 +67,7 @@ class SignerTest extends AbstractTestCase
             $utxos = [];
             $keys = [];
             $signDatas = [];
-            $txb = new TxBuilder();
+            $txb = new TxBuilder;
             $txb->locktime($locktime);
             foreach ($inputs as $input) {
                 $hash = Buffer::hex($input['hash']);
@@ -82,11 +81,11 @@ class SignerTest extends AbstractTestCase
                 }, $input['keys']);
                 $utxos[] = new Utxo($outpoint, $txOut);
 
-                $signData = new SignData();
-                if (array_key_exists('redeemScript', $input) && "" !== $input['redeemScript']) {
+                $signData = new SignData;
+                if (array_key_exists('redeemScript', $input) && $input['redeemScript'] !== '') {
                     $signData->p2sh(ScriptFactory::fromHex($input['redeemScript']));
                 }
-                if (array_key_exists('witnessScript', $input) && "" !== $input['witnessScript']) {
+                if (array_key_exists('witnessScript', $input) && $input['witnessScript'] !== '') {
                     $signData->p2wsh(ScriptFactory::fromHex($input['witnessScript']));
                 }
                 $inputPolicy = isset($input['signaturePolicy']) ? $this->getScriptFlagsFromString($input['signaturePolicy']) : $policy;
@@ -116,6 +115,7 @@ class SignerTest extends AbstractTestCase
 
     /**
      * Produces ALL vectors
+     *
      * @return array
      */
     public function getVectors()
@@ -124,14 +124,12 @@ class SignerTest extends AbstractTestCase
         foreach ($this->getEcAdapters() as $ecAdapter) {
             $results = array_merge($results, $this->getScriptVectors($ecAdapter[0]));
         }
+
         return $results;
     }
 
     /**
      * Create a mock UTXO to spend
-     * @param ScriptInterface $scriptPubKey
-     * @param int $value
-     * @return Utxo
      */
     public function createCredit(ScriptInterface $scriptPubKey, int $value): Utxo
     {
@@ -139,16 +137,13 @@ class SignerTest extends AbstractTestCase
     }
 
     /**
-     * @param string $description
-     * @param EcAdapterInterface $ecAdapter
-     * @param Utxo[] $utxos
-     * @param TxBuilder $builder
-     * @param SignData[] $signDatas
-     * @param array $keys
-     * @param array $optExtra
+     * @param  string  $description
+     * @param  Utxo[]  $utxos
+     * @param  SignData[]  $signDatas
+     *
      * @dataProvider getVectors
      */
-    public function testCases($description, EcAdapterInterface $ecAdapter, TxBuilder $builder, array $utxos, array $signDatas, array $keys, array $optExtra)
+    public function test_cases($description, EcAdapterInterface $ecAdapter, TxBuilder $builder, array $utxos, array $signDatas, array $keys, array $optExtra)
     {
         $signer = new Signer($builder->get(), $ecAdapter);
         for ($i = 0, $count = count($utxos); $i < $count; $i++) {
@@ -184,14 +179,14 @@ class SignerTest extends AbstractTestCase
                     // redeem script solution is the witness script hash
                     $this->assertTrue($inputScripts->witnessScript()->getScript()->getWitnessScriptHash()->equals($redeemScript->getSolution()));
                 }
-            } else if ($signData->hasWitnessScript()) {
+            } elseif ($signData->hasWitnessScript()) {
                 $this->assertEquals(ScriptType::P2WSH, $scriptPubKey->getType());
                 // spk solution is the witness script hash
                 $this->assertTrue($inputScripts->witnessScript()->getScript()->getWitnessScriptHash()->equals($scriptPubKey->getSolution()));
             }
 
             foreach ($signSteps as $keyAndHashType) {
-                list ($privateKey, $sigHashType) = $keyAndHashType;
+                [$privateKey, $sigHashType] = $keyAndHashType;
                 $signer->sign($i, $privateKey, $utxo->getOutput(), $signData, $sigHashType);
             }
 
@@ -225,18 +220,18 @@ class SignerTest extends AbstractTestCase
             $osig = $origSigner->getSignatures();
             $ikey = $inSigner->getPublicKeys();
             $isig = $inSigner->getSignatures();
-            
+
             $this->assertEquals(count($okey), count($ikey), 'should recover same # public keys');
             $this->assertEquals(count($osig), count($isig), 'should recover same # signatures');
 
             for ($j = 0, $l = count($okey); $j < $l; $j++) {
                 if ($okey[$j] === null) {
                     $this->assertEquals(null, $ikey[$j]);
-                } else if ($okey[$j] instanceof PublicKeyInterface) {
+                } elseif ($okey[$j] instanceof PublicKeyInterface) {
                     $this->assertInstanceOf(PublicKeyInterface::class, $ikey[$j]);
                     $this->assertTrue($okey[$j]->equals($ikey[$j]));
                 } else {
-                    throw new \RuntimeException("Strange - getPublicKeys returned a value that was neither null or PublicKeyInterface");
+                    throw new \RuntimeException('Strange - getPublicKeys returned a value that was neither null or PublicKeyInterface');
                 }
             }
 
@@ -257,8 +252,8 @@ class SignerTest extends AbstractTestCase
     }
 
     /**
-     * @param EcAdapterInterface $ecAdapter
      * @return array
+     *
      * @throws \Exception
      */
     public function getSimpleSpendCases(EcAdapterInterface $ecAdapter)
@@ -268,10 +263,11 @@ class SignerTest extends AbstractTestCase
         $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, false, $ecAdapter);
         $pubKeyBuffer = $pubKeySerializer->serialize($publicKey);
         $pubKeyHash = Hash::sha256ripe160($pubKeyBuffer);
+
         return [
             ScriptFactory::sequence([$pubKeyBuffer, Opcodes::OP_CHECKSIG]),
             ScriptFactory::scriptPubKey()->p2pkh($pubKeyHash),
-            ScriptFactory::scriptPubKey()->multisigKeyBuffers(1, [$pubKeyBuffer])
+            ScriptFactory::scriptPubKey()->multisigKeyBuffers(1, [$pubKeyBuffer]),
         ];
     }
 
@@ -292,18 +288,18 @@ class SignerTest extends AbstractTestCase
     }
 
     /**
-     * @param EcAdapterInterface $ecAdapter
-     * @param ScriptInterface $script
      * @dataProvider getSimpleSpendVectors
+     *
      * @expectedException \RuntimeException
+     *
      * @expectedExceptionMessage Signing with the wrong private key
      */
-    public function testRejectsWrongKey(EcAdapterInterface $ecAdapter, ScriptInterface $script)
+    public function test_rejects_wrong_key(EcAdapterInterface $ecAdapter, ScriptInterface $script)
     {
-        $outpoint = new OutPoint(new Buffer('', 32), 0xffffffff);
+        $outpoint = new OutPoint(new Buffer('', 32), 0xFFFFFFFF);
 
-        $tx = (new TxBuilder())
-            ->inputs([new TransactionInput($outpoint, new Script())])
+        $tx = (new TxBuilder)
+            ->inputs([new TransactionInput($outpoint, new Script)])
             ->outputs([new TransactionOutput(4900000000, $script)])
             ->get();
 
@@ -315,37 +311,37 @@ class SignerTest extends AbstractTestCase
         $signer->input(0, $txOut)->sign($privateKey, SigHash::ALL);
     }
 
-    public function testRejectsInvalidSigHashType()
+    public function test_rejects_invalid_sig_hash_type()
     {
-        $outpoint = new OutPoint(new Buffer('', 32), 0xffffffff);
-        $txOut = new TransactionOutput(5000000000, ScriptFactory::scriptPubKey()->p2pkh((new Random())->bytes(20)));
-        $signer = new Signer((new TxBuilder())
-            ->inputs([new TransactionInput($outpoint, new Script())])
+        $outpoint = new OutPoint(new Buffer('', 32), 0xFFFFFFFF);
+        $txOut = new TransactionOutput(5000000000, ScriptFactory::scriptPubKey()->p2pkh((new Random)->bytes(20)));
+        $signer = new Signer((new TxBuilder)
+            ->inputs([new TransactionInput($outpoint, new Script)])
             ->outputs([new TransactionOutput(4900000000, new Script)])
             ->get(), Bitcoin::getEcAdapter());
 
         $input = $signer->input(0, $txOut);
         $this->expectException(SignerException::class);
-        $this->expectExceptionMessage("Invalid sigHashType requested");
+        $this->expectExceptionMessage('Invalid sigHashType requested');
 
         $input->getSigHash(20);
     }
 
-    public function testSetCheckerCreatorNoInputs()
+    public function test_set_checker_creator_no_inputs()
     {
-        $signer = new Signer((new TxBuilder())
+        $signer = new Signer((new TxBuilder)
             ->get(), Bitcoin::getEcAdapter());
         $ecAdapter = Bitcoin::getEcAdapter();
         $checkerCreator = \BitWasp\Bitcoin\Transaction\Factory\Checker\CheckerCreator::fromEcAdapter($ecAdapter);
         $signer->setCheckerCreator($checkerCreator);
     }
 
-    public function testSetCheckerCreator()
+    public function test_set_checker_creator()
     {
-        $outpoint = new OutPoint(new Buffer('', 32), 0xffffffff);
-        $txOut = new TransactionOutput(5000000000, ScriptFactory::scriptPubKey()->p2pkh((new Random())->bytes(20)));
-        $signer = new Signer((new TxBuilder())
-            ->inputs([new TransactionInput($outpoint, new Script())])
+        $outpoint = new OutPoint(new Buffer('', 32), 0xFFFFFFFF);
+        $txOut = new TransactionOutput(5000000000, ScriptFactory::scriptPubKey()->p2pkh((new Random)->bytes(20)));
+        $signer = new Signer((new TxBuilder)
+            ->inputs([new TransactionInput($outpoint, new Script)])
             ->outputs([new TransactionOutput(4900000000, new Script)])
             ->get(), Bitcoin::getEcAdapter());
         $input = $signer->input(0, $txOut);
@@ -353,12 +349,12 @@ class SignerTest extends AbstractTestCase
         $checkerCreator = \BitWasp\Bitcoin\Transaction\Factory\Checker\CheckerCreator::fromEcAdapter($ecAdapter);
 
         $this->expectException(SignerException::class);
-        $this->expectExceptionMessage("Cannot change CheckerCreator after inputs have been parsed");
+        $this->expectExceptionMessage('Cannot change CheckerCreator after inputs have been parsed');
 
         $signer->setCheckerCreator($checkerCreator);
     }
 
-    public function testDiscouragesInvalidKeysInScripts()
+    public function test_discourages_invalid_keys_in_scripts()
     {
         $caught = false;
 
@@ -368,10 +364,10 @@ class SignerTest extends AbstractTestCase
             $caught = true;
         }
 
-        $this->assertTrue($caught, "Expect exception to be thrown in default state");
+        $this->assertTrue($caught, 'Expect exception to be thrown in default state');
     }
 
-    public function testCanRequireValidKeys()
+    public function test_can_require_valid_keys()
     {
         $caught = false;
         try {
@@ -380,10 +376,10 @@ class SignerTest extends AbstractTestCase
             $caught = true;
         }
 
-        $this->assertTrue($caught, "Expect exception with invalid key");
+        $this->assertTrue($caught, 'Expect exception with invalid key');
     }
 
-    public function testCanDisablePublicKeyValidCheck()
+    public function test_can_disable_public_key_valid_check()
     {
         $caught = false;
         try {
@@ -392,25 +388,25 @@ class SignerTest extends AbstractTestCase
             echo $e->getMessage().PHP_EOL;
             $caught = true;
         }
-        $this->assertFalse($caught, "No exception expected when tolerate=true");
+        $this->assertFalse($caught, 'No exception expected when tolerate=true');
     }
 
     /**
-     * @param null|bool $tolerateBadKey
+     * @param  null|bool  $tolerateBadKey
      */
     protected function doTestSignerInvalidKeyInteraction($tolerateBadKey = null)
     {
-        $factory = new PrivateKeyFactory();
-        $myKey = $factory->generateUncompressed(new Random());
-        $badKey = Buffer::hex("031234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd");
+        $factory = new PrivateKeyFactory;
+        $myKey = $factory->generateUncompressed(new Random);
+        $badKey = Buffer::hex('031234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd');
         $script = ScriptFactory::scriptPubKey()->multisigKeyBuffers(1, [$myKey->getPublicKey()->getBuffer(), $badKey], false);
 
         $txOut = new TransactionOutput(123123, $script);
 
         $dest = new PayToPubKeyHashAddress($myKey->getPubKeyHash());
 
-        $tx = (new TxBuilder())
-            ->input("abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234", 0)
+        $tx = (new TxBuilder)
+            ->input('abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234', 0)
             ->payToAddress(121000, $dest)
             ->get();
 
@@ -428,19 +424,19 @@ class SignerTest extends AbstractTestCase
         }
     }
 
-    public function testDontSignInput()
+    public function test_dont_sign_input()
     {
         $expectSpend = '020000000113aaf49280ba92bddfcbdc30d6c7501c2575e4a80f539236df233f9218a2c8400000000000ffffffff0100f2052a010000001976a914cd29cc97826c37281ac61301e4d5ed374770585688ac00000000';
         $value = 50 * 100000000;
 
-        $txid = "40c8a218923f23df3692530fa8e475251c50c7d630dccbdfbd92ba8092f4aa13";
+        $txid = '40c8a218923f23df3692530fa8e475251c50c7d630dccbdfbd92ba8092f4aa13';
         $vout = 0;
         $network = NetworkFactory::bitcoinTestnet();
 
-        $addrCreator = new AddressCreator();
+        $addrCreator = new AddressCreator;
         $dest = $addrCreator->fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
 
-        $txb = (new TxBuilder())
+        $txb = (new TxBuilder)
             ->version(2)
             ->input($txid, $vout)
             ->output($value, $dest);
@@ -453,7 +449,7 @@ class SignerTest extends AbstractTestCase
 
     public function paddedMultisigsProvider()
     {
-        $privFactory = new PrivateKeyFactory();
+        $privFactory = new PrivateKeyFactory;
         $keys = [
             $privFactory->fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
             $privFactory->fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
@@ -470,14 +466,14 @@ class SignerTest extends AbstractTestCase
         $value = 40000;
 
         $p2shTxout = new TransactionOutput($value, $p2sh->getOutputScript());
-        $p2shSignData = (new SignData())
+        $p2shSignData = (new SignData)
             ->p2sh($p2sh);
         $p2wshTxout = new TransactionOutput($value, $p2wsh->getOutputScript());
-        $p2wshSignData = (new SignData())
+        $p2wshSignData = (new SignData)
             ->p2wsh($p2wsh);
 
-        $addrCreator = new AddressCreator();
-        $unsigned = (new TxBuilder())
+        $addrCreator = new AddressCreator;
+        $unsigned = (new TxBuilder)
             ->input('5077666f78045cb3482f64ee5d203366363af71436c1bb6db8b49c428a53f00d', 0)
             ->payToAddress($value, $addrCreator->fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
             ->get();
@@ -519,17 +515,12 @@ class SignerTest extends AbstractTestCase
     }
 
     /**
-     * @param array $privKeys
-     * @param TransactionInterface $tx
-     * @param TransactionOutputInterface $txOut
-     * @param SignData $signData
      * @dataProvider paddedMultisigsProvider
      */
-    public function testPaddingMultisig(array $privKeys, TransactionInterface $tx, TransactionOutputInterface $txOut, SignData $signData)
+    public function test_padding_multisig(array $privKeys, TransactionInterface $tx, TransactionOutputInterface $txOut, SignData $signData)
     {
         $signer = (new Signer($tx))
-            ->padUnsignedMultisigs(true)
-        ;
+            ->padUnsignedMultisigs(true);
 
         $input = $signer->input(0, $txOut, $signData);
 
@@ -549,7 +540,7 @@ class SignerTest extends AbstractTestCase
 
         for ($i = 0; $i < $input->getRequiredSigs(); $i++) {
             if (array_key_exists($i, $input->getSignatures())) {
-                $this->assertTrue(array_key_exists($i, $inputAgain->getSignatures()), "Missing or misplaced signature");
+                $this->assertTrue(array_key_exists($i, $inputAgain->getSignatures()), 'Missing or misplaced signature');
 
                 $a = $input->getSignatures()[$i];
                 $b = $input->getSignatures()[$i];
@@ -563,9 +554,9 @@ class SignerTest extends AbstractTestCase
         $this->assertEquals($input->isFullySigned(), $inputAgain->isFullySigned());
     }
 
-    public function testFullySignedMultisigIsNotPadded()
+    public function test_fully_signed_multisig_is_not_padded()
     {
-        $privFactory = new PrivateKeyFactory();
+        $privFactory = new PrivateKeyFactory;
         $keys = [
             $privFactory->fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
             $privFactory->fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
@@ -582,33 +573,31 @@ class SignerTest extends AbstractTestCase
         $value = 40000;
         $txOut = new TransactionOutput($value, $addr->getScriptPubKey());
 
-        $addrCreator = new AddressCreator();
-        $unsigned = (new TxBuilder())
+        $addrCreator = new AddressCreator;
+        $unsigned = (new TxBuilder)
             ->input('5077666f78045cb3482f64ee5d203366363af71436c1bb6db8b49c428a53f00d', 0)
             ->payToAddress($value, $addrCreator->fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
             ->get();
 
-        $signData = (new SignData())
+        $signData = (new SignData)
             ->p2sh($p2sh);
 
         $signer = (new Signer($unsigned))
-            ->padUnsignedMultisigs(true)
-        ;
+            ->padUnsignedMultisigs(true);
 
         $signer
             ->input(0, $txOut, $signData)
             ->sign($keys[0], SigHash::ALL)
-            ->sign($keys[1], SigHash::ALL)
-        ;
+            ->sign($keys[1], SigHash::ALL);
 
         $signed = $signer->get();
 
         $fullySigned = $signed->getInput(0)->getScript();
         $chunks = $fullySigned->getScriptParser()->decode();
-        $op_0 = new Operation(Opcodes::OP_0, new Buffer());
+        $op_0 = new Operation(Opcodes::OP_0, new Buffer);
 
-        for ($i = 0; $i < count($chunks); ++$i) {
-            $copy =[];
+        for ($i = 0; $i < count($chunks); $i++) {
+            $copy = [];
             foreach ($chunks as $j => $c) {
                 if ($i == $j) {
                     $copy[] = $op_0;
@@ -623,8 +612,7 @@ class SignerTest extends AbstractTestCase
             $exception = null;
             try {
                 $signerAgain = (new Signer($txInvalid))
-                    ->padUnsignedMultisigs(true)
-                ;
+                    ->padUnsignedMultisigs(true);
 
                 $signerAgain->input(0, $txOut, $signData);
             } catch (\Exception $e) {
@@ -632,13 +620,13 @@ class SignerTest extends AbstractTestCase
             }
 
             $this->assertInstanceOf(SignerException::class, $exception);
-            $this->assertEquals("Padding is forbidden for a fully signed multisig script", $exception->getMessage());
+            $this->assertEquals('Padding is forbidden for a fully signed multisig script', $exception->getMessage());
         }
     }
 
-    public function testFullySignedWitnessMultisigIsNotPadded()
+    public function test_fully_signed_witness_multisig_is_not_padded()
     {
-        $privFactory = new PrivateKeyFactory();
+        $privFactory = new PrivateKeyFactory;
         $keys = [
             $privFactory->fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
             $privFactory->fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
@@ -654,32 +642,30 @@ class SignerTest extends AbstractTestCase
         $value = 40000;
         $txOut = new TransactionOutput($value, $p2wsh->getOutputScript());
 
-        $addrCreator = new AddressCreator();
-        $unsigned = (new TxBuilder())
+        $addrCreator = new AddressCreator;
+        $unsigned = (new TxBuilder)
             ->input('5077666f78045cb3482f64ee5d203366363af71436c1bb6db8b49c428a53f00d', 0)
             ->payToAddress($value, $addrCreator->fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
             ->get();
 
-        $signData = (new SignData())
+        $signData = (new SignData)
             ->p2wsh($p2wsh);
 
         $signer = (new Signer($unsigned))
-            ->padUnsignedMultisigs(true)
-        ;
+            ->padUnsignedMultisigs(true);
 
         $signer
             ->input(0, $txOut, $signData)
             ->sign($keys[0], SigHash::ALL)
-            ->sign($keys[1], SigHash::ALL)
-        ;
+            ->sign($keys[1], SigHash::ALL);
 
         $signed = $signer->get();
 
         $chunks = $signed->getWitness(0)->all();
-        $op_0 = new Buffer();
+        $op_0 = new Buffer;
 
-        for ($i = 0; $i < count($chunks); ++$i) {
-            $copy =[];
+        for ($i = 0; $i < count($chunks); $i++) {
+            $copy = [];
             foreach ($chunks as $j => $c) {
                 if ($i == $j) {
                     $copy[] = $op_0;
@@ -689,15 +675,14 @@ class SignerTest extends AbstractTestCase
 
             $txMut = new TxMutator($signed);
             $txMut->witness([
-                new ScriptWitness(...$copy)
+                new ScriptWitness(...$copy),
             ]);
             $txInvalid = $txMut->done();
 
             $exception = null;
             try {
                 $signerAgain = (new Signer($txInvalid))
-                    ->padUnsignedMultisigs(true)
-                ;
+                    ->padUnsignedMultisigs(true);
 
                 $signerAgain->input(0, $txOut, $signData);
             } catch (\Exception $e) {
@@ -705,7 +690,7 @@ class SignerTest extends AbstractTestCase
             }
 
             $this->assertInstanceOf(SignerException::class, $exception);
-            $this->assertEquals("Padding is forbidden for a fully signed multisig script", $exception->getMessage());
+            $this->assertEquals('Padding is forbidden for a fully signed multisig script', $exception->getMessage());
         }
     }
 }

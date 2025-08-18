@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class MissingBip32Prefix extends \Exception
-{
-
-}
+class MissingBip32Prefix extends \Exception {}

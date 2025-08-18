@@ -22,42 +22,38 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
 
     /**
      * @dataProvider getSequenceVectors
-     * @param $node
-     * @param $eSeq
      */
-    public function testGetSequence($node, $eSeq)
+    public function test_get_sequence($node, $eSeq)
     {
-        $sequence = new HierarchicalKeySequence();
+        $sequence = new HierarchicalKeySequence;
         $this->assertEquals([$eSeq], $sequence->decodeRelative($node));
     }
 
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testDecodePathFailure()
+    public function test_decode_path_failure()
     {
-        $sequence = new HierarchicalKeySequence();
+        $sequence = new HierarchicalKeySequence;
         $sequence->decodeRelative('');
     }
 
-    public function testDecodePath()
+    public function test_decode_path()
     {
-        $sequence = new HierarchicalKeySequence();
+        $sequence = new HierarchicalKeySequence;
 
-        $expected = ['2147483648','2147483649','444','2147526030'];
+        $expected = ['2147483648', '2147483649', '444', '2147526030'];
         $this->assertEquals($expected, $sequence->decodeRelative("0'/1'/444/42382'"));
     }
 
     /**
      * @dataProvider getSequenceVectors
-     * @param $node
-     * @param $integer
      */
-    public function testDecodePathVectors($node, $integer)
+    public function test_decode_path_vectors($node, $integer)
     {
-        $sequence = new HierarchicalKeySequence();
+        $sequence = new HierarchicalKeySequence;
 
         // There should only be one, just implode to get the value
-        $this->assertEquals($integer, implode("", $sequence->decodeRelative($node)));
+        $this->assertEquals($integer, implode('', $sequence->decodeRelative($node)));
     }
 }

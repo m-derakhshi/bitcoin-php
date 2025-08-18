@@ -15,24 +15,17 @@ class OutputMutator
      */
     private $output;
 
-    /**
-     * @param TransactionOutputInterface $output
-     */
     public function __construct(TransactionOutputInterface $output)
     {
         $this->output = $output;
     }
 
-    /**
-     * @return TransactionOutputInterface
-     */
     public function done(): TransactionOutputInterface
     {
         return $this->output;
     }
 
     /**
-     * @param array $array
      * @return $this
      */
     private function replace(array $array)
@@ -46,20 +39,18 @@ class OutputMutator
     }
 
     /**
-     * @param int $value
      * @return $this
      */
     public function value(int $value)
     {
-        return $this->replace(array('value' => $value));
+        return $this->replace(['value' => $value]);
     }
 
     /**
-     * @param ScriptInterface $script
      * @return $this
      */
     public function script(ScriptInterface $script)
     {
-        return $this->replace(array('script' => $script));
+        return $this->replace(['script' => $script]);
     }
 }

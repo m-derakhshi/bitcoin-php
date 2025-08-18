@@ -28,9 +28,9 @@ class CompactSignatureTest extends AbstractTestCase
 
         $vectors = [];
 
-        $random = new Random();
+        $random = new Random;
         for ($i = 0; $i < 2; $i++) {
-            ;
+
             $message = "Message $i";
 
             foreach ($this->getEcAdapters() as $adapterRow) {
@@ -49,11 +49,8 @@ class CompactSignatureTest extends AbstractTestCase
 
     /**
      * @dataProvider getCSVectors
-     * @param EcAdapterInterface $ecAdapter
-     * @param PrivateKeyInterface $private
-     * @param string $message
      */
-    public function testCompactSignature(EcAdapterInterface $ecAdapter, PrivateKeyInterface $private, string $message)
+    public function test_compact_signature(EcAdapterInterface $ecAdapter, PrivateKeyInterface $private, string $message)
     {
         $pubKey = $private->getPublicKey();
         $msgSigner = new MessageSigner($ecAdapter);

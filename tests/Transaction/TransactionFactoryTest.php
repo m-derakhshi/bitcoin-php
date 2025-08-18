@@ -12,15 +12,15 @@ use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class TransactionFactoryTest extends AbstractTestCase
 {
-    public function testBuilder()
+    public function test_builder()
     {
         $builder = TransactionFactory::build();
         $this->assertInstanceOf(TxBuilder::class, $builder);
     }
 
-    public function testMutateSigner()
+    public function test_mutate_signer()
     {
-        $signer = TransactionFactory::mutate(new Transaction());
+        $signer = TransactionFactory::mutate(new Transaction);
         $this->assertInstanceOf(TxMutator::class, $signer);
     }
 }

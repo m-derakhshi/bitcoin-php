@@ -9,9 +9,9 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class SignedMessageMagicTest extends AbstractTestCase
 {
-    public function testGetSignedMessageMagic()
+    public function test_get_signed_message_magic()
     {
-        $bitcoin = new Bitcoin();
-        $this->assertEquals("Bitcoin Signed Message", $bitcoin->getSignedMessageMagic());
+        $bitcoin = new Bitcoin;
+        $this->assertEquals('Bitcoin Signed Message', $bitcoin->getSignedMessageMagic());
     }
 }

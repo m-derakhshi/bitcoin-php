@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . "/../vendor/autoload.php";
+require __DIR__.'/../vendor/autoload.php';
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
@@ -13,14 +13,14 @@ use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 
 // Lets pretend the coins are owned by this guy
-$privKeyFactory = new PrivateKeyFactory();
-$originPriv = $privKeyFactory->fromWif("KzBmWku6EuUXbhSym74RXUE7bKWdNanc8vTqxFrMxEstofCWsKgH");
+$privKeyFactory = new PrivateKeyFactory;
+$originPriv = $privKeyFactory->fromWif('KzBmWku6EuUXbhSym74RXUE7bKWdNanc8vTqxFrMxEstofCWsKgH');
 $originSpk = ScriptFactory::scriptPubKey()->p2pkh($originPriv->getPubKeyHash());
 
 // 2 people want to receive BTC in a 2-of-2, so they contribute their
 // public keys, and make a P2SH multisignature address
-$privKey1 = $privKeyFactory->fromWif("L3WyxitKt4DQrhcdTEnyzLWWyurf2fz1iqCdAbuUXaUmSM328JWv");
-$privKey2 = $privKeyFactory->fromWif("L45C3XqWziQVnifEQdzwYmpGG5SPXxFv5Es8bnjE5QXZF5K8bSGh");
+$privKey1 = $privKeyFactory->fromWif('L3WyxitKt4DQrhcdTEnyzLWWyurf2fz1iqCdAbuUXaUmSM328JWv');
+$privKey2 = $privKeyFactory->fromWif('L45C3XqWziQVnifEQdzwYmpGG5SPXxFv5Es8bnjE5QXZF5K8bSGh');
 $pubKeys = array_map(function (PrivateKeyInterface $priv) {
     return $priv->getPublicKey();
 }, [$privKey1, $privKey2]);
@@ -39,7 +39,7 @@ $scriptPubKey = $p2shMultisig->getOutputScript();
 $outpoint = new OutPoint(Buffer::hex('a54255bc701c9746319b97d044bf90d4193d5f513de0fe759a1dff4e0c760155', 32), 0);
 $txOut = new TransactionOutput(100000000, $originSpk);
 
-$unsigned = (new TxBuilder())
+$unsigned = (new TxBuilder)
     ->spendOutPoint($outpoint)
     ->output(95590000, $scriptPubKey)
     ->get();
@@ -49,9 +49,9 @@ $input = $signer->input(0, $txOut);
 $input->sign($originPriv);
 
 // Check signatures
-echo "Script validation result: " . ($input->verify() ? "yay\n" : "nay\n");
+echo 'Script validation result: '.($input->verify() ? "yay\n" : "nay\n");
 
 $signed = $signer->get();
 
-echo $signed->getHex() . PHP_EOL;
+echo $signed->getHex().PHP_EOL;
 echo "txid: {$signed->getTxId()->getHex()}\n";

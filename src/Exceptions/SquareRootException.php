@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class SquareRootException extends \Exception
-{
-
-}
+class SquareRootException extends \Exception {}

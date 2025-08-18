@@ -18,34 +18,25 @@ interface TransactionInterface extends SerializableInterface
      */
     const MAX_LOCKTIME = 4294967295;
 
-    /**
-     * @return bool
-     */
     public function isCoinbase(): bool;
 
     /**
      * Get the transactions sha256d hash.
-     *
-     * @return BufferInterface
      */
     public function getTxHash(): BufferInterface;
 
     /**
      * Get the little-endian sha256d hash.
-     * @return BufferInterface
      */
     public function getTxId(): BufferInterface;
 
     /**
      * Get the little endian sha256d hash including witness data
-     * @return BufferInterface
      */
     public function getWitnessTxId(): BufferInterface;
 
     /**
      * Get the version of this transaction
-     *
-     * @return int
      */
     public function getVersion(): int;
 
@@ -56,10 +47,6 @@ interface TransactionInterface extends SerializableInterface
      */
     public function getInputs(): array;
 
-    /**
-     * @param int $index
-     * @return TransactionInputInterface
-     */
     public function getInput(int $index): TransactionInputInterface;
 
     /**
@@ -69,16 +56,8 @@ interface TransactionInterface extends SerializableInterface
      */
     public function getOutputs(): array;
 
-    /**
-     * @param int $vout
-     * @return TransactionOutputInterface
-     */
     public function getOutput(int $vout): TransactionOutputInterface;
 
-    /**
-     * @param int $index
-     * @return ScriptWitnessInterface
-     */
     public function getWitness(int $index): ScriptWitnessInterface;
 
     /**
@@ -86,22 +65,12 @@ interface TransactionInterface extends SerializableInterface
      */
     public function getWitnesses(): array;
 
-    /**
-     * @param int $vout
-     * @return OutPointInterface
-     */
     public function makeOutPoint(int $vout): OutPointInterface;
 
-    /**
-     * @param int $vout
-     * @return Utxo
-     */
     public function makeUtxo(int $vout): Utxo;
 
     /**
      * Return the locktime for this transaction
-     *
-     * @return int
      */
     public function getLockTime(): int;
 
@@ -110,30 +79,16 @@ interface TransactionInterface extends SerializableInterface
      */
     public function getValueOut();
 
-    /**
-     * @return bool
-     */
     public function hasWitness(): bool;
 
-    /**
-     * @param TransactionInterface $tx
-     * @return bool
-     */
     public function equals(TransactionInterface $tx): bool;
 
-    /**
-     * @return BufferInterface
-     */
     public function getBaseSerialization(): BufferInterface;
 
-    /**
-     * @return BufferInterface
-     */
     public function getWitnessSerialization(): BufferInterface;
 
     /**
      * @deprecated
-     * @return BufferInterface
      */
     public function getWitnessBuffer(): BufferInterface;
 }

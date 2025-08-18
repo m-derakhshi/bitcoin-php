@@ -16,13 +16,13 @@ class BlockSerializerTest extends AbstractTestCase
     /**
      * @expectedException \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
-    public function testInvalidParse()
+    public function test_invalid_parse()
     {
         $serializer = new BlockSerializer(
             new Math,
             new BlockHeaderSerializer,
-            new TransactionSerializer()
+            new TransactionSerializer
         );
-        $serializer->parse(new Buffer());
+        $serializer->parse(new Buffer);
     }
 }

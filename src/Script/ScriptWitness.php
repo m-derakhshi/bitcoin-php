@@ -10,10 +10,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 class ScriptWitness extends StaticBufferCollection implements ScriptWitnessInterface
 {
-    /**
-     * @param ScriptWitnessInterface $witness
-     * @return bool
-     */
     public function equals(ScriptWitnessInterface $witness): bool
     {
         $nStack = count($this);
@@ -22,7 +18,7 @@ class ScriptWitness extends StaticBufferCollection implements ScriptWitnessInter
         }
 
         for ($i = 0; $i < $nStack; $i++) {
-            if (false === $this->offsetGet($i)->equals($witness->offsetGet($i))) {
+            if ($this->offsetGet($i)->equals($witness->offsetGet($i)) === false) {
                 return false;
             }
         }
@@ -30,11 +26,8 @@ class ScriptWitness extends StaticBufferCollection implements ScriptWitnessInter
         return true;
     }
 
-    /**
-     * @return \BitWasp\Buffertools\BufferInterface
-     */
     public function getBuffer(): BufferInterface
     {
-        return (new ScriptWitnessSerializer())->serialize($this);
+        return (new ScriptWitnessSerializer)->serialize($this);
     }
 }

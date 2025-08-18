@@ -11,7 +11,7 @@ use BitWasp\Buffertools\Buffer;
 
 class BlockLocatorTest extends AbstractTestCase
 {
-    public function testCreate()
+    public function test_create()
     {
         $hash1 = new Buffer('A', 32);
         $hash2 = new Buffer('B', 32);
@@ -22,14 +22,14 @@ class BlockLocatorTest extends AbstractTestCase
         $this->assertEquals($hashStop, $locator->getHashStop());
     }
 
-    public function testsSerializer()
+    public function tests_serializer()
     {
         $hash1 = new Buffer(str_pad('', 32, 'A'), 32);
         $hash2 = new Buffer(str_pad('', 32, 'A'), 32);
         $hashStop = new Buffer(str_pad('', 32, '0'), 32);
         $locator = new BlockLocator([$hash1, $hash2], $hashStop);
 
-        $serializer = new BlockLocatorSerializer();
+        $serializer = new BlockLocatorSerializer;
         $buffer = $serializer->serialize($locator);
         $this->assertEquals($buffer->getBinary(), $locator->getBinary());
 

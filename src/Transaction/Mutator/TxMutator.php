@@ -27,48 +27,36 @@ class TxMutator
      */
     private $outputsMutator;
 
-    /**
-     * @param TransactionInterface $transaction
-     */
     public function __construct(TransactionInterface $transaction)
     {
         $this->transaction = clone $transaction;
     }
 
-    /**
-     * @return InputCollectionMutator
-     */
     public function inputsMutator(): InputCollectionMutator
     {
-        if (null === $this->inputsMutator) {
+        if ($this->inputsMutator === null) {
             $this->inputsMutator = new InputCollectionMutator($this->transaction->getInputs());
         }
 
         return $this->inputsMutator;
     }
 
-    /**
-     * @return OutputCollectionMutator
-     */
     public function outputsMutator(): OutputCollectionMutator
     {
-        if (null === $this->outputsMutator) {
+        if ($this->outputsMutator === null) {
             $this->outputsMutator = new OutputCollectionMutator($this->transaction->getOutputs());
         }
 
         return $this->outputsMutator;
     }
 
-    /**
-     * @return TransactionInterface
-     */
     public function done(): TransactionInterface
     {
-        if (null !== $this->inputsMutator) {
+        if ($this->inputsMutator !== null) {
             $this->inputs($this->inputsMutator->done());
         }
 
-        if (null !== $this->outputsMutator) {
+        if ($this->outputsMutator !== null) {
             $this->outputs($this->outputsMutator->done());
         }
 
@@ -76,7 +64,6 @@ class TxMutator
     }
 
     /**
-     * @param array $array
      * @return $this
      */
     private function replace(array $array = [])
@@ -93,47 +80,45 @@ class TxMutator
     }
 
     /**
-     * @param int $nVersion
      * @return $this
      */
     public function version(int $nVersion)
     {
-        return $this->replace(array('version' => $nVersion));
+        return $this->replace(['version' => $nVersion]);
     }
 
     /**
-     * @param TransactionInputInterface[] $inputCollection
+     * @param  TransactionInputInterface[]  $inputCollection
      * @return $this
      */
     public function inputs(array $inputCollection)
     {
-        return $this->replace(array('inputs' => $inputCollection));
+        return $this->replace(['inputs' => $inputCollection]);
     }
 
     /**
-     * @param TransactionOutputInterface[] $outputCollection
+     * @param  TransactionOutputInterface[]  $outputCollection
      * @return $this
      */
     public function outputs(array $outputCollection)
     {
-        return $this->replace(array('outputs' => $outputCollection));
+        return $this->replace(['outputs' => $outputCollection]);
     }
 
     /**
-     * @param ScriptWitnessInterface[] $witnessCollection
+     * @param  ScriptWitnessInterface[]  $witnessCollection
      * @return $this
      */
     public function witness(array $witnessCollection)
     {
-        return $this->replace(array('witness' => $witnessCollection));
+        return $this->replace(['witness' => $witnessCollection]);
     }
 
     /**
-     * @param int $locktime
      * @return $this
      */
     public function locktime(int $locktime)
     {
-        return $this->replace(array('nLockTime' => $locktime));
+        return $this->replace(['nLockTime' => $locktime]);
     }
 }

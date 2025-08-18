@@ -4,24 +4,24 @@ use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\NetworkConfig;
-use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
-use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
-use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;
 use BitWasp\Bitcoin\Key\Deterministic\Slip132\Slip132;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\KeyToScriptHelper;
+use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
 use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\Base58ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 
-require __DIR__ . "/../vendor/autoload.php";
+require __DIR__.'/../vendor/autoload.php';
 
 $adapter = Bitcoin::getEcAdapter();
 $slip132 = new Slip132(new KeyToScriptHelper($adapter));
-$addrCreator = new AddressCreator();
+$addrCreator = new AddressCreator;
 
 // We're using bitcoin, and need the slip132 bitcoin registry
 $btc = NetworkFactory::bitcoin();
-$bitcoinPrefixes = new BitcoinRegistry();
+$bitcoinPrefixes = new BitcoinRegistry;
 
 // What prefixes do we want to encode/decode? Configure those here
 // Separate out this one, want it in a sec
@@ -40,14 +40,14 @@ $config = new GlobalPrefixConfig([
 
         $ypubPrefix,
         $slip132->p2wpkh($bitcoinPrefixes),
-    ])
+    ]),
 ]);
 
 $btcPrefixConfig = $config->getNetworkConfig($btc);
 $serializer = new Base58ExtendedKeySerializer(new ExtendedKeySerializer($adapter, $config));
 
-$bip39 = new Bip39SeedGenerator();
-$seed = $bip39->getSeed("insect issue net wall milk bulb stamp remind tell fee roast mansion angry stable oil");
+$bip39 = new Bip39SeedGenerator;
+$seed = $bip39->getSeed('insect issue net wall milk bulb stamp remind tell fee roast mansion angry stable oil');
 
 // This shows how we create such keys. You
 // don't actually need the config until serialize
@@ -64,7 +64,7 @@ $accountKey = $parsedKey->derivePath("44'/0'/0'"); // Can't really remember the 
 $serAccKey = $serializer->serialize($btc, $accountKey);
 echo "account key {$serAccKey}\n";
 
-$addrKey = $accountKey->derivePath("0/0");
+$addrKey = $accountKey->derivePath('0/0');
 $serAddrKey = $serializer->serialize($btc, $addrKey);
 echo "address key {$serAddrKey}\n";
 echo "addr[0] {$addrKey->getAddress($addrCreator)->getAddress($btc)}\n";

@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class MissingBase58Prefix extends \Exception
-{
-
-}
+class MissingBase58Prefix extends \Exception {}

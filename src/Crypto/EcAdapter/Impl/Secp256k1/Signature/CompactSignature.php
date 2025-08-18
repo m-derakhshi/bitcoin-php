@@ -32,15 +32,12 @@ class CompactSignature extends Signature implements CompactSignatureInterface
     private $ecAdapter;
 
     /**
-     * @param EcAdapter $ecAdapter
-     * @param resource $secp256k1_ecdsa_signature_t
-     * @param int $recid
-     * @param bool $compressed
+     * @param  resource  $secp256k1_ecdsa_signature_t
      */
     public function __construct(EcAdapter $ecAdapter, $secp256k1_ecdsa_signature_t, int $recid, bool $compressed)
     {
-        if (!is_resource($secp256k1_ecdsa_signature_t)
-            || SECP256K1_TYPE_RECOVERABLE_SIG !== get_resource_type($secp256k1_ecdsa_signature_t)
+        if (! is_resource($secp256k1_ecdsa_signature_t)
+            || get_resource_type($secp256k1_ecdsa_signature_t) !== SECP256K1_TYPE_RECOVERABLE_SIG
         ) {
             throw new \RuntimeException('CompactSignature: must pass recoverable signature resource');
         }
@@ -48,7 +45,7 @@ class CompactSignature extends Signature implements CompactSignatureInterface
         $ser = '';
         $recidout = 0;
         secp256k1_ecdsa_recoverable_signature_serialize_compact($ecAdapter->getContext(), $ser, $recidout, $secp256k1_ecdsa_signature_t);
-        list ($r, $s) = array_map(
+        [$r, $s] = array_map(
             function ($val) {
                 return (new Buffer($val))->getGmp();
             },
@@ -62,14 +59,12 @@ class CompactSignature extends Signature implements CompactSignatureInterface
         parent::__construct($ecAdapter, $r, $s, $secp256k1_ecdsa_signature_t);
     }
 
-    /**
-     * @return Signature
-     */
     public function convert(): Signature
     {
         $sig_t = '';
         /** @var resource $sig_t */
         secp256k1_ecdsa_recoverable_signature_convert($this->ecAdapter->getContext(), $sig_t, $this->resource);
+
         return new Signature($this->ecAdapter, $this->getR(), $this->getS(), $sig_t);
     }
 
@@ -81,33 +76,21 @@ class CompactSignature extends Signature implements CompactSignatureInterface
         return $this->resource;
     }
 
-    /**
-     * @return int
-     */
     public function getRecoveryId(): int
     {
         return $this->recid;
     }
 
-    /**
-     * @return int
-     */
     public function getFlags(): int
     {
         return $this->getRecoveryId() + 27 + ($this->isCompressed() ? 4 : 0);
     }
 
-    /**
-     * @return bool
-     */
     public function isCompressed(): bool
     {
         return $this->compressed;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getBuffer(): BufferInterface
     {
         return (new CompactSignatureSerializer($this->ecAdapter))->serialize($this);

@@ -15,15 +15,11 @@ interface BlockInterface extends SerializableInterface
 
     /**
      * Get the header of this block.
-     *
-     * @return BlockHeaderInterface
      */
     public function getHeader(): BlockHeaderInterface;
 
     /**
      * Calculate the merkle root of the transactions in the block.
-     *
-     * @return BufferInterface
      */
     public function getMerkleRoot(): BufferInterface;
 
@@ -34,15 +30,7 @@ interface BlockInterface extends SerializableInterface
      */
     public function getTransactions(): array;
 
-    /**
-     * @param int $i
-     * @return TransactionInterface
-     */
     public function getTransaction(int $i): TransactionInterface;
 
-    /**
-     * @param BloomFilter $filter
-     * @return FilteredBlock
-     */
     public function filter(BloomFilter $filter): FilteredBlock;
 }

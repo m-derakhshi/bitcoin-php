@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class MissingScriptException extends ScriptQualificationError
-{
-
-}
+class MissingScriptException extends ScriptQualificationError {}

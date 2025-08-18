@@ -17,17 +17,11 @@ abstract class Address implements AddressInterface
      */
     protected $hash;
 
-    /**
-     * @param BufferInterface $hash
-     */
     public function __construct(BufferInterface $hash)
     {
         $this->hash = $hash;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getHash(): BufferInterface
     {
         return $this->hash;

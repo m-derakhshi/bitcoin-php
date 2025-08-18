@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 
 class BitcoindBlockSerializer
@@ -34,10 +33,6 @@ class BitcoindBlockSerializer
      */
     private $size;
 
-    /**
-     * @param NetworkInterface $network
-     * @param BlockSerializer $blockSerializer
-     */
     public function __construct(NetworkInterface $network, BlockSerializer $blockSerializer)
     {
         $this->blockSerializer = $blockSerializer;
@@ -46,24 +41,21 @@ class BitcoindBlockSerializer
         $this->network = $network;
     }
 
-    /**
-     * @param BlockInterface $block
-     * @return BufferInterface
-     */
     public function serialize(BlockInterface $block): BufferInterface
     {
         $buffer = $this->blockSerializer->serialize($block);
+
         return new Buffer(sprintf(
-            "%s%s%s",
-            strrev(pack("H*", $this->network->getNetMagicBytes())),
-            pack("V", $buffer->getSize()),
+            '%s%s%s',
+            strrev(pack('H*', $this->network->getNetMagicBytes())),
+            pack('V', $buffer->getSize()),
             $buffer->getBinary()
         ));
     }
 
     /**
-     * @param Parser $parser
      * @return BlockInterface
+     *
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
@@ -73,7 +65,7 @@ class BitcoindBlockSerializer
          * @var Buffer $bytes
          * @var int $blockSize
          */
-        list ($bytes, $blockSize) = [$this->magic->read($parser), (int) $this->size->read($parser)];
+        [$bytes, $blockSize] = [$this->magic->read($parser), (int) $this->size->read($parser)];
         if ($bytes->getHex() !== $this->network->getNetMagicBytes()) {
             throw new \RuntimeException('Block version bytes did not match network');
         }
@@ -81,10 +73,6 @@ class BitcoindBlockSerializer
         return $this->blockSerializer->fromParser(new Parser($parser->readBytes($blockSize)));
     }
 
-    /**
-     * @param BufferInterface $data
-     * @return BlockInterface
-     */
     public function parse(BufferInterface $data): BlockInterface
     {
         return $this->fromParser(new Parser($data));

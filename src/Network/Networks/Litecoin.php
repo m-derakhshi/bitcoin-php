@@ -9,33 +9,37 @@ class Litecoin extends Network
 {
     /**
      * {@inheritdoc}
+     *
      * @see Network::$base58PrefixMap
      */
     protected $base58PrefixMap = [
-        self::BASE58_ADDRESS_P2PKH => "30",
-        self::BASE58_ADDRESS_P2SH => "32",
-        self::BASE58_WIF => "b0",
+        self::BASE58_ADDRESS_P2PKH => '30',
+        self::BASE58_ADDRESS_P2SH => '32',
+        self::BASE58_WIF => 'b0',
     ];
 
     /**
      * {@inheritdoc}
+     *
      * @see Network::$bech32PrefixMap
      */
     protected $bech32PrefixMap = [
-        self::BECH32_PREFIX_SEGWIT => "ltc",
+        self::BECH32_PREFIX_SEGWIT => 'ltc',
     ];
 
     /**
      * {@inheritdoc}
+     *
      * @see Network::$bip32PrefixMap
      */
     protected $bip32PrefixMap = [
-        self::BIP32_PREFIX_XPUB => "019da462",
-        self::BIP32_PREFIX_XPRV => "019d9cfe",
+        self::BIP32_PREFIX_XPUB => '019da462',
+        self::BIP32_PREFIX_XPRV => '019d9cfe',
     ];
 
     /**
      * {@inheritdoc}
+     *
      * @see Network::$bip32ScriptTypeMap
      */
     protected $bip32ScriptTypeMap = [
@@ -45,13 +49,15 @@ class Litecoin extends Network
 
     /**
      * {@inheritdoc}
+     *
      * @see Network::$signedMessagePrefix
      */
-    protected $signedMessagePrefix = "Litecoin Signed Message";
+    protected $signedMessagePrefix = 'Litecoin Signed Message';
 
     /**
      * {@inheritdoc}
+     *
      * @see Network::$p2pMagic
      */
-    protected $p2pMagic = "dbb6c0fb";
+    protected $p2pMagic = 'dbb6c0fb';
 }

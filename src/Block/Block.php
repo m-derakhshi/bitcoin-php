@@ -37,9 +37,8 @@ class Block extends Serializable implements BlockInterface
 
     /**
      * Block constructor.
-     * @param Math $math
-     * @param BlockHeaderInterface $header
-     * @param TransactionInterface[] ...$transactions
+     *
+     * @param  TransactionInterface[]  ...$transactions
      */
     public function __construct(Math $math, BlockHeaderInterface $header, TransactionInterface ...$transactions)
     {
@@ -50,6 +49,7 @@ class Block extends Serializable implements BlockInterface
 
     /**
      * {@inheritdoc}
+     *
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getHeader()
      */
     public function getHeader(): BlockHeaderInterface
@@ -59,12 +59,14 @@ class Block extends Serializable implements BlockInterface
 
     /**
      * {@inheritdoc}
+     *
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getMerkleRoot()
+     *
      * @throws \BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty
      */
     public function getMerkleRoot(): BufferInterface
     {
-        if (null === $this->merkleRoot) {
+        if ($this->merkleRoot === null) {
             $this->merkleRoot = new MerkleRoot($this->math, $this->getTransactions());
         }
 
@@ -73,6 +75,7 @@ class Block extends Serializable implements BlockInterface
 
     /**
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getTransactions()
+     *
      * @return TransactionInterface[]
      */
     public function getTransactions(): array
@@ -82,22 +85,16 @@ class Block extends Serializable implements BlockInterface
 
     /**
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getTransaction()
-     * @param int $i
-     * @return TransactionInterface
      */
     public function getTransaction(int $i): TransactionInterface
     {
-        if (!array_key_exists($i, $this->transactions)) {
-            throw new \InvalidArgumentException("No transaction in the block with this index");
+        if (! array_key_exists($i, $this->transactions)) {
+            throw new \InvalidArgumentException('No transaction in the block with this index');
         }
 
         return $this->transactions[$i];
     }
 
-    /**
-     * @param BloomFilter $filter
-     * @return FilteredBlock
-     */
     public function filter(BloomFilter $filter): FilteredBlock
     {
         $vMatch = [];
@@ -115,10 +112,11 @@ class Block extends Serializable implements BlockInterface
 
     /**
      * {@inheritdoc}
+     *
      * @see \BitWasp\Buffertools\SerializableInterface::getBuffer()
      */
     public function getBuffer(): BufferInterface
     {
-        return (new BlockSerializer($this->math, new BlockHeaderSerializer(), new TransactionSerializer()))->serialize($this);
+        return (new BlockSerializer($this->math, new BlockHeaderSerializer, new TransactionSerializer))->serialize($this);
     }
 }

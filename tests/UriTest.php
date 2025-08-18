@@ -10,66 +10,66 @@ use BitWasp\Bitcoin\Uri;
 
 class UriTest extends AbstractTestCase
 {
-    public function testDefault()
+    public function test_default()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $addrCreator = new AddressCreator();
+        $addrCreator = new AddressCreator;
         $address = $addrCreator->fromString($string);
         $uri = new Uri($address);
         $this->assertEquals('bitcoin:'.$string, $uri->uri());
     }
 
-    public function testAmount()
+    public function test_amount()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $addrCreator = new AddressCreator();
+        $addrCreator = new AddressCreator;
         $address = $addrCreator->fromString($string);
         $uri = new Uri($address);
 
-        $amount = new Amount();
+        $amount = new Amount;
         $uri->setAmount($amount, 1);
 
-        $this->assertEquals('bitcoin:'.$string."?amount=0.00000001", $uri->uri());
+        $this->assertEquals('bitcoin:'.$string.'?amount=0.00000001', $uri->uri());
     }
 
-    public function testAmountBtc()
+    public function test_amount_btc()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $addrCreator = new AddressCreator();
+        $addrCreator = new AddressCreator;
         $address = $addrCreator->fromString($string);
         $uri = new Uri($address);
 
         $uri->setAmountBtc('1');
 
-        $this->assertEquals('bitcoin:'.$string."?amount=1", $uri->uri());
+        $this->assertEquals('bitcoin:'.$string.'?amount=1', $uri->uri());
     }
 
-    public function testLabel()
+    public function test_label()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $addrCreator = new AddressCreator();
+        $addrCreator = new AddressCreator;
         $address = $addrCreator->fromString($string);
         $uri = new Uri($address);
         $uri->setLabel('this is the label');
 
-        $this->assertEquals('bitcoin:'.$string."?label=this+is+the+label", $uri->uri());
+        $this->assertEquals('bitcoin:'.$string.'?label=this+is+the+label', $uri->uri());
     }
 
-    public function testMessage()
+    public function test_message()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $addrCreator = new AddressCreator();
+        $addrCreator = new AddressCreator;
         $address = $addrCreator->fromString($string);
         $uri = new Uri($address);
         $uri->setMessage('this is the label');
 
-        $this->assertEquals('bitcoin:'.$string."?message=this+is+the+label", $uri->uri());
+        $this->assertEquals('bitcoin:'.$string.'?message=this+is+the+label', $uri->uri());
     }
 
-    public function testRequestUrl()
+    public function test_request_url()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $addrCreator = new AddressCreator();
+        $addrCreator = new AddressCreator;
         $address = $addrCreator->fromString($string);
         $uri = new Uri($address);
         $uri->setRequestUrl('https://example.com/request');
@@ -80,13 +80,13 @@ class UriTest extends AbstractTestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testBip21MustProvideAddress()
+    public function test_bip21_must_provide_address()
     {
         $address = null;
         new Uri($address);
     }
 
-    public function testBip72Incompatible()
+    public function test_bip72_incompatible()
     {
         $address = null;
         $uri = new Uri($address, Uri::BIP0072);

@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 class OutputCollectionMutator extends AbstractCollectionMutator
 {
     /**
-     * @param TransactionOutputInterface[] $outputs
+     * @param  TransactionOutputInterface[]  $outputs
      */
     public function __construct(array $outputs)
     {
@@ -21,21 +21,17 @@ class OutputCollectionMutator extends AbstractCollectionMutator
         }
     }
 
-    /**
-     * @return OutputMutator
-     */
     public function current(): OutputMutator
     {
         return $this->set->current();
     }
 
     /**
-     * @param int $offset
-     * @return OutputMutator
+     * @param  int  $offset
      */
     public function offsetGet($offset): OutputMutator
     {
-        if (!$this->set->offsetExists($offset)) {
+        if (! $this->set->offsetExists($offset)) {
             throw new \OutOfRangeException('Nothing found at this offset');
         }
 
@@ -56,8 +52,6 @@ class OutputCollectionMutator extends AbstractCollectionMutator
     }
 
     /**
-     * @param int $start
-     * @param int $length
      * @return $this
      */
     public function slice(int $start, int $length)
@@ -68,6 +62,7 @@ class OutputCollectionMutator extends AbstractCollectionMutator
         }
 
         $this->set = \SplFixedArray::fromArray(array_slice($this->set->toArray(), $start, $length), false);
+
         return $this;
     }
 
@@ -77,11 +72,11 @@ class OutputCollectionMutator extends AbstractCollectionMutator
     public function null()
     {
         $this->slice(0, 0);
+
         return $this;
     }
 
     /**
-     * @param TransactionOutputInterface $output
      * @return $this
      */
     public function add(TransactionOutputInterface $output)
@@ -90,17 +85,18 @@ class OutputCollectionMutator extends AbstractCollectionMutator
         $this->set->setSize($size + 1);
 
         $this->set[$size] = new OutputMutator($output);
+
         return $this;
     }
 
     /**
-     * @param int $i
-     * @param TransactionOutputInterface $output
+     * @param  int  $i
      * @return $this
      */
     public function set($i, TransactionOutputInterface $output)
     {
         $this->set[$i] = new OutputMutator($output);
+
         return $this;
     }
 }

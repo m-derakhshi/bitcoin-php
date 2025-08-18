@@ -14,26 +14,26 @@ use BitWasp\Buffertools\Buffer;
 
 class ParsedScriptTest extends AbstractTestCase
 {
-    public function testRequiresRootLogicOpNode()
+    public function test_requires_root_logic_op_node()
     {
-        $root = new LogicOpNode();
-        list ($child, ) = $root->split();
+        $root = new LogicOpNode;
+        [$child] = $root->split();
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("LogicOpNode was not for root");
+        $this->expectExceptionMessage('LogicOpNode was not for root');
 
-        new ParsedScript(new Script(new Buffer()), $child, []);
+        new ParsedScript(new Script(new Buffer), $child, []);
     }
 
-    public function testGetBranchByPathWroks()
+    public function test_get_branch_by_path_wroks()
     {
         $script = new Script(new Buffer("\x01\x01"));
         $onlyPath = [];
         $onlyBranch = new ScriptBranch($script, $onlyPath, [
-            [new Operation(1, new Buffer("\x01"))]
+            [new Operation(1, new Buffer("\x01"))],
         ]);
 
-        $ps = new ParsedScript($script, new LogicOpNode(), [
+        $ps = new ParsedScript($script, new LogicOpNode, [
             $onlyBranch,
         ]);
 
@@ -41,34 +41,34 @@ class ParsedScriptTest extends AbstractTestCase
         $this->assertSame($onlyBranch, $branch);
     }
 
-    public function testGetBranchByPathFailsForUnknownPath()
+    public function test_get_branch_by_path_fails_for_unknown_path()
     {
         $script = new Script(new Buffer("\x01\x01"));
         $onlyPath = [];
         $onlyBranch = new ScriptBranch($script, $onlyPath, [
-            [new Operation(1, new Buffer("\x01"))]
+            [new Operation(1, new Buffer("\x01"))],
         ]);
 
-        $ps = new ParsedScript($script, new LogicOpNode(), [
+        $ps = new ParsedScript($script, new LogicOpNode, [
             $onlyBranch,
         ]);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("Unknown logical pathway");
+        $this->expectExceptionMessage('Unknown logical pathway');
 
         $ps->getBranchByPath([true, false, false, true]);
     }
 
-    public function testRejectsDuplicatePaths()
+    public function test_rejects_duplicate_paths()
     {
         $script = new Script(new Buffer("\x0101"));
         $branch = new ScriptBranch($script, [], [
-            [new Operation(1, new Buffer("\x01"))]
+            [new Operation(1, new Buffer("\x01"))],
         ]);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("Duplicate logical pathway, invalid ScriptBranch found");
+        $this->expectExceptionMessage('Duplicate logical pathway, invalid ScriptBranch found');
 
-        new ParsedScript($script, new LogicOpNode(), [$branch, $branch]);
+        new ParsedScript($script, new LogicOpNode, [$branch, $branch]);
     }
 }

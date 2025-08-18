@@ -11,7 +11,6 @@ use BitWasp\Buffertools\Parser;
 
 class FilteredBlockSerializer
 {
-
     /**
      * @var BlockHeaderSerializer
      */
@@ -22,20 +21,12 @@ class FilteredBlockSerializer
      */
     private $treeSerializer;
 
-    /**
-     * @param BlockHeaderSerializer $header
-     * @param PartialMerkleTreeSerializer $tree
-     */
     public function __construct(BlockHeaderSerializer $header, PartialMerkleTreeSerializer $tree)
     {
         $this->headerSerializer = $header;
         $this->treeSerializer = $tree;
     }
 
-    /**
-     * @param Parser $parser
-     * @return FilteredBlock
-     */
     public function fromParser(Parser $parser): FilteredBlock
     {
         return new FilteredBlock(
@@ -44,19 +35,11 @@ class FilteredBlockSerializer
         );
     }
 
-    /**
-     * @param BufferInterface $data
-     * @return FilteredBlock
-     */
     public function parse(BufferInterface $data): FilteredBlock
     {
         return $this->fromParser(new Parser($data));
     }
 
-    /**
-     * @param FilteredBlock $merkleBlock
-     * @return BufferInterface
-     */
     public function serialize(FilteredBlock $merkleBlock): BufferInterface
     {
         return Buffertools::concat(

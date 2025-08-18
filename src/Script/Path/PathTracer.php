@@ -40,20 +40,16 @@ class PathTracer
 
     /**
      * Add an operation to current segment
-     * @param Operation $operation
      */
     private function addToCurrent(Operation $operation)
     {
         $this->current[] = $operation;
     }
 
-    /**
-     * @param Operation $operation
-     */
     public function operation(Operation $operation)
     {
         if ($this->done) {
-            throw new \RuntimeException("Cannot add operation to finished PathTracer");
+            throw new \RuntimeException('Cannot add operation to finished PathTracer');
         }
 
         if ($operation->isLogical()) {
@@ -69,9 +65,6 @@ class PathTracer
         }
     }
 
-    /**
-     * @return array
-     */
     public function done(): array
     {
         if ($this->done) {

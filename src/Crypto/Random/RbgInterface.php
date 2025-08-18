@@ -10,9 +10,6 @@ interface RbgInterface
 {
     /**
      * Return $numBytes bytes deterministically derived from a seed
-     *
-     * @param int $numNumBytes
-     * @return BufferInterface
      */
     public function bytes(int $numNumBytes): BufferInterface;
 }

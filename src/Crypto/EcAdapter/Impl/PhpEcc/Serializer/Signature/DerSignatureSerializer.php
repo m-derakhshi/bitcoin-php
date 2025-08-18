@@ -28,26 +28,18 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
      */
     private $varstring;
 
-    /**
-     * @param EcAdapter $adapter
-     */
     public function __construct(EcAdapter $adapter)
     {
         $this->ecAdapter = $adapter;
         $this->varstring = Types::varstring();
     }
 
-    /**
-     * @return EcAdapterInterface
-     */
     public function getEcAdapter(): EcAdapterInterface
     {
         return $this->ecAdapter;
     }
 
     /**
-     * @param SignatureInterface $signature
-     * @return BufferInterface
      * @throws \Exception
      */
     public function serialize(SignatureInterface $signature): BufferInterface
@@ -78,15 +70,13 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     }
 
     /**
-     * @param Parser $parser
-     * @return SignatureInterface
      * @throws ParserOutOfRange
      */
     public function fromParser(Parser $parser): SignatureInterface
     {
         $prefix = $parser->readBytes(1);
         if ($prefix->getBinary() != "\x30") {
-            throw new \RuntimeException("invalid signature");
+            throw new \RuntimeException('invalid signature');
         }
         $inner = $this->varstring->read($parser);
 
@@ -95,13 +85,13 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
 
             $rPref = $pinner->readBytes(1);
             if ($rPref->getBinary() != "\x02") {
-                throw new \RuntimeException("invalid signature");
+                throw new \RuntimeException('invalid signature');
             }
             $r = $this->varstring->read($pinner);
 
             $sPref = $pinner->readBytes(1);
             if ($sPref->getBinary() != "\x02") {
-                throw new \RuntimeException("invalid signature");
+                throw new \RuntimeException('invalid signature');
             }
             $s = $this->varstring->read($pinner);
         } catch (ParserOutOfRange $e) {
@@ -112,8 +102,6 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     }
 
     /**
-     * @param BufferInterface $derSignature
-     * @return SignatureInterface
      * @throws ParserOutOfRange
      */
     public function parse(BufferInterface $derSignature): SignatureInterface

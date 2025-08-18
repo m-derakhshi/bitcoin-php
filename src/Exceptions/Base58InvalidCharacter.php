@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class Base58InvalidCharacter extends \Exception
-{
-
-}
+class Base58InvalidCharacter extends \Exception {}

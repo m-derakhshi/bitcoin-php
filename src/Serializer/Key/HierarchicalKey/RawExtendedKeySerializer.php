@@ -45,7 +45,6 @@ class RawExtendedKeySerializer
 
     /**
      * RawExtendedKeySerializer constructor.
-     * @param EcAdapterInterface $ecAdapter
      */
     public function __construct(EcAdapterInterface $ecAdapter)
     {
@@ -58,25 +57,21 @@ class RawExtendedKeySerializer
     }
 
     /**
-     * @param RawKeyParams $keyParams
-     * @return BufferInterface
      * @throws \Exception
      */
     public function serialize(RawKeyParams $keyParams): BufferInterface
     {
         return new Buffer(
-            pack("H*", $keyParams->getPrefix()) .
-            $this->uint8->write($keyParams->getDepth()) .
-            $this->uint32->write($keyParams->getParentFingerprint()) .
-            $this->uint32->write($keyParams->getSequence()) .
-            $this->bytestring32->write($keyParams->getChainCode()) .
+            pack('H*', $keyParams->getPrefix()).
+            $this->uint8->write($keyParams->getDepth()).
+            $this->uint32->write($keyParams->getParentFingerprint()).
+            $this->uint32->write($keyParams->getSequence()).
+            $this->bytestring32->write($keyParams->getChainCode()).
             $this->bytestring33->write($keyParams->getKeyData())
         );
     }
 
     /**
-     * @param Parser $parser
-     * @return RawKeyParams
      * @throws ParserOutOfRange
      */
     public function fromParser(Parser $parser): RawKeyParams

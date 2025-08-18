@@ -16,19 +16,12 @@ abstract class Key extends Serializable implements KeyInterface
      */
     protected $pubKeyHash;
 
-    /**
-     * @return bool
-     */
     public function isPrivate(): bool
     {
         return $this instanceof PrivateKeyInterface;
     }
 
-    /**
-     * @param PublicKeySerializerInterface|null $serializer
-     * @return \BitWasp\Buffertools\BufferInterface
-     */
-    public function getPubKeyHash(PublicKeySerializerInterface $serializer = null): BufferInterface
+    public function getPubKeyHash(?PublicKeySerializerInterface $serializer = null): BufferInterface
     {
         if ($this instanceof PrivateKeyInterface) {
             $publicKey = $this->getPublicKey();
@@ -36,7 +29,7 @@ abstract class Key extends Serializable implements KeyInterface
             $publicKey = $this;
         }
 
-        if (null === $this->pubKeyHash) {
+        if ($this->pubKeyHash === null) {
             $this->pubKeyHash = Hash::sha256ripe160($serializer ? $serializer->serialize($publicKey) : $publicKey->getBuffer());
         }
 

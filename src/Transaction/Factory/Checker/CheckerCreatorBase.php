@@ -30,9 +30,6 @@ abstract class CheckerCreatorBase
 
     /**
      * CheckerCreator constructor.
-     * @param EcAdapterInterface $ecAdapter
-     * @param TransactionSignatureSerializer $txSigSerializer
-     * @param PublicKeySerializerInterface $pubKeySerializer
      */
     public function __construct(
         EcAdapterInterface $ecAdapter,
@@ -44,11 +41,5 @@ abstract class CheckerCreatorBase
         $this->pubKeySerializer = $pubKeySerializer;
     }
 
-    /**
-     * @param TransactionInterface $tx
-     * @param int $nInput
-     * @param TransactionOutputInterface $txOut
-     * @return CheckerBase
-     */
     abstract public function create(TransactionInterface $tx, int $nInput, TransactionOutputInterface $txOut): CheckerBase;
 }

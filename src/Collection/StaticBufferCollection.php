@@ -23,44 +23,34 @@ class StaticBufferCollection extends StaticCollection
 
     /**
      * StaticBufferCollection constructor.
-     * @param BufferInterface ...$values
      */
-    public function __construct(BufferInterface... $values)
+    public function __construct(BufferInterface ...$values)
     {
         $this->set = $values;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function bottom(): BufferInterface
     {
         return parent::bottom();
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function top(): BufferInterface
     {
         return parent::top();
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function current(): BufferInterface
     {
         return $this->set[$this->position];
     }
 
     /**
-     * @param int $offset
+     * @param  int  $offset
      * @return BufferInterface
      */
     public function offsetGet($offset)
     {
-        if (!array_key_exists($offset, $this->set)) {
+        if (! array_key_exists($offset, $this->set)) {
             throw new \OutOfRangeException('No offset found');
         }
 

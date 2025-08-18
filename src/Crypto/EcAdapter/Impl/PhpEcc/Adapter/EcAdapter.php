@@ -28,19 +28,12 @@ class EcAdapter implements EcAdapterInterface
      */
     private $generator;
 
-    /**
-     * @param Math $math
-     * @param GeneratorPoint $generator
-     */
     public function __construct(Math $math, GeneratorPoint $generator)
     {
         $this->math = $math;
         $this->generator = $generator;
     }
 
-    /**
-     * @return Math
-     */
     public function getMath(): Math
     {
         return $this->math;
@@ -54,18 +47,13 @@ class EcAdapter implements EcAdapterInterface
         return $this->generator;
     }
 
-    /**
-     * @return \GMP
-     */
     public function getOrder(): \GMP
     {
         return $this->generator->getOrder();
     }
 
     /**
-     * @param \GMP $scalar
-     * @param bool|false $compressed
-     * @return PrivateKeyInterface
+     * @param  bool|false  $compressed
      */
     public function getPrivateKey(\GMP $scalar, bool $compressed = false): PrivateKeyInterface
     {
@@ -73,9 +61,8 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param BufferInterface $messageHash
-     * @param CompactSignature|CompactSignatureInterface $signature
-     * @return PublicKeyInterface
+     * @param  CompactSignature|CompactSignatureInterface  $signature
+     *
      * @throws \Exception
      */
     public function recover(BufferInterface $messageHash, CompactSignatureInterface $signature): PublicKeyInterface
@@ -95,7 +82,7 @@ class EcAdapter implements EcAdapterInterface
         $pOverFour = $math->div($math->add($curve->getPrime(), $one), gmp_init(4));
 
         // 1.1 Compute x
-        if (!$isSecondKey) {
+        if (! $isSecondKey) {
             $x = $r;
         } else {
             $x = $math->add($r, $G->getOrder());
@@ -137,11 +124,6 @@ class EcAdapter implements EcAdapterInterface
     /**
      * Attempt to calculate the public key recovery param by trial and error
      *
-     * @param \GMP $r
-     * @param \GMP $s
-     * @param BufferInterface $messageHash
-     * @param PublicKey $publicKey
-     * @return int
      * @throws \Exception
      */
     public function calcPubKeyRecoveryParam(\GMP $r, \GMP $s, BufferInterface $messageHash, PublicKey $publicKey): int
@@ -161,22 +143,14 @@ class EcAdapter implements EcAdapterInterface
         throw new \Exception('Failed to find valid recovery factor');
     }
 
-    /**
-     * @param BufferInterface $privateKey
-     * @return bool
-     */
     public function validatePrivateKey(BufferInterface $privateKey): bool
     {
         $math = $this->math;
         $scalar = $privateKey->getGmp();
+
         return $math->cmp($scalar, gmp_init(0)) > 0 && $math->cmp($scalar, $this->getOrder()) < 0;
     }
 
-    /**
-     * @param \GMP $element
-     * @param bool $half
-     * @return bool
-     */
     public function validateSignatureElement(\GMP $element, bool $half = false): bool
     {
         $math = $this->getMath();
@@ -189,8 +163,6 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param BufferInterface $publicKey
-     * @return PublicKeyInterface
      * @throws \Exception
      */
     public function publicKeyFromBuffer(BufferInterface $publicKey): PublicKeyInterface
@@ -202,7 +174,7 @@ class EcAdapter implements EcAdapterInterface
             if ($size !== PublicKey::LENGTH_UNCOMPRESSED) {
                 throw new \Exception('Invalid length for uncompressed key');
             }
-        } else if ($prefix === PublicKey::KEY_COMPRESSED_EVEN || $prefix === PublicKey::KEY_COMPRESSED_ODD) {
+        } elseif ($prefix === PublicKey::KEY_COMPRESSED_EVEN || $prefix === PublicKey::KEY_COMPRESSED_ODD) {
             if ($size !== PublicKey::LENGTH_COMPRESSED) {
                 throw new \Exception('Invalid length for compressed key');
             }
@@ -210,7 +182,7 @@ class EcAdapter implements EcAdapterInterface
         } else {
             throw new \Exception('Unknown public key prefix');
         }
-        
+
         $x = $publicKey->slice(1, 32)->getGmp();
         $curve = $this->generator->getCurve();
         $y = $compressed

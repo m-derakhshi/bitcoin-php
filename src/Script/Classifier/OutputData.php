@@ -26,9 +26,8 @@ class OutputData
 
     /**
      * OutputData constructor.
-     * @param string $type
-     * @param ScriptInterface $script
-     * @param mixed $solution
+     *
+     * @param  mixed  $solution
      */
     public function __construct(string $type, ScriptInterface $script, $solution)
     {
@@ -37,17 +36,11 @@ class OutputData
         $this->solution = $solution;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return ScriptInterface
-     */
     public function getScript(): ScriptInterface
     {
         return $this->script;
@@ -61,9 +54,6 @@ class OutputData
         return $this->solution;
     }
 
-    /**
-     * @return bool
-     */
     public function canSign(): bool
     {
         return in_array($this->type, [ScriptType::MULTISIG, ScriptType::P2PK, ScriptType::P2PKH]);

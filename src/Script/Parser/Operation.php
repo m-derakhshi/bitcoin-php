@@ -38,9 +38,6 @@ class Operation
 
     /**
      * Operation constructor.
-     * @param int $opCode
-     * @param BufferInterface $pushData
-     * @param int $pushDataSize
      */
     public function __construct(int $opCode, BufferInterface $pushData, int $pushDataSize = 0)
     {
@@ -62,45 +59,29 @@ class Operation
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isPush(): bool
     {
         return $this->push;
     }
 
-    /**
-     * @return bool
-     */
     public function isLogical(): bool
     {
-        return !$this->isPush() && in_array($this->opCode, self::$logical);
+        return ! $this->isPush() && in_array($this->opCode, self::$logical);
     }
 
-
-    /**
-     * @return int
-     */
     public function getOp(): int
     {
         return $this->opCode;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getData(): BufferInterface
     {
         return $this->pushData;
     }
 
-    /**
-     * @return int
-     */
     public function getDataSize(): int
     {
-        if (!$this->push) {
+        if (! $this->push) {
             throw new \RuntimeException("Op wasn't a push operation");
         }
 

@@ -27,8 +27,8 @@ class RbfTransactionTest extends AbstractTestCase
         parent::__construct($name, $data, $dataName);
 
         static $rpcFactory = null;
-        if (null === $rpcFactory) {
-            $rpcFactory = new RegtestBitcoinFactory();
+        if ($rpcFactory === null) {
+            $rpcFactory = new RegtestBitcoinFactory;
         }
         $this->rpcFactory = $rpcFactory;
     }
@@ -55,10 +55,10 @@ class RbfTransactionTest extends AbstractTestCase
     }
 
     /**
-     * @param Utxo[] $utxos
-     * @param PrivateKeyInterface[] $privKeys
-     * @param TransactionOutput[] $outputs
-     * @param array $sequences - sequence to set on inputs
+     * @param  Utxo[]  $utxos
+     * @param  PrivateKeyInterface[]  $privKeys
+     * @param  TransactionOutput[]  $outputs
+     * @param  array  $sequences  - sequence to set on inputs
      * @return TransactionInterface
      */
     private function createTransaction(array $utxos, array $privKeys, array $outputs, array $sequences)
@@ -67,7 +67,7 @@ class RbfTransactionTest extends AbstractTestCase
         $this->assertEquals(count($utxos), count($sequences));
 
         // First transaction, spends UTXO 0, to $destSPK 0.25 and $changeSPK 0.2499
-        $txBuilder = new TxBuilder();
+        $txBuilder = new TxBuilder;
 
         $totalIn = 0;
         foreach ($utxos as $i => $utxo) {
@@ -83,27 +83,26 @@ class RbfTransactionTest extends AbstractTestCase
             $totalOut += $output->getValue();
         }
 
-        $this->assertGreaterThanOrEqual($totalOut, $totalIn, "TotalIn should be greater than TotalOut");
+        $this->assertGreaterThanOrEqual($totalOut, $totalIn, 'TotalIn should be greater than TotalOut');
 
         $signer = new Signer($txBuilder->get());
         foreach ($utxos as $i => $utxo) {
             $iSigner = $signer
                 ->input($i, $utxo->getOutput())
-                ->sign($privKeys[$i])
-            ;
+                ->sign($privKeys[$i]);
             $this->assertTrue($iSigner->isFullySigned());
         }
 
         return $signer->get();
     }
 
-    public function testCanReplaceSingleOutputIfOptin()
+    public function test_can_replace_single_output_if_optin()
     {
         $bitcoind = $this->rpcFactory->startBitcoind();
         $this->assertTrue($bitcoind->isRunning());
 
-        $rng = new Random();
-        $factory = new PrivateKeyFactory();
+        $rng = new Random;
+        $factory = new PrivateKeyFactory;
         $destKey = $factory->generateCompressed($rng);
         $destSPK = ScriptFactory::scriptPubKey()->p2wkh($destKey->getPubKeyHash());
 
@@ -121,7 +120,7 @@ class RbfTransactionTest extends AbstractTestCase
         $tx = $this->createTransaction(
             [$utxos[0]],
             [$privateKey],
-            [new TransactionOutput(99999000, $destSPK),],
+            [new TransactionOutput(99999000, $destSPK)],
             [TransactionInput::SEQUENCE_FINAL - 2]
         );
 
@@ -132,7 +131,7 @@ class RbfTransactionTest extends AbstractTestCase
         $tx = $this->createTransaction(
             $utxos,
             [$privateKey, $privateKey],
-            [new TransactionOutput($amount + 99980000, $destSPK),],
+            [new TransactionOutput($amount + 99980000, $destSPK)],
             [TransactionInput::SEQUENCE_FINAL - 1, TransactionInput::SEQUENCE_FINAL - 1]
         );
 
@@ -142,13 +141,13 @@ class RbfTransactionTest extends AbstractTestCase
         $bitcoind->destroy();
     }
 
-    public function testCannotReplaceIfNotOptin()
+    public function test_cannot_replace_if_not_optin()
     {
         $bitcoind = $this->rpcFactory->startBitcoind();
         $this->assertTrue($bitcoind->isRunning());
 
-        $random = new Random();
-        $factory = new PrivateKeyFactory();
+        $random = new Random;
+        $factory = new PrivateKeyFactory;
         $destKey = $factory->generateCompressed($random);
         $destSPK = ScriptFactory::scriptPubKey()->p2wkh($destKey->getPubKeyHash());
 
@@ -166,7 +165,7 @@ class RbfTransactionTest extends AbstractTestCase
         $tx = $this->createTransaction(
             [$utxos[0]],
             [$privateKey],
-            [new TransactionOutput(99990000, $destSPK),],
+            [new TransactionOutput(99990000, $destSPK)],
             [TransactionInput::SEQUENCE_FINAL]
         );
 
@@ -177,7 +176,7 @@ class RbfTransactionTest extends AbstractTestCase
         $tx = $this->createTransaction(
             $utxos,
             [$privateKey, $privateKey],
-            [new TransactionOutput($amount + 99990000, $destSPK),],
+            [new TransactionOutput($amount + 99990000, $destSPK)],
             [TransactionInput::SEQUENCE_FINAL, 0]
         );
 
@@ -187,13 +186,13 @@ class RbfTransactionTest extends AbstractTestCase
         $bitcoind->destroy();
     }
 
-    public function testCanReplaceIfOptin()
+    public function test_can_replace_if_optin()
     {
         $bitcoind = $this->rpcFactory->startBitcoind();
         $this->assertTrue($bitcoind->isRunning());
 
-        $random = new Random();
-        $factory = new PrivateKeyFactory();
+        $random = new Random;
+        $factory = new PrivateKeyFactory;
         $destKey = $factory->generateCompressed($random);
         $destSPK = ScriptFactory::scriptPubKey()->p2wkh($destKey->getPubKeyHash());
 
@@ -212,7 +211,6 @@ class RbfTransactionTest extends AbstractTestCase
             $bitcoind->fundOutput($amount, $scriptPubKey),
         ];
 
-
         // Part 1: replacable tx[#1: replaceable 2]
         $nIn = 1;
         $tx = $this->createTransaction(
@@ -227,7 +225,6 @@ class RbfTransactionTest extends AbstractTestCase
 
         $result = $bitcoind->makeRpcRequest('sendrawtransaction', [$tx->getHex()]);
         $this->assertSendRawTransaction($result);
-
 
         // Part 2: replace tx[#1: replaceable 1 | #2: replaceable 1]
         $nIn = 2;
@@ -244,7 +241,6 @@ class RbfTransactionTest extends AbstractTestCase
         $result = $bitcoind->makeRpcRequest('sendrawtransaction', [$tx->getHex()]);
         $this->assertSendRawTransaction($result);
 
-
         // Part 3: replace tx[#1: replaceable 0 | #2: replaceable 0 | #3: replaceable 0]
         $nIn = 3;
         $tx = $this->createTransaction(
@@ -259,7 +255,6 @@ class RbfTransactionTest extends AbstractTestCase
 
         $result = $bitcoind->makeRpcRequest('sendrawtransaction', [$tx->getHex()]);
         $this->assertSendRawTransaction($result);
-
 
         // Part 4: this one won't work, inputs are all irreplacable
         $nIn = 4;

@@ -12,18 +12,12 @@ use BitWasp\Bitcoin\Transaction\TransactionInterface;
 class BitcoinConsensus implements ConsensusInterface
 {
     /**
-     * @param TransactionInterface $tx
-     * @param ScriptInterface $scriptPubKey
-     * @param int $flags
-     * @param int $nInputToSign
-     * @param int $amount
-     * @return bool
      * @throws BitcoinConsensusException
      */
     public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, int $flags, int $nInputToSign, int $amount): bool
     {
         if ($flags !== ($flags & BITCOINCONSENSUS_SCRIPT_FLAGS_VERIFY_ALL)) {
-            throw new BitcoinConsensusException("Invalid flags for bitcoinconsensus");
+            throw new BitcoinConsensusException('Invalid flags for bitcoinconsensus');
         }
 
         $error = 0;

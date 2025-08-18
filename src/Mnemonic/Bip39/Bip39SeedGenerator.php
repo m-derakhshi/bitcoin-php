@@ -11,13 +11,11 @@ use BitWasp\Buffertools\BufferInterface;
 class Bip39SeedGenerator
 {
     /**
-     * @param string $string
-     * @return BufferInterface
      * @throws \Exception
      */
     private function normalize(string $string): BufferInterface
     {
-        if (!class_exists('Normalizer')) {
+        if (! class_exists('Normalizer')) {
             if (mb_detect_encoding($string) === 'UTF-8') {
                 throw new \Exception('UTF-8 passphrase is not supported without the PECL intl extension installed.');
             } else {
@@ -29,9 +27,6 @@ class Bip39SeedGenerator
     }
 
     /**
-     * @param string $mnemonic
-     * @param string $passphrase
-     * @return \BitWasp\Buffertools\BufferInterface
      * @throws \Exception
      */
     public function getSeed(string $mnemonic, string $passphrase = ''): BufferInterface

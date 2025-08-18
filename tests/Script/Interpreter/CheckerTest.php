@@ -13,15 +13,15 @@ use BitWasp\Buffertools\Buffer;
 
 class CheckerTest extends AbstractTestCase
 {
-
     /**
      * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
+     *
      * @expectedExceptionMessage Signature with invalid hashtype
      */
-    public function testCheckSignatureEncodingInvalidHashtype()
+    public function test_check_signature_encoding_invalid_hashtype()
     {
         $f = InterpreterInterface::VERIFY_STRICTENC;
-        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
 
         $buffer = Buffer::hex('3044022029ff6008e57d80619edf3b03b9a69ae1f8a659d9c231cde629c22f97d5bbf7e702200362617c577aa586fca20348f55a59f5ba71f3d6839b66fcfe13a84749b776e891');
 
@@ -29,10 +29,10 @@ class CheckerTest extends AbstractTestCase
         $this->assertTrue(true);
     }/**/
 
-    public function testCheckSignatureSafeWhenFlagNotSet()
+    public function test_check_signature_safe_when_flag_not_set()
     {
         $f = 0;
-        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
         $buffer = new Buffer('obviously incorrect.....?');
         try {
             $c->checkSignatureEncoding($buffer, $f);
@@ -44,20 +44,21 @@ class CheckerTest extends AbstractTestCase
 
     /**
      * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
+     *
      * @expectedExceptionMessage Signature s element was not low
      */
-    public function testCheckSignatureEncodingLowS()
+    public function test_check_signature_encoding_low_s()
     {
         $f = InterpreterInterface::VERIFY_LOW_S;
-        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
         $buffer = Buffer::hex('30450220377bf4cab9bbdb219f1b0cca56f4a39fbf787d6fa9d04e248101d498de991d30022100b8e0c72dfab9a0d88eb2703c62e0e57ab2cb906e8f156b7641c2f0e24b8bba2b01');
         $c->checkSignatureEncoding($buffer, $f);
     }
 
-    public function testCheckEmptySignatureSafeWhenFlagNotSet()
+    public function test_check_empty_signature_safe_when_flag_not_set()
     {
         $f = 0;
-        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
         $buffer = new Buffer('');
         try {
             $c->checkSignatureEncoding($buffer, $f);
@@ -69,20 +70,21 @@ class CheckerTest extends AbstractTestCase
 
     /**
      * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
+     *
      * @expectedExceptionMessage Signature with incorrect encoding
      */
-    public function testCheckSignatureEncodingWhenFlagSet()
+    public function test_check_signature_encoding_when_flag_set()
     {
         $f = InterpreterInterface::VERIFY_DERSIG;
-        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
         $buffer = new Buffer('obviously incorrect.....?');
         $c->checkSignatureEncoding($buffer, $f);
     }
 
-    public function testCheckSignatureEncodingWhenLowSFlagSet()
+    public function test_check_signature_encoding_when_low_s_flag_set()
     {
         $f = InterpreterInterface::VERIFY_LOW_S;
-        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
         $buffer = Buffer::hex('3044022029ff6008e57d80619edf3b03b9a69ae1f8a659d9c231cde629c22f97d5bbf7e702200362617c577aa586fca20348f55a59f5ba71f3d6839b66fcfe13a84749b776e801');
         try {
             $c->checkSignatureEncoding($buffer, $f);
@@ -92,10 +94,10 @@ class CheckerTest extends AbstractTestCase
         }
     }
 
-    public function testCheckSignatureEncodingWhenStrictEncFlagSet()
+    public function test_check_signature_encoding_when_strict_enc_flag_set()
     {
         $f = InterpreterInterface::VERIFY_STRICTENC;
-        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
         $buffer = Buffer::hex('3044022029ff6008e57d80619edf3b03b9a69ae1f8a659d9c231cde629c22f97d5bbf7e702200362617c577aa586fca20348f55a59f5ba71f3d6839b66fcfe13a84749b776e801');
         try {
             $c->checkSignatureEncoding($buffer, $f);
@@ -105,10 +107,10 @@ class CheckerTest extends AbstractTestCase
         }
     }
 
-    public function testCheckPublicKeyEncoding()
+    public function test_check_public_key_encoding()
     {
         $f = InterpreterInterface::VERIFY_STRICTENC;
-        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
         $pubkey = Buffer::hex('045e9392308b08d0d663961463b6cd056a66b757a2ced9dde197c21362360237f231b80ea66315898969f5c079f0ba3fc1c0661ed8c853ad15043f22f2b7779c95');
         try {
             $c->checkPublicKeyEncoding($pubkey, $f);
@@ -120,21 +122,22 @@ class CheckerTest extends AbstractTestCase
 
     /**
      * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
+     *
      * @expectedExceptionMessage Signature with incorrect encoding
      */
-    public function testIsLowDERFailsWithIncorrectEncoding()
+    public function test_is_low_der_fails_with_incorrect_encoding()
     {
-        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
         $checker->isLowDerSignature(new Buffer('abcd'));
     }
 
-    public function testReturnsFalseWithNoSig()
+    public function test_returns_false_with_no_sig()
     {
-        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
-        $this->assertFalse($checker->isDefinedHashtypeSignature(new Buffer()));
+        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
+        $this->assertFalse($checker->isDefinedHashtypeSignature(new Buffer));
     }
 
-    public function testIsDefinedHashType()
+    public function test_is_defined_hash_type()
     {
         $valid = [
             1,
@@ -142,13 +145,13 @@ class CheckerTest extends AbstractTestCase
             3,
             0x81,
             0x82,
-            0x83
+            0x83,
         ];
 
         $invalid = [
             4,
             50,
-            255
+            255,
         ];
 
         $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
@@ -165,12 +168,13 @@ class CheckerTest extends AbstractTestCase
 
     /**
      * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
+     *
      * @expectedExceptionMessage Public key with incorrect encoding
      */
-    public function testCheckPublicKeyEncodingFail()
+    public function test_check_public_key_encoding_fail()
     {
         $f = InterpreterInterface::VERIFY_STRICTENC;
-        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $c = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
         $pubkey = Buffer::hex('045e9392308b08d0d663961463b6cd056a66b757a2ced9dde197c21362360237f231b80ea66315898969f5c079f0ba3fc1c0661ed8c853ad15043f22b7779c95');
         $c->checkPublicKeyEncoding($pubkey, $f);
     }

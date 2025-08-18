@@ -18,25 +18,25 @@ class P2wshScriptDecoratorTest extends AbstractTestCase
     public function getAllowedScriptFactories()
     {
         return [
-            [new P2pkhScriptDataFactory()],
-            [new P2pkScriptDataFactory()],
+            [new P2pkhScriptDataFactory],
+            [new P2pkScriptDataFactory],
         ];
     }
 
     /**
      * @dataProvider getAllowedScriptFactories
-     * @param KeyToScriptDataFactory $factory
+     *
      * @throws \BitWasp\Bitcoin\Exceptions\DisallowedScriptDataFactoryException
      */
-    public function testAllowedScriptType(KeyToScriptDataFactory $factory)
+    public function test_allowed_script_type(KeyToScriptDataFactory $factory)
     {
         $p2shFactory = new P2wshScriptDecorator($factory);
-        $this->assertEquals(ScriptType::P2WSH . "|" . $factory->getScriptType(), $p2shFactory->getScriptType());
+        $this->assertEquals(ScriptType::P2WSH.'|'.$factory->getScriptType(), $p2shFactory->getScriptType());
     }
 
-    public function testNotAllowed()
+    public function test_not_allowed()
     {
         $this->expectException(DisallowedScriptDataFactoryException::class);
-        new P2wshScriptDecorator(new P2wpkhScriptDataFactory());
+        new P2wshScriptDecorator(new P2wpkhScriptDataFactory);
     }
 }

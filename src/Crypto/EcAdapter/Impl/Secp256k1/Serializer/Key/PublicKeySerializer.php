@@ -10,7 +10,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Parser;
 
 class PublicKeySerializer implements PublicKeySerializerInterface
 {
@@ -19,23 +18,19 @@ class PublicKeySerializer implements PublicKeySerializerInterface
      */
     private $ecAdapter;
 
-    /**
-     * @param EcAdapter $ecAdapter
-     */
     public function __construct(EcAdapter $ecAdapter)
     {
         $this->ecAdapter = $ecAdapter;
     }
 
     /**
-     * @param PublicKey $publicKey
      * @return BufferInterface
      */
     private function doSerialize(PublicKey $publicKey)
     {
         $serialized = '';
         $isCompressed = $publicKey->isCompressed();
-        if (!secp256k1_ec_pubkey_serialize(
+        if (! secp256k1_ec_pubkey_serialize(
             $this->ecAdapter->getContext(),
             $serialized,
             $publicKey->getResource(),
@@ -50,27 +45,20 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         );
     }
 
-    /**
-     * @param PublicKeyInterface $publicKey
-     * @return BufferInterface
-     */
     public function serialize(PublicKeyInterface $publicKey): BufferInterface
     {
         /** @var PublicKey $publicKey */
         return $this->doSerialize($publicKey);
     }
 
-    /**
-     * @param BufferInterface $buffer
-     * @return PublicKeyInterface
-     */
     public function parse(BufferInterface $buffer): PublicKeyInterface
     {
         $binary = $buffer->getBinary();
         $pubkey_t = null;
-        if (!secp256k1_ec_pubkey_parse($this->ecAdapter->getContext(), $pubkey_t, $binary)) {
+        if (! secp256k1_ec_pubkey_parse($this->ecAdapter->getContext(), $pubkey_t, $binary)) {
             throw new \RuntimeException('Secp256k1 failed to parse public key');
         }
+
         /** @var resource $pubkey_t */
         return new PublicKey(
             $this->ecAdapter,

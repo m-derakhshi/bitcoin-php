@@ -5,7 +5,7 @@ use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
-require __DIR__ . "/../../../vendor/autoload.php";
+require __DIR__.'/../../../vendor/autoload.php';
 
 /**
  * This example shows how a fully signed transaction
@@ -22,7 +22,6 @@ require __DIR__ . "/../../../vendor/autoload.php";
  * flags, set in Signer. It's probably better than trying
  * to manage them yourself.
  */
-
 $txOut = new TransactionOutput(
     500000000,
     ScriptFactory::fromHex('a914521ab4907bf71c5113954be128931f0f32d48a8d87')

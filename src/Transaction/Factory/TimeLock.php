@@ -16,17 +16,18 @@ class TimeLock
 
     /**
      * TimeLock constructor.
-     * @param CheckLocktimeVerify|CheckSequenceVerify $info
+     *
+     * @param  CheckLocktimeVerify|CheckSequenceVerify  $info
      */
     public function __construct($info)
     {
         if (is_object($info)) {
             $class = get_class($info);
             if ($class !== CheckLocktimeVerify::class && $class !== CheckSequenceVerify::class) {
-                throw new \RuntimeException("Invalid script info for TimeLock, must be CLTV/CSV");
+                throw new \RuntimeException('Invalid script info for TimeLock, must be CLTV/CSV');
             }
         } else {
-            throw new \RuntimeException("Invalid script info for TimeLock, must be a script info object");
+            throw new \RuntimeException('Invalid script info for TimeLock, must be a script info object');
         }
 
         $this->info = $info;

@@ -34,7 +34,7 @@ class Bitcoin
      */
     public static function getMath()
     {
-        return new Math();
+        return new Math;
     }
 
     /**
@@ -46,13 +46,11 @@ class Bitcoin
     }
 
     /**
-     * @param Math $math
-     * @param GeneratorPoint $generator
      * @return EcAdapterInterface
      */
-    public static function getEcAdapter(Math $math = null, GeneratorPoint $generator = null)
+    public static function getEcAdapter(?Math $math = null, ?GeneratorPoint $generator = null)
     {
-        if (null === self::$adapter) {
+        if (self::$adapter === null) {
             self::$adapter = EcAdapterFactory::getAdapter(
                 ($math ?: self::getMath()),
                 ($generator ?: self::getGenerator())
@@ -62,9 +60,6 @@ class Bitcoin
         return self::$adapter;
     }
 
-    /**
-     * @param ParamsInterface $params
-     */
     public static function setParams(ParamsInterface $params)
     {
         self::$params = $params;
@@ -75,7 +70,7 @@ class Bitcoin
      */
     public static function getParams()
     {
-        if (null === self::$params) {
+        if (self::$params === null) {
             self::$params = self::getDefaultParams();
         }
 
@@ -83,25 +78,18 @@ class Bitcoin
     }
 
     /**
-     * @param Math|null $math
      * @return ParamsInterface
      */
-    public static function getDefaultParams(Math $math = null)
+    public static function getDefaultParams(?Math $math = null)
     {
         return new Params($math ?: self::getMath());
     }
 
-    /**
-     * @param EcAdapterInterface $adapter
-     */
     public static function setAdapter(EcAdapterInterface $adapter)
     {
         self::$adapter = $adapter;
     }
 
-    /**
-     * @param NetworkInterface $network
-     */
     public static function setNetwork(NetworkInterface $network)
     {
         self::$network = $network;
@@ -112,7 +100,7 @@ class Bitcoin
      */
     public static function getNetwork()
     {
-        if (null === self::$network) {
+        if (self::$network === null) {
             self::$network = self::getDefaultNetwork();
         }
 

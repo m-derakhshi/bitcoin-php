@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
-use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
+use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
+use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
+use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -49,39 +49,29 @@ class ExtendedKeySerializer
      */
     private $publicKeySerializer;
 
-    /**
-     * @param EcAdapterInterface $ecAdapter
-     * @param GlobalPrefixConfig|null $config
-     */
-    public function __construct(EcAdapterInterface $ecAdapter, GlobalPrefixConfig $config = null)
+    public function __construct(EcAdapterInterface $ecAdapter, ?GlobalPrefixConfig $config = null)
     {
         $this->privateKeySerializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
         $this->publicKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
 
         $this->ecAdapter = $ecAdapter;
         $this->rawSerializer = new RawExtendedKeySerializer($ecAdapter);
-        $this->defaultScriptFactory = new P2pkhScriptDataFactory();
+        $this->defaultScriptFactory = new P2pkhScriptDataFactory;
         $this->prefixConfig = $config;
     }
 
-    /**
-     * @param NetworkInterface $network
-     * @param HierarchicalKey $key
-     * @return BufferInterface
-     */
     public function serialize(NetworkInterface $network, HierarchicalKey $key): BufferInterface
     {
-        if (null === $this->prefixConfig) {
+        if ($this->prefixConfig === null) {
             if ($key->getScriptDataFactory()->getScriptType() !== $this->defaultScriptFactory->getScriptType()) {
-                throw new \InvalidArgumentException("Cannot serialize non-P2PKH HierarchicalKeys without a GlobalPrefixConfig");
+                throw new \InvalidArgumentException('Cannot serialize non-P2PKH HierarchicalKeys without a GlobalPrefixConfig');
             }
             $privatePrefix = $network->getHDPrivByte();
             $publicPrefix = $network->getHDPubByte();
         } else {
             $scriptConfig = $this->prefixConfig
                 ->getNetworkConfig($network)
-                ->getConfigForScriptType($key->getScriptDataFactory()->getScriptType())
-            ;
+                ->getConfigForScriptType($key->getScriptDataFactory()->getScriptType());
             $privatePrefix = $scriptConfig->getPrivatePrefix();
             $publicPrefix = $scriptConfig->getPublicPrefix();
         }
@@ -107,17 +97,14 @@ class ExtendedKeySerializer
     }
 
     /**
-     * @param NetworkInterface $network
-     * @param Parser $parser
-     * @return HierarchicalKey
      * @throws ParserOutOfRange
      */
     public function fromParser(NetworkInterface $network, Parser $parser): HierarchicalKey
     {
         $params = $this->rawSerializer->fromParser($parser);
 
-        if (null === $this->prefixConfig) {
-            if (!($params->getPrefix() === $network->getHDPubByte() || $params->getPrefix() === $network->getHDPrivByte())) {
+        if ($this->prefixConfig === null) {
+            if (! ($params->getPrefix() === $network->getHDPubByte() || $params->getPrefix() === $network->getHDPrivByte())) {
                 throw new \InvalidArgumentException('HD key magic bytes do not match network magic bytes');
             }
             $privatePrefix = $network->getHDPrivByte();
@@ -125,8 +112,7 @@ class ExtendedKeySerializer
         } else {
             $scriptConfig = $this->prefixConfig
                 ->getNetworkConfig($network)
-                ->getConfigForPrefix($params->getPrefix())
-            ;
+                ->getConfigForPrefix($params->getPrefix());
             $privatePrefix = $scriptConfig->getPrivatePrefix();
             $scriptFactory = $scriptConfig->getScriptDataFactory();
         }
@@ -149,9 +135,6 @@ class ExtendedKeySerializer
     }
 
     /**
-     * @param NetworkInterface $network
-     * @param BufferInterface $buffer
-     * @return HierarchicalKey
      * @throws ParserOutOfRange
      */
     public function parse(NetworkInterface $network, BufferInterface $buffer): HierarchicalKey

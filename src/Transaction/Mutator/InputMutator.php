@@ -19,24 +19,17 @@ class InputMutator
      */
     private $input;
 
-    /**
-     * @param TransactionInputInterface $input
-     */
     public function __construct(TransactionInputInterface $input)
     {
         $this->input = $input;
     }
 
-    /**
-     * @return TransactionInputInterface
-     */
     public function done(): TransactionInputInterface
     {
         return $this->input;
     }
 
     /**
-     * @param array $array
      * @return $this
      */
     private function replace(array $array = [])
@@ -51,56 +44,50 @@ class InputMutator
     }
 
     /**
-     * @param OutPointInterface $outPoint
      * @return InputMutator
      */
     public function outpoint(OutPointInterface $outPoint)
     {
-        return $this->replace(array('outpoint' => $outPoint));
+        return $this->replace(['outpoint' => $outPoint]);
     }
-
 
     /**
      * @return $this
      */
     public function null()
     {
-        return $this->replace(array('outpoint' => new OutPoint(new Buffer(str_pad('', 32, "\x00"), 32), 0xffffffff)));
+        return $this->replace(['outpoint' => new OutPoint(new Buffer(str_pad('', 32, "\x00"), 32), 0xFFFFFFFF)]);
     }
 
     /**
-     * @param BufferInterface $txid
      * @return $this
      */
     public function txid(BufferInterface $txid)
     {
-        return $this->replace(array('txid' => $txid));
+        return $this->replace(['txid' => $txid]);
     }
 
     /**
-     * @param int $vout
      * @return InputMutator
      */
     public function vout(int $vout)
     {
-        return $this->replace(array('vout' => $vout));
+        return $this->replace(['vout' => $vout]);
     }
 
     /**
-     * @param ScriptInterface $script
      * @return $this
      */
     public function script(ScriptInterface $script)
     {
-        return $this->replace(array('script' => $script));
+        return $this->replace(['script' => $script]);
     }
 
     /**
-     * @param int $nSequence
      * @return $this
      */
     public function sequence(int $nSequence)
     {
-        return $this->replace(array('nSequence' => $nSequence));
+        return $this->replace(['nSequence' => $nSequence]);
     }
 }

@@ -12,22 +12,14 @@ use BitWasp\Buffertools\Parser;
 interface BlockSerializerInterface
 {
     /**
-     * @param Parser $parser
-     * @return BlockInterface
      * @throws ParserOutOfRange
      */
     public function fromParser(Parser $parser): BlockInterface;
 
     /**
-     * @param BufferInterface $buffer
-     * @return BlockInterface
      * @throws ParserOutOfRange
      */
     public function parse(BufferInterface $buffer): BlockInterface;
 
-    /**
-     * @param BlockInterface $block
-     * @return BufferInterface
-     */
     public function serialize(BlockInterface $block): BufferInterface;
 }

@@ -18,7 +18,6 @@ class SegwitAddress extends Address implements Bech32AddressInterface
 
     /**
      * SegwitAddress constructor.
-     * @param WitnessProgram $witnessProgram
      */
     public function __construct(WitnessProgram $witnessProgram)
     {
@@ -27,37 +26,24 @@ class SegwitAddress extends Address implements Bech32AddressInterface
         parent::__construct($witnessProgram->getProgram());
     }
 
-    /**
-     * @param NetworkInterface|null $network
-     * @return string
-     */
-    public function getHRP(NetworkInterface $network = null): string
+    public function getHRP(?NetworkInterface $network = null): string
     {
         $network = $network ?: Bitcoin::getNetwork();
+
         return $network->getSegwitBech32Prefix();
     }
 
-    /**
-     * @return WitnessProgram
-     */
     public function getWitnessProgram(): WitnessProgram
     {
         return $this->witnessProgram;
     }
 
-    /**
-     * @return ScriptInterface
-     */
     public function getScriptPubKey(): ScriptInterface
     {
         return $this->witnessProgram->getScript();
     }
 
-    /**
-     * @param NetworkInterface|null $network
-     * @return string
-     */
-    public function getAddress(NetworkInterface $network = null): string
+    public function getAddress(?NetworkInterface $network = null): string
     {
         $network = $network ?: Bitcoin::getNetwork();
 

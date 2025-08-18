@@ -14,9 +14,7 @@ use Mdanter\Ecc\EccFactory;
 
 class EcTest extends AbstractTestCase
 {
-
     /**
-     * @param EcAdapterInterface $ecAdapterInterface
      * @return PrivateKeyInterface
      */
     public function getFirstPrivateKey(EcAdapterInterface $ecAdapterInterface)
@@ -25,38 +23,35 @@ class EcTest extends AbstractTestCase
     }
 
     /**
-     * @param PrivateKeyInterface $private
-     * @param \GMP $add
-     * @param EcAdapterInterface $ec
      * @return \GMP|resource
      */
     public function addModN(PrivateKeyInterface $private, \GMP $add, EcAdapterInterface $ec)
     {
         $math = $ec->getMath();
         $key = $private->getSecret();
+
         return $math->mod($math->add($key, $add), $ec->getOrder());
     }
 
     /**
-     * @param PrivateKeyInterface $private
-     * @param \GMP $add
-     * @param EcAdapterInterface $ec
      * @return \GMP|resource
      */
     public function mulModN(PrivateKeyInterface $private, \GMP $add, EcAdapterInterface $ec)
     {
         $math = $ec->getMath();
         $key = $private->getSecret();
+
         return $math->mod($math->mul($key, $add), $ec->getOrder());
     }
 
     /**
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage Failed to find valid recovery factor
      */
-    public function testCalcPubkeyRecidFail()
+    public function test_calc_pubkey_recid_fail()
     {
-        $math = new Math();
+        $math = new Math;
         $g = EccFactory::getSecgCurves($math)->generator256k1();
 
         $phpecc = new PhpEcc($math, $g);
@@ -66,9 +61,8 @@ class EcTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ec
      */
-    public function testAdd(EcAdapterInterface $ec)
+    public function test_add(EcAdapterInterface $ec)
     {
         $private = $this->getFirstPrivateKey($ec);
         $public = $private->getPublicKey();
@@ -96,9 +90,8 @@ class EcTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ec
      */
-    public function testMul(EcAdapterInterface $ec)
+    public function test_mul(EcAdapterInterface $ec)
     {
         $private = $this->getFirstPrivateKey($ec);
         $public = $private->getPublicKey();
@@ -121,9 +114,8 @@ class EcTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ec
      */
-    public function testSign(EcAdapterInterface $ec)
+    public function test_sign(EcAdapterInterface $ec)
     {
         $private = $this->getFirstPrivateKey($ec);
         $messageHash = Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32);
@@ -134,9 +126,8 @@ class EcTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ec
      */
-    public function testSignCompact(EcAdapterInterface $ec)
+    public function test_sign_compact(EcAdapterInterface $ec)
     {
         $private = $this->getFirstPrivateKey($ec);
         $messageHash = Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32);
@@ -149,9 +140,8 @@ class EcTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ec
      */
-    public function testValidatePrivateKey(EcAdapterInterface $ec)
+    public function test_validate_private_key(EcAdapterInterface $ec)
     {
         $valid = [
             'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
@@ -167,7 +157,7 @@ class EcTest extends AbstractTestCase
         );
 
         $invalid = [
-            'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'
+            'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141',
         ];
 
         array_map(

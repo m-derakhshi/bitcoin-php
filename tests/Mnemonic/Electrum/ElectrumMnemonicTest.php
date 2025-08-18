@@ -12,10 +12,10 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class ElectrumMnemonicTest extends AbstractTestCase
 {
-    public function testSpecificMnemonic()
+    public function test_specific_mnemonic()
     {
         $ec = Bitcoin::getEcAdapter();
-        $mnemonicConv = new ElectrumMnemonic($ec, new EnglishWordList());
+        $mnemonicConv = new ElectrumMnemonic($ec, new EnglishWordList);
 
         $mnemonic = trim('teach start paradise collect blade chill gay childhood creek picture creator branch');
         $known_seed = 'dcb85458ec2fcaaac54b71fba90bd4a5';
@@ -23,12 +23,12 @@ class ElectrumMnemonicTest extends AbstractTestCase
         $this->assertEquals($known_seed, $mnemonicConv->mnemonicToEntropy($mnemonic)->getHex());
     }
 
-    public function testEncodesEntropy()
+    public function test_encodes_entropy()
     {
         $ec = Bitcoin::getEcAdapter();
-        $m = new ElectrumMnemonic($ec, new EnglishWordList());
+        $m = new ElectrumMnemonic($ec, new EnglishWordList);
 
-        $random = new Random();
+        $random = new Random;
         $bytes = $random->bytes(16);
         $words = $m->entropyToMnemonic($bytes);
         $entropy = $m->mnemonicToEntropy($words);

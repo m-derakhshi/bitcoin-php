@@ -13,8 +13,10 @@ use BitWasp\Buffertools\BufferInterface;
 class Number extends Serializable
 {
     const MAX_NUM_SIZE = 4;
-    const MAX = 2**31-1;
-    const MIN = -2**31+1;
+
+    const MAX = 2 ** 31 - 1;
+
+    const MIN = -2 ** 31 + 1;
 
     /**
      * @var Math
@@ -28,8 +30,8 @@ class Number extends Serializable
 
     /**
      * Number constructor.
-     * @param int|string $number
-     * @param Math $math
+     *
+     * @param  int|string  $number
      */
     public function __construct($number, Math $math)
     {
@@ -38,11 +40,10 @@ class Number extends Serializable
     }
 
     /**
-     * @param int|string $number
-     * @param Math|null $math
+     * @param  int|string  $number
      * @return self
      */
-    public static function int($number, Math $math = null)
+    public static function int($number, ?Math $math = null)
     {
         return new self(
             $number,
@@ -51,11 +52,9 @@ class Number extends Serializable
     }
 
     /**
-     * @param \GMP $number
-     * @param Math|null $math
      * @return self
      */
-    public static function gmp(\GMP $number, Math $math = null)
+    public static function gmp(\GMP $number, ?Math $math = null)
     {
         return new self(
             gmp_strval($number, 10),
@@ -64,13 +63,11 @@ class Number extends Serializable
     }
 
     /**
-     * @param BufferInterface $vch
-     * @param bool $fRequireMinimal
-     * @param int $maxNumSize
-     * @param Math|null $math
+     * @param  bool  $fRequireMinimal
+     * @param  int  $maxNumSize
      * @return self
      */
-    public static function buffer(BufferInterface $vch, $fRequireMinimal, $maxNumSize = self::MAX_NUM_SIZE, Math $math = null)
+    public static function buffer(BufferInterface $vch, $fRequireMinimal, $maxNumSize = self::MAX_NUM_SIZE, ?Math $math = null)
     {
         $size = $vch->getSize();
         if ($size > $maxNumSize) {
@@ -79,7 +76,7 @@ class Number extends Serializable
 
         if ($fRequireMinimal && $size > 0) {
             $binary = $vch->getBinary();
-            if ((ord($binary[$size - 1]) & 0x7f) === 0) {
+            if ((ord($binary[$size - 1]) & 0x7F) === 0) {
                 if ($size <= 1 || (ord($binary[$size - 2]) & 0x80) === 0) {
                     throw new \RuntimeException('Non-minimally encoded script number');
                 }
@@ -89,13 +86,10 @@ class Number extends Serializable
         $math = $math ?: Bitcoin::getMath();
         $number = new self(0, $math);
         $number->number = $number->parseBuffer($vch);
+
         return $number;
     }
 
-    /**
-     * @param BufferInterface $buffer
-     * @return string
-     */
     private function parseBuffer(BufferInterface $buffer): string
     {
         $size = $buffer->getSize();
@@ -103,7 +97,7 @@ class Number extends Serializable
             return '0';
         }
 
-        $chars = array_values(unpack("C*", $buffer->getBinary()));
+        $chars = array_values(unpack('C*', $buffer->getBinary()));
 
         $result = gmp_init(0);
         for ($i = 0; $i < $size; $i++) {
@@ -112,7 +106,7 @@ class Number extends Serializable
             $result = $this->math->bitwiseOr($result, $byte);
         }
 
-        if ($chars[count($chars)-1] & 0x80) {
+        if ($chars[count($chars) - 1] & 0x80) {
             $mask = gmp_com($this->math->leftShift(gmp_init(0x80), (8 * ($size - 1))));
             $result = $this->math->sub(gmp_init(0), $this->math->bitwiseAnd($result, $mask));
         }
@@ -120,9 +114,6 @@ class Number extends Serializable
         return gmp_strval($result, 10);
     }
 
-    /**
-     * @return BufferInterface
-     */
     private function serialize(): BufferInterface
     {
         if ((int) $this->number === 0) {
@@ -134,7 +125,7 @@ class Number extends Serializable
         $result = [];
         $negative = $this->math->cmp(gmp_init($this->number), $zero) < 0;
         $abs = $negative ? $this->math->sub($zero, gmp_init($this->number, 10)) : gmp_init($this->number, 10);
-        $mask = gmp_init(0xff);
+        $mask = gmp_init(0xFF);
         while ($this->math->cmp($abs, $zero) > 0) {
             $result[] = (int) gmp_strval($this->math->bitwiseAnd($abs, $mask), 10);
             $abs = $this->math->rightShift($abs, 8);
@@ -142,29 +133,23 @@ class Number extends Serializable
 
         if ($result[count($result) - 1] & 0x80) {
             $result[] = $negative ? 0x80 : 0;
-        } else if ($negative) {
+        } elseif ($negative) {
             $result[count($result) - 1] |= 0x80;
         }
 
-        return new Buffer(pack("C*", ...$result));
+        return new Buffer(pack('C*', ...$result));
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getBuffer(): BufferInterface
     {
         return $this->serialize();
     }
 
-    /**
-     * @return int
-     */
     public function getInt(): int
     {
         if ($this->math->cmp(gmp_init($this->number, 10), gmp_init(self::MAX)) > 0) {
             return self::MAX;
-        } else if ($this->math->cmp(gmp_init($this->number, 10), gmp_init(self::MIN)) < 0) {
+        } elseif ($this->math->cmp(gmp_init($this->number, 10), gmp_init(self::MIN)) < 0) {
             return self::MIN;
         }
 

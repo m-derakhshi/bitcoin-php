@@ -25,14 +25,14 @@ class NetworkConfig
 
     /**
      * NetworkHdKeyPrefixConfig constructor.
-     * @param NetworkInterface $network
-     * @param ScriptPrefix[] $prefixConfigList
+     *
+     * @param  ScriptPrefix[]  $prefixConfigList
      */
     public function __construct(NetworkInterface $network, array $prefixConfigList)
     {
         foreach ($prefixConfigList as $config) {
-            if (!($config instanceof ScriptPrefix)) {
-                throw new \InvalidArgumentException("expecting array of NetworkPrefixConfig");
+            if (! ($config instanceof ScriptPrefix)) {
+                throw new \InvalidArgumentException('expecting array of NetworkPrefixConfig');
             }
             $this->setupConfig($config);
         }
@@ -40,9 +40,6 @@ class NetworkConfig
         $this->network = $network;
     }
 
-    /**
-     * @param ScriptPrefix $config
-     */
     private function setupConfig(ScriptPrefix $config)
     {
         $this->checkForOverwriting($config);
@@ -52,9 +49,6 @@ class NetworkConfig
         $this->scriptTypeMap[$config->getScriptDataFactory()->getScriptType()] = $config;
     }
 
-    /**
-     * @param ScriptPrefix $config
-     */
     private function checkForOverwriting(ScriptPrefix $config)
     {
         if (array_key_exists($config->getPublicPrefix(), $this->scriptPrefixMap)) {
@@ -71,27 +65,23 @@ class NetworkConfig
     }
 
     /**
-     * @param ScriptPrefix $config
-     * @param string $prefix
+     * @param  string  $prefix
      */
     private function rejectConflictPrefix(ScriptPrefix $config, $prefix)
     {
         $conflict = $this->scriptPrefixMap[$prefix];
         throw new \RuntimeException(sprintf(
-            "A BIP32 prefix for %s conflicts with the %s BIP32 prefix of %s",
+            'A BIP32 prefix for %s conflicts with the %s BIP32 prefix of %s',
             $config->getScriptDataFactory()->getScriptType(),
-            $prefix === $config->getPublicPrefix() ? "public" : "private",
+            $prefix === $config->getPublicPrefix() ? 'public' : 'private',
             $conflict->getScriptDataFactory()->getScriptType()
         ));
     }
 
-    /**
-     * @param ScriptPrefix $config
-     */
     private function rejectConflictScriptType(ScriptPrefix $config)
     {
         throw new \RuntimeException(sprintf(
-            "The script type %s has a conflict",
+            'The script type %s has a conflict',
             $config->getScriptDataFactory()->getScriptType()
         ));
     }
@@ -105,26 +95,26 @@ class NetworkConfig
     }
 
     /**
-     * @param string $prefix
+     * @param  string  $prefix
      * @return ScriptPrefix
      */
     public function getConfigForPrefix($prefix)
     {
-        if (!array_key_exists($prefix, $this->scriptPrefixMap)) {
-            throw new \InvalidArgumentException("Prefix not configured for network");
+        if (! array_key_exists($prefix, $this->scriptPrefixMap)) {
+            throw new \InvalidArgumentException('Prefix not configured for network');
         }
 
         return $this->scriptPrefixMap[$prefix];
     }
 
     /**
-     * @param string $scriptType
+     * @param  string  $scriptType
      * @return ScriptPrefix
      */
     public function getConfigForScriptType($scriptType)
     {
-        if (!array_key_exists($scriptType, $this->scriptTypeMap)) {
-            throw new \InvalidArgumentException("Script type not configured for network");
+        if (! array_key_exists($scriptType, $this->scriptTypeMap)) {
+            throw new \InvalidArgumentException('Script type not configured for network');
         }
 
         return $this->scriptTypeMap[$scriptType];

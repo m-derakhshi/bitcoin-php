@@ -29,18 +29,15 @@ class PrivateKeyFactory
 
     /**
      * PrivateKeyFactory constructor.
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(EcAdapterInterface $ecAdapter = null)
+    public function __construct(?EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $this->privSerializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
         $this->wifSerializer = new WifPrivateKeySerializer($this->privSerializer);
     }
-    
+
     /**
-     * @param Random $random
-     * @return PrivateKeyInterface
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
     public function generateCompressed(Random $random): PrivateKeyInterface
@@ -49,8 +46,6 @@ class PrivateKeyFactory
     }
 
     /**
-     * @param Random $random
-     * @return PrivateKeyInterface
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
     public function generateUncompressed(Random $random): PrivateKeyInterface
@@ -59,8 +54,6 @@ class PrivateKeyFactory
     }
 
     /**
-     * @param BufferInterface $raw
-     * @return PrivateKeyInterface
      * @throws \Exception
      */
     public function fromBufferCompressed(BufferInterface $raw): PrivateKeyInterface
@@ -69,8 +62,6 @@ class PrivateKeyFactory
     }
 
     /**
-     * @param BufferInterface $raw
-     * @return PrivateKeyInterface
      * @throws \Exception
      */
     public function fromBufferUncompressed(BufferInterface $raw): PrivateKeyInterface
@@ -79,8 +70,6 @@ class PrivateKeyFactory
     }
 
     /**
-     * @param string $hex
-     * @return PrivateKeyInterface
      * @throws \Exception
      */
     public function fromHexCompressed(string $hex): PrivateKeyInterface
@@ -89,8 +78,6 @@ class PrivateKeyFactory
     }
 
     /**
-     * @param string $hex
-     * @return PrivateKeyInterface
      * @throws \Exception
      */
     public function fromHexUncompressed(string $hex): PrivateKeyInterface
@@ -99,14 +86,11 @@ class PrivateKeyFactory
     }
 
     /**
-     * @param string $wif
-     * @param NetworkInterface $network
-     * @return PrivateKeyInterface
      * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      * @throws \BitWasp\Bitcoin\Exceptions\InvalidPrivateKey
      * @throws \Exception
      */
-    public function fromWif(string $wif, NetworkInterface $network = null): PrivateKeyInterface
+    public function fromWif(string $wif, ?NetworkInterface $network = null): PrivateKeyInterface
     {
         return $this->wifSerializer->parse($wif, $network);
     }

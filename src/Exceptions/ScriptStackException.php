@@ -2,6 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class ScriptStackException extends \Exception
-{
-}
+class ScriptStackException extends \Exception {}

@@ -11,16 +11,16 @@ use BitWasp\Buffertools\Buffer;
 
 class OutpointSerializerTest extends AbstractTestCase
 {
-    public function testOutpointSerializer()
+    public function test_outpoint_serializer()
     {
         $txid = new Buffer('a', 32);
         $vout = 10;
         $outpoint = new OutPoint($txid, $vout);
 
-        $serialized = $txid->flip()->getBinary() . pack('V', $vout);
+        $serialized = $txid->flip()->getBinary().pack('V', $vout);
         $this->assertEquals($serialized, $outpoint->getBuffer()->getBinary());
 
-        $serializer = new OutPointSerializer();
+        $serializer = new OutPointSerializer;
         $serializedOutput = $serializer->serialize($outpoint);
         $this->assertEquals($serialized, $serializedOutput->getBinary());
 

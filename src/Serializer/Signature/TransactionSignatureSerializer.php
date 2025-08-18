@@ -17,26 +17,17 @@ class TransactionSignatureSerializer
      */
     private $sigSerializer;
 
-    /**
-     * @param DerSignatureSerializerInterface $sigSerializer
-     */
     public function __construct(DerSignatureSerializerInterface $sigSerializer)
     {
         $this->sigSerializer = $sigSerializer;
     }
 
-    /**
-     * @param TransactionSignatureInterface $txSig
-     * @return BufferInterface
-     */
     public function serialize(TransactionSignatureInterface $txSig): BufferInterface
     {
-        return new Buffer($this->sigSerializer->serialize($txSig->getSignature())->getBinary() . pack('C', $txSig->getHashType()));
+        return new Buffer($this->sigSerializer->serialize($txSig->getSignature())->getBinary().pack('C', $txSig->getHashType()));
     }
 
     /**
-     * @param BufferInterface $buffer
-     * @return TransactionSignatureInterface
      * @throws \Exception
      */
     public function parse(BufferInterface $buffer): TransactionSignatureInterface
@@ -44,7 +35,7 @@ class TransactionSignatureSerializer
         $adapter = $this->sigSerializer->getEcAdapter();
 
         if ($buffer->getSize() < 1) {
-            throw new \RuntimeException("Empty signature");
+            throw new \RuntimeException('Empty signature');
         }
 
         return new TransactionSignature(

@@ -18,33 +18,25 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      */
     private $ecAdapter;
 
-    /**
-     * @param EcAdapter $ecAdapter
-     */
     public function __construct(EcAdapter $ecAdapter)
     {
         $this->ecAdapter = $ecAdapter;
     }
 
     /**
-     * @param CompactSignature $signature
      * @return BufferInterface
      */
     private function doSerialize(CompactSignature $signature)
     {
         $sig_t = '';
         $recid = 0;
-        if (!secp256k1_ecdsa_recoverable_signature_serialize_compact($this->ecAdapter->getContext(), $sig_t, $recid, $signature->getResource())) {
+        if (! secp256k1_ecdsa_recoverable_signature_serialize_compact($this->ecAdapter->getContext(), $sig_t, $recid, $signature->getResource())) {
             throw new \RuntimeException('Secp256k1 serialize compact failure');
         }
 
-        return new Buffer(chr($signature->getFlags()) . $sig_t, 65);
+        return new Buffer(chr($signature->getFlags()).$sig_t, 65);
     }
 
-    /**
-     * @param CompactSignatureInterface $signature
-     * @return BufferInterface
-     */
     public function serialize(CompactSignatureInterface $signature): BufferInterface
     {
         /** @var CompactSignature $signature */
@@ -52,8 +44,6 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     }
 
     /**
-     * @param BufferInterface $buffer
-     * @return CompactSignatureInterface
      * @throws \Exception
      */
     public function parse(BufferInterface $buffer): CompactSignatureInterface
@@ -74,9 +64,10 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
         $recoveryId = $recoveryFlags - ($isCompressed ? 4 : 0);
 
         $sig_t = null;
-        if (!secp256k1_ecdsa_recoverable_signature_parse_compact($this->ecAdapter->getContext(), $sig_t, $sig->getBinary(), $recoveryId)) {
+        if (! secp256k1_ecdsa_recoverable_signature_parse_compact($this->ecAdapter->getContext(), $sig_t, $sig->getBinary(), $recoveryId)) {
             throw new \RuntimeException('Unable to parse compact signature');
         }
+
         /** @var resource $sig_t */
         return new CompactSignature($this->ecAdapter, $sig_t, $recoveryId, $isCompressed);
     }

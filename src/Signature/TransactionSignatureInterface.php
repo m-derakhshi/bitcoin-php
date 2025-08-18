@@ -9,19 +9,9 @@ use BitWasp\Bitcoin\SerializableInterface;
 
 interface TransactionSignatureInterface extends SerializableInterface
 {
-    /**
-     * @return SignatureInterface
-     */
     public function getSignature(): SignatureInterface;
 
-    /**
-     * @return int
-     */
     public function getHashType(): int;
 
-    /**
-     * @param TransactionSignatureInterface $other
-     * @return bool
-     */
     public function equals(TransactionSignatureInterface $other): bool;
 }

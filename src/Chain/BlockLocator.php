@@ -21,8 +21,7 @@ class BlockLocator extends Serializable
     private $hashStop;
 
     /**
-     * @param BufferInterface[] $hashes
-     * @param BufferInterface $hashStop
+     * @param  BufferInterface[]  $hashes
      */
     public function __construct(array $hashes, BufferInterface $hashStop)
     {
@@ -33,9 +32,6 @@ class BlockLocator extends Serializable
         $this->hashStop = $hashStop;
     }
 
-    /**
-     * @param BufferInterface $hash
-     */
     private function addHash(BufferInterface $hash)
     {
         $this->hashes[] = $hash;
@@ -49,19 +45,13 @@ class BlockLocator extends Serializable
         return $this->hashes;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getHashStop(): BufferInterface
     {
         return $this->hashStop;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getBuffer(): BufferInterface
     {
-        return (new BlockLocatorSerializer())->serialize($this);
+        return (new BlockLocatorSerializer)->serialize($this);
     }
 }

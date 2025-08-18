@@ -11,7 +11,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 class TransactionOutput extends Serializable implements TransactionOutputInterface
 {
-
     /**
      * @var int
      */
@@ -24,9 +23,6 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
 
     /**
      * Initialize class
-     *
-     * @param int $value
-     * @param ScriptInterface $script
      */
     public function __construct(int $value, ScriptInterface $script)
     {
@@ -39,6 +35,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
 
     /**
      * {@inheritdoc}
+     *
      * @see TransactionOutputInterface::getValue()
      */
     public function getValue(): int
@@ -48,6 +45,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
 
     /**
      * {@inheritdoc}
+     *
      * @see TransactionOutputInterface::getScript()
      */
     public function getScript(): ScriptInterface
@@ -57,12 +55,13 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
 
     /**
      * {@inheritdoc}
+     *
      * @see TransactionOutputInterface::equals()
      */
     public function equals(TransactionOutputInterface $output): bool
     {
         $script = $this->script->equals($output->getScript());
-        if (!$script) {
+        if (! $script) {
             return false;
         }
 
@@ -71,10 +70,11 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
 
     /**
      * {@inheritdoc}
+     *
      * @see \BitWasp\Bitcoin\SerializableInterface::getBuffer()
      */
     public function getBuffer(): BufferInterface
     {
-        return (new TransactionOutputSerializer())->serialize($this);
+        return (new TransactionOutputSerializer)->serialize($this);
     }
 }

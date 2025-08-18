@@ -10,7 +10,7 @@ use BitWasp\Buffertools\Buffer;
 
 class HashTest extends AbstractTestCase
 {
-    public function testSha256()
+    public function test_sha256()
     {
         $json = json_decode($this->dataFile('hash.sha256.json'));
         foreach ($json->test as $test) {
@@ -18,7 +18,7 @@ class HashTest extends AbstractTestCase
         }
     }
 
-    public function testSha256d()
+    public function test_sha256d()
     {
         $json = json_decode($this->dataFile('hash.sha256d.json'));
         foreach ($json->test as $test) {
@@ -26,7 +26,7 @@ class HashTest extends AbstractTestCase
         }
     }
 
-    public function testRipemd160()
+    public function test_ripemd160()
     {
         $json = json_decode($this->dataFile('hash.ripemd160.json'));
         foreach ($json->test as $test) {
@@ -34,7 +34,7 @@ class HashTest extends AbstractTestCase
         }
     }
 
-    public function testRipemd160d()
+    public function test_ripemd160d()
     {
         $json = json_decode($this->dataFile('hash.ripemd160d.json'));
         foreach ($json->test as $test) {
@@ -42,7 +42,7 @@ class HashTest extends AbstractTestCase
         }
     }
 
-    public function testPBKDF2()
+    public function test_pbkd_f2()
     {
         $json = json_decode($this->dataFile('hash.pbkdf2.json'));
         foreach ($json->test as $test) {
@@ -53,23 +53,25 @@ class HashTest extends AbstractTestCase
 
     /**
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage PBKDF2 ERROR: Invalid hash algorithm
      */
-    public function testPbkdf2FailsInvalidAlgorithm()
+    public function test_pbkdf2_fails_invalid_algorithm()
     {
         Hash::pbkdf2('test', new Buffer('password'), new Buffer('salt'), 100, 128);
     }
 
     /**
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage PBKDF2 ERROR: Invalid parameters
      */
-    public function testPbkdf2FailsInvalidCount()
+    public function test_pbkdf2_fails_invalid_count()
     {
         Hash::pbkdf2('sha512', new Buffer('password'), new Buffer('salt'), 0, 128);
     }
 
-    public function testSha256Ripe160()
+    public function test_sha256_ripe160()
     {
         $json = json_decode($this->dataFile('hash.sha256ripe160.json'));
         foreach ($json->test as $test) {
@@ -77,7 +79,7 @@ class HashTest extends AbstractTestCase
         }
     }
 
-    public function testSha1()
+    public function test_sha1()
     {
         $json = json_decode($this->dataFile('hash.sha1.json'));
         foreach ($json->test as $test) {

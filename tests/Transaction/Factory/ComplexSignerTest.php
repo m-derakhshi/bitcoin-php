@@ -28,7 +28,6 @@ use BitWasp\Buffertools\Buffer;
 
 class ComplexSignerTest extends AbstractTestCase
 {
-
     /**
      * @var PrivateKeyInterface[]
      */
@@ -42,21 +41,20 @@ class ComplexSignerTest extends AbstractTestCase
 
     protected function initKeyStore()
     {
-        $factory = new PrivateKeyFactory();
-        $this->privateKeys[] = $factory->fromHexCompressed("990000009900000099000000990000009900000099000000ff00000099000000");
-        $this->privateKeys[] = $factory->fromHexCompressed("98aa0000990000009900000099000000990000009900000099000ff099000000");
-        $this->privateKeys[] = $factory->fromHexCompressed("98bb000099000000990ff0009900000099000000990000009900000099000000");
-        $this->privateKeys[] = $factory->fromHexCompressed("98cc00009900000099000000990000009900ff00990000009900000099000000");
-        $this->privateKeys[] = $factory->fromHexCompressed("98cc0000990ed00099000000990920009900ff009900000099000000990000cc");
+        $factory = new PrivateKeyFactory;
+        $this->privateKeys[] = $factory->fromHexCompressed('990000009900000099000000990000009900000099000000ff00000099000000');
+        $this->privateKeys[] = $factory->fromHexCompressed('98aa0000990000009900000099000000990000009900000099000ff099000000');
+        $this->privateKeys[] = $factory->fromHexCompressed('98bb000099000000990ff0009900000099000000990000009900000099000000');
+        $this->privateKeys[] = $factory->fromHexCompressed('98cc00009900000099000000990000009900ff00990000009900000099000000');
+        $this->privateKeys[] = $factory->fromHexCompressed('98cc0000990ed00099000000990920009900ff009900000099000000990000cc');
     }
 
     /**
-     * @param int $idx
      * @return PrivateKeyInterface
      */
     protected function getKeyFromStore(int $idx)
     {
-        if (!array_key_exists($idx, $this->privateKeys)) {
+        if (! array_key_exists($idx, $this->privateKeys)) {
             throw new \RuntimeException("Key at {$idx} is missing");
         }
 
@@ -65,6 +63,7 @@ class ComplexSignerTest extends AbstractTestCase
 
     /**
      * NOTIF [AliceKey] CHECKSIGVERIFY ENDIF [BobKey] CHECKSIG
+     *
      * @return array
      */
     private function conditionalBlockWithMandatoryEnding()
@@ -99,11 +98,12 @@ class ComplexSignerTest extends AbstractTestCase
             ],
         ];
 
-        return [$script_1, $paths_1, $keys_1,];
+        return [$script_1, $paths_1, $keys_1];
     }
 
     /**
      * 2-of-2 MULTISIG IF [Alice] CHECKSIG ELSE [BobKey] CHECKSIG ENDIF
+     *
      * @return array
      */
     private function mandatoryStartWithConditionalEnding()
@@ -135,7 +135,7 @@ class ComplexSignerTest extends AbstractTestCase
                 [
                     [$pB1, $pB2],
                     [],
-                    [$pA]
+                    [$pA],
                 ],
                 [
                     [],
@@ -148,6 +148,7 @@ class ComplexSignerTest extends AbstractTestCase
 
     /**
      * IF [Alice] CHECKSIG ELSE [Bob] CHECKSIG
+     *
      * @return array
      */
     private function similarConditionalSection()
@@ -173,7 +174,7 @@ class ComplexSignerTest extends AbstractTestCase
             [
                 [
                     [],
-                    [$pB]
+                    [$pB],
                 ],
 
                 [
@@ -186,6 +187,7 @@ class ComplexSignerTest extends AbstractTestCase
 
     /**
      * IF 2 of 2 MULTISIG ELSE [Alice] CHECKSIG ENDIF
+     *
      * @return array
      */
     private function differentlyTypedConditionalSection()
@@ -213,11 +215,11 @@ class ComplexSignerTest extends AbstractTestCase
             [
                 [
                     [],
-                    [$pB1, $pB2]
+                    [$pB1, $pB2],
                 ],
                 [
                     [],
-                    [$pA]
+                    [$pA],
                 ],
             ],
         ];
@@ -225,6 +227,7 @@ class ComplexSignerTest extends AbstractTestCase
 
     /**
      * IF 2 of 2 MULTISIG ELSE [Alice] CHECKSIG ENDIF
+     *
      * @return array
      */
     private function oneNestedNotif()
@@ -260,7 +263,7 @@ class ComplexSignerTest extends AbstractTestCase
             [
                 [
                     [],
-                    [$pA]
+                    [$pA],
                 ],
                 [
                     [],
@@ -280,6 +283,7 @@ class ComplexSignerTest extends AbstractTestCase
 
     /**
      * [Alice] CHECKSIG
+     *
      * @return array
      */
     private function simpleStillWorks()
@@ -297,7 +301,7 @@ class ComplexSignerTest extends AbstractTestCase
             ],
             [
                 [
-                    [$pB]
+                    [$pB],
                 ],
             ],
         ];
@@ -305,6 +309,7 @@ class ComplexSignerTest extends AbstractTestCase
 
     /**
      * [Alice] CHECKSIGVERIFY [Bob] CHECKSIG
+     *
      * @return array
      */
     private function twoMildlySimilarTemplates()
@@ -334,6 +339,7 @@ class ComplexSignerTest extends AbstractTestCase
 
     /**
      * 2of3 CHECKMULTISIGVERIFY [Bob] CHECKSIG
+     *
      * @return array
      */
     private function twoRatherDifferentTemplates()
@@ -377,6 +383,7 @@ class ComplexSignerTest extends AbstractTestCase
 
     /**
      * 2of3 CHECKMULTISIGVERIFY [Bob] CHECKSIG
+     *
      * @return array
      */
     private function lotsOfTemplates()
@@ -412,7 +419,7 @@ class ComplexSignerTest extends AbstractTestCase
                     [$pC],
                     [$pD],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -436,8 +443,8 @@ class ComplexSignerTest extends AbstractTestCase
 
     public function complexTestProvider()
     {
-        $addrCreator = new AddressCreator();
-        $spend = (new TxBuilder())
+        $addrCreator = new AddressCreator;
+        $spend = (new TxBuilder)
             ->spendOutPoint(new OutPoint(new Buffer('abcd', 32), 0))
             ->payToAddress(10000000, $addrCreator->fromString('1BQLNJtMDKmMZ4PyqVFfRuBNvoGhjigBKF'))
             ->get();
@@ -450,10 +457,10 @@ class ComplexSignerTest extends AbstractTestCase
              * @var array $vPaths
              * @var array $vPathStepKeys
              */
-            list ($script, $vPaths, $vPathStepKeys) = $fixture;
+            [$script, $vPaths, $vPathStepKeys] = $fixture;
 
             if (count($vPaths) != count($vPathStepKeys)) {
-                throw new \RuntimeException("Invalid data provider");
+                throw new \RuntimeException('Invalid data provider');
             }
 
             $n = count($vPaths);
@@ -471,18 +478,14 @@ class ComplexSignerTest extends AbstractTestCase
     }
 
     /**
-     * @param TransactionInterface $unsigned
-     * @param TransactionOutputInterface $txOut
-     * @param array $branch
-     * @param array $branchKeyList
      * @dataProvider complexTestProvider
      */
-    public function testCase(TransactionInterface $unsigned, TransactionOutputInterface $txOut, array $branch, array $branchKeyList)
+    public function test_case(TransactionInterface $unsigned, TransactionOutputInterface $txOut, array $branch, array $branchKeyList)
     {
         $signer = new Signer($unsigned);
         $signer->allowComplexScripts(true);
 
-        $signData = new SignData();
+        $signData = new SignData;
         $signData->logicalPath($branch);
 
         $input = $signer->input(0, $txOut, $signData);
@@ -501,7 +504,7 @@ class ComplexSignerTest extends AbstractTestCase
 
         $flags = Interpreter::VERIFY_WITNESS | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_DERSIG;
         $result = $input->verify($flags);
-        $this->assertTrue($result, "script should verify");
+        $this->assertTrue($result, 'script should verify');
 
         $complete = $signer->get();
         $signed = new Signer($complete);
@@ -530,16 +533,16 @@ class ComplexSignerTest extends AbstractTestCase
                     for ($i = 0, $keyCount = $info->getKeyCount(); $i < $keyCount; $i++) {
                         $this->assertTrue($info->getKeyBuffers()[$i]->equals($other->getKeyBuffers()[$i]));
                     }
-                } else if ($info instanceof PayToPubkey) {
+                } elseif ($info instanceof PayToPubkey) {
                     $other = $sstep->getInfo();
                     $this->assertEquals($info->isChecksigVerify(), $other->isChecksigVerify());
                     $this->assertTrue($info->getKeyBuffer()->equals($other->getKeyBuffer()));
-                } else if ($info instanceof PayToPubkeyHash) {
+                } elseif ($info instanceof PayToPubkeyHash) {
                     $other = $sstep->getInfo();
                     $this->assertEquals($info->isChecksigVerify(), $other->isChecksigVerify());
                     $this->assertTrue($info->getPubKeyHash()->equals($other->getPubKeyHash()));
                 }
-            } else if ($step instanceof Conditional || $sstep instanceof Conditional) {
+            } elseif ($step instanceof Conditional || $sstep instanceof Conditional) {
                 /** @var Conditional $sstep */
                 $this->assertInstanceOf(Conditional::class, $sstep);
                 $this->assertInstanceOf(Conditional::class, $step);
@@ -557,10 +560,9 @@ class ComplexSignerTest extends AbstractTestCase
                  * @var Checksig $step
                  * @var Checksig $sstep
                  */
-
-                $this->assertEquals($step->getRequiredSigs(), $sstep->getRequiredSigs(), "`requiredSigs` should match after extracting signatures");
-                $this->assertEquals(count($step->getSignatures()), count($sstep->getSignatures()), "number of signatures should match after extracting signatures");
-                $this->assertEquals($step->isFullySigned(), $sstep->isFullySigned(), "isFullySigned should match after extracting signatures");
+                $this->assertEquals($step->getRequiredSigs(), $sstep->getRequiredSigs(), '`requiredSigs` should match after extracting signatures');
+                $this->assertEquals(count($step->getSignatures()), count($sstep->getSignatures()), 'number of signatures should match after extracting signatures');
+                $this->assertEquals($step->isFullySigned(), $sstep->isFullySigned(), 'isFullySigned should match after extracting signatures');
 
                 for ($i = 0; $i < count($step->getKeys()); $i++) {
                     $this->assertEquals($step->hasKey($i), $sstep->hasKey($i));

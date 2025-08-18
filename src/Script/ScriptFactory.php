@@ -24,8 +24,6 @@ class ScriptFactory
     private static $outputScriptFactory = null;
 
     /**
-     * @param string $string
-     * @return ScriptInterface
      * @throws \Exception
      */
     public static function fromHex(string $string): ScriptInterface
@@ -33,39 +31,26 @@ class ScriptFactory
         return self::fromBuffer(Buffer::hex($string));
     }
 
-    /**
-     * @param BufferInterface $buffer
-     * @param Opcodes|null $opcodes
-     * @param Math|null $math
-     * @return ScriptInterface
-     */
-    public static function fromBuffer(BufferInterface $buffer, Opcodes $opcodes = null, Math $math = null): ScriptInterface
+    public static function fromBuffer(BufferInterface $buffer, ?Opcodes $opcodes = null, ?Math $math = null): ScriptInterface
     {
         return self::create($buffer, $opcodes, $math)->getScript();
     }
 
-    /**
-     * @param BufferInterface|null $buffer
-     * @param Opcodes|null $opcodes
-     * @param Math|null $math
-     * @return ScriptCreator
-     */
-    public static function create(BufferInterface $buffer = null, Opcodes $opcodes = null, Math $math = null): ScriptCreator
+    public static function create(?BufferInterface $buffer = null, ?Opcodes $opcodes = null, ?Math $math = null): ScriptCreator
     {
-        return new ScriptCreator($math ?: Bitcoin::getMath(), $opcodes ?: new Opcodes(), $buffer);
+        return new ScriptCreator($math ?: Bitcoin::getMath(), $opcodes ?: new Opcodes, $buffer);
     }
 
     /**
      * Create a script consisting only of push-data operations.
      * Suitable for a scriptSig.
      *
-     * @param BufferInterface[] $buffers
-     * @return ScriptInterface
+     * @param  BufferInterface[]  $buffers
      */
     public static function pushAll(array $buffers): ScriptInterface
     {
         return self::sequence(array_map(function ($buffer) {
-            if (!($buffer instanceof BufferInterface)) {
+            if (! ($buffer instanceof BufferInterface)) {
                 throw new \RuntimeException('Script contained a non-push opcode');
             }
 
@@ -84,8 +69,7 @@ class ScriptFactory
     }
 
     /**
-     * @param int[]|\BitWasp\Bitcoin\Script\Interpreter\Number[]|BufferInterface[] $sequence
-     * @return ScriptInterface
+     * @param  int[]|\BitWasp\Bitcoin\Script\Interpreter\Number[]|BufferInterface[]  $sequence
      */
     public static function sequence(array $sequence): ScriptInterface
     {
@@ -93,15 +77,14 @@ class ScriptFactory
     }
 
     /**
-     * @param Operation[] $operations
-     * @return ScriptInterface
+     * @param  Operation[]  $operations
      */
     public static function fromOperations(array $operations): ScriptInterface
     {
         $sequence = [];
         foreach ($operations as $operation) {
-            if (!($operation instanceof Operation)) {
-                throw new \RuntimeException("Invalid input to fromOperations");
+            if (! ($operation instanceof Operation)) {
+                throw new \RuntimeException('Invalid input to fromOperations');
             }
 
             $sequence[] = $operation->encode();
@@ -110,40 +93,26 @@ class ScriptFactory
         return self::sequence($sequence);
     }
 
-    /**
-     * @return OutputScriptFactory
-     */
     public static function scriptPubKey(): OutputScriptFactory
     {
         if (self::$outputScriptFactory === null) {
-            self::$outputScriptFactory = new OutputScriptFactory();
+            self::$outputScriptFactory = new OutputScriptFactory;
         }
 
         return self::$outputScriptFactory;
     }
 
-    /**
-     * @param EcAdapterInterface|null $ecAdapter
-     * @return NativeConsensus
-     */
-    public static function getNativeConsensus(EcAdapterInterface $ecAdapter = null): NativeConsensus
+    public static function getNativeConsensus(?EcAdapterInterface $ecAdapter = null): NativeConsensus
     {
         return new NativeConsensus($ecAdapter ?: Bitcoin::getEcAdapter());
     }
 
-    /**
-     * @return BitcoinConsensus
-     */
     public static function getBitcoinConsensus(): BitcoinConsensus
     {
-        return new BitcoinConsensus();
+        return new BitcoinConsensus;
     }
 
-    /**
-     * @param EcAdapterInterface|null $ecAdapter
-     * @return ConsensusInterface
-     */
-    public static function consensus(EcAdapterInterface $ecAdapter = null): ConsensusInterface
+    public static function consensus(?EcAdapterInterface $ecAdapter = null): ConsensusInterface
     {
         if (extension_loaded('bitcoinconsensus')) {
             return self::getBitcoinConsensus();

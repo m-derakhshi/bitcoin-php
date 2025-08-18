@@ -44,38 +44,36 @@ class Multisig
 
     /**
      * Multisig constructor.
-     * @param int $requiredSigs
-     * @param BufferInterface[] $keys
-     * @param int $opcode
-     * @param bool $allowVerify
-     * @param PublicKeySerializerInterface|null $pubKeySerializer
+     *
+     * @param  BufferInterface[]  $keys
+     * @param  bool  $allowVerify
      */
-    public function __construct(int $requiredSigs, array $keys, int $opcode, $allowVerify = false, PublicKeySerializerInterface $pubKeySerializer = null)
+    public function __construct(int $requiredSigs, array $keys, int $opcode, $allowVerify = false, ?PublicKeySerializerInterface $pubKeySerializer = null)
     {
         if ($opcode === Opcodes::OP_CHECKMULTISIG) {
             $verify = false;
-        } else if ($allowVerify && $opcode === Opcodes::OP_CHECKMULTISIGVERIFY) {
+        } elseif ($allowVerify && $opcode === Opcodes::OP_CHECKMULTISIGVERIFY) {
             $verify = true;
         } else {
             throw new \InvalidArgumentException('Malformed multisig script');
         }
 
         foreach ($keys as $key) {
-            if (!PublicKey::isCompressedOrUncompressed($key)) {
-                throw new \RuntimeException("Malformed public key");
+            if (! PublicKey::isCompressedOrUncompressed($key)) {
+                throw new \RuntimeException('Malformed public key');
             }
         }
 
         $keyCount = count($keys);
         if ($requiredSigs < 0 || $requiredSigs > $keyCount) {
-            throw new \RuntimeException("Invalid number of required signatures");
+            throw new \RuntimeException('Invalid number of required signatures');
         }
 
         if ($keyCount < 1 || $keyCount > 16) {
-            throw new \RuntimeException("Invalid number of public keys");
+            throw new \RuntimeException('Invalid number of public keys');
         }
 
-        if (null === $pubKeySerializer) {
+        if ($pubKeySerializer === null) {
             $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, Bitcoin::getEcAdapter());
         }
 
@@ -87,12 +85,11 @@ class Multisig
     }
 
     /**
-     * @param Operation[] $decoded
-     * @param PublicKeySerializerInterface|null $pubKeySerializer
-     * @param bool $allowVerify
+     * @param  Operation[]  $decoded
+     * @param  bool  $allowVerify
      * @return Multisig
      */
-    public static function fromDecodedScript(array $decoded, PublicKeySerializerInterface $pubKeySerializer = null, $allowVerify = false)
+    public static function fromDecodedScript(array $decoded, ?PublicKeySerializerInterface $pubKeySerializer = null, $allowVerify = false)
     {
         if (count($decoded) < 4) {
             throw new \InvalidArgumentException('Malformed multisig script');
@@ -106,7 +103,7 @@ class Multisig
         $publicKeyBuffers = [];
         foreach (array_slice($decoded, 1, -2) as $key) {
             /** @var \BitWasp\Bitcoin\Script\Parser\Operation $key */
-            if (!$key->isPush()) {
+            if (! $key->isPush()) {
                 throw new \RuntimeException('Malformed multisig script');
             }
 
@@ -123,52 +120,33 @@ class Multisig
     }
 
     /**
-     * @param ScriptInterface $script
-     * @param PublicKeySerializerInterface|null $pubKeySerializer
-     * @param bool $allowVerify
      * @return Multisig
      */
-    public static function fromScript(ScriptInterface $script, PublicKeySerializerInterface $pubKeySerializer = null, bool $allowVerify = false)
+    public static function fromScript(ScriptInterface $script, ?PublicKeySerializerInterface $pubKeySerializer = null, bool $allowVerify = false)
     {
         return static::fromDecodedScript($script->getScriptParser()->decode(), $pubKeySerializer, $allowVerify);
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return ScriptType::MULTISIG;
     }
 
-    /**
-     * @return int
-     */
     public function getRequiredSigCount(): int
     {
         return $this->m;
     }
 
-    /**
-     * @return int
-     */
     public function getKeyCount(): int
     {
         return $this->n;
     }
 
-    /**
-     * @return bool
-     */
     public function isChecksigVerify(): bool
     {
         return $this->verify;
     }
 
-    /**
-     * @param PublicKeyInterface $publicKey
-     * @return bool
-     */
     public function checkInvolvesKey(PublicKeyInterface $publicKey): bool
     {
         $buffer = $this->pubKeySerializer->serialize($publicKey);

@@ -21,9 +21,9 @@ use BitWasp\Buffertools\Buffer;
 
 class TxBuilderTest extends AbstractTestCase
 {
-    public function testDefault()
+    public function test_default()
     {
-        $builder = new TxBuilder();
+        $builder = new TxBuilder;
         $tx = $builder->get();
         $this->assertEmpty($tx->getInputs());
         $this->assertEmpty($tx->getOutputs());
@@ -31,7 +31,7 @@ class TxBuilderTest extends AbstractTestCase
         $this->assertEquals(0, $tx->getLockTime());
     }
 
-    public function testBuildsAndCanReset()
+    public function test_builds_and_can_reset()
     {
         // Input
         $hashPrevOut = Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000', 32);
@@ -42,7 +42,7 @@ class TxBuilderTest extends AbstractTestCase
         $script = new Script(new Buffer('123'));
         $value = 50;
 
-        $builder = new TxBuilder();
+        $builder = new TxBuilder;
         $tx = $builder
             ->input($hashPrevOut, $nPrevOut, $inputScript, $sequence)
             ->output($value, $script)
@@ -66,15 +66,15 @@ class TxBuilderTest extends AbstractTestCase
         $this->assertNotEquals($tx, $reset);
     }
 
-    public function testSpendsOutputFrom()
+    public function test_spends_output_from()
     {
         $parent = new Transaction(1, [], [
-            new TransactionOutput(50, new Script())
+            new TransactionOutput(50, new Script),
         ]);
 
         $parentHash = $parent->getTxId();
 
-        $builder = new TxBuilder();
+        $builder = new TxBuilder;
         $builder->spendOutputFrom($parent, 0);
         $tx = $builder->get();
 
@@ -83,14 +83,14 @@ class TxBuilderTest extends AbstractTestCase
         $this->assertEquals(0, $input->getOutPoint()->getVout());
     }
 
-    public function testPayToAddress()
+    public function test_pay_to_address()
     {
         $addressStr = '1KnHL81THzfp7tfFqHYWwo4GnY1L2rt4pk';
-        $addrCreator = new AddressCreator();
+        $addrCreator = new AddressCreator;
         $address = $addrCreator->fromString($addressStr);
         $value = 50;
 
-        $builder = new TxBuilder();
+        $builder = new TxBuilder;
         $builder->payToAddress($value, $address);
         $tx = $builder->get();
 
@@ -100,12 +100,12 @@ class TxBuilderTest extends AbstractTestCase
         $this->assertEquals($value, $output->getValue());
     }
 
-    public function testSetMethods()
+    public function test_set_methods()
     {
         $version = 10;
         $locktime = 100;
 
-        $builder = new TxBuilder();
+        $builder = new TxBuilder;
         $tx = $builder
             ->version($version)
             ->input('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 1)
@@ -120,15 +120,15 @@ class TxBuilderTest extends AbstractTestCase
         $this->assertEquals(1, count($tx->getOutputs()));
     }
 
-    public function testLocktime()
+    public function test_locktime()
     {
-        $locktime = new Locktime();
+        $locktime = new Locktime;
         $blockHeight = 389356;
         $blockHeightLocktime = $locktime->fromBlockHeight($blockHeight);
 
         $timestamp = 123123123;
         $timestampLocktime = $locktime->fromTimestamp($timestamp);
-        $builder = new TxBuilder();
+        $builder = new TxBuilder;
 
         $this->assertEquals($blockHeightLocktime, $builder->lockToBlockHeight($locktime, $blockHeight)->getAndReset()->getLockTime());
         $this->assertEquals($timestampLocktime, $builder->lockToTimestamp($locktime, $timestamp)->getAndReset()->getLockTime());
@@ -136,10 +136,11 @@ class TxBuilderTest extends AbstractTestCase
 
     public function getAddresses()
     {
-        $factory = new PrivateKeyFactory();
-        $key = $factory->generateUncompressed(new Random());
+        $factory = new PrivateKeyFactory;
+        $key = $factory->generateUncompressed(new Random);
         $script = ScriptFactory::scriptPubKey()->multisig(1, [$key->getPublicKey()]);
         $scriptAddress = new ScriptHashAddress($script->getScriptHash());
+
         return [
             [new PayToPubKeyHashAddress($key->getPubKeyHash())],
             [$scriptAddress],
@@ -148,13 +149,12 @@ class TxBuilderTest extends AbstractTestCase
 
     /**
      * @dataProvider getAddresses
-     * @param AddressInterface $address
      */
-    public function testPayToAddress2(AddressInterface $address)
+    public function test_pay_to_address2(AddressInterface $address)
     {
         $expectedScript = $address->getScriptPubKey();
 
-        $builder = new TxBuilder();
+        $builder = new TxBuilder;
         $builder->payToAddress(50, $address);
 
         $this->assertEquals($expectedScript, $builder->get()->getOutput(0)->getScript());

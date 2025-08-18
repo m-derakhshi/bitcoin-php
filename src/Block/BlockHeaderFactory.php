@@ -11,8 +11,6 @@ use BitWasp\Buffertools\BufferInterface;
 class BlockHeaderFactory
 {
     /**
-     * @param string $string
-     * @return BlockHeaderInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
@@ -22,12 +20,10 @@ class BlockHeaderFactory
     }
 
     /**
-     * @param BufferInterface $buffer
-     * @return BlockHeaderInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public static function fromBuffer(BufferInterface $buffer): BlockHeaderInterface
     {
-        return (new BlockHeaderSerializer())->parse($buffer);
+        return (new BlockHeaderSerializer)->parse($buffer);
     }
 }

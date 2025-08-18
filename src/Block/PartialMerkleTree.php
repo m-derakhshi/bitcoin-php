@@ -35,10 +35,6 @@ class PartialMerkleTree extends Serializable
 
     /**
      * Takes array of hashes and flag array only. Use PartialMerkleTree::create() instead of creating instance directly..
-     *
-     * @param int $txCount
-     * @param array $vHashes
-     * @param array $vBits
      */
     public function __construct(int $txCount = 0, array $vHashes = [], array $vBits = [])
     {
@@ -50,22 +46,19 @@ class PartialMerkleTree extends Serializable
     /**
      * Construct the Merkle tree
      *
-     * @param int $txCount
-     * @param array $vTxHashes
-     * @param array $vMatch
      * @return PartialMerkleTree
      */
     public static function create(int $txCount, array $vTxHashes, array $vMatch)
     {
         $tree = new self($txCount);
         $tree->traverseAndBuild($tree->calcTreeHeight(), 0, $vTxHashes, $vMatch);
+
         return $tree;
     }
 
     /**
      * Calculate tree width for a given height.
      *
-     * @param int $height
      * @return int
      */
     public function calcTreeWidth(int $height)
@@ -75,8 +68,6 @@ class PartialMerkleTree extends Serializable
 
     /**
      * Calculate the tree height.
-     *
-     * @return int
      */
     public function calcTreeHeight(): int
     {
@@ -88,9 +79,6 @@ class PartialMerkleTree extends Serializable
         return $height;
     }
 
-    /**
-     * @return int
-     */
     public function getTxCount(): int
     {
         return $this->elementCount;
@@ -104,9 +92,6 @@ class PartialMerkleTree extends Serializable
         return $this->vHashes;
     }
 
-    /**
-     * @return array
-     */
     public function getFlagBits(): array
     {
         return $this->vFlagBits;
@@ -115,10 +100,8 @@ class PartialMerkleTree extends Serializable
     /**
      * Calculate the hash for the given $height and $position
      *
-     * @param int $height
-     * @param int $position
-     * @param \BitWasp\Buffertools\BufferInterface[] $vTxid
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @param  int  $position
+     * @param  \BitWasp\Buffertools\BufferInterface[]  $vTxid
      */
     public function calculateHash(int $height, $position, array $vTxid): BufferInterface
     {
@@ -139,10 +122,8 @@ class PartialMerkleTree extends Serializable
     /**
      * Construct the list of Merkle Tree hashes
      *
-     * @param int $height
-     * @param int $position
-     * @param array $vTxid - array of Txid's in the block
-     * @param array $vMatch - reference to array to populate
+     * @param  array  $vTxid  - array of Txid's in the block
+     * @param  array  $vMatch  - reference to array to populate
      */
     public function traverseAndBuild(int $height, int $position, array $vTxid, array &$vMatch)
     {
@@ -153,7 +134,7 @@ class PartialMerkleTree extends Serializable
 
         $this->vFlagBits[] = $parent;
 
-        if (0 === $height || !$parent) {
+        if ($height === 0 || ! $parent) {
             $this->vHashes[] = $this->calculateHash($height, $position, $vTxid);
         } else {
             $this->traverseAndBuild($height - 1, $position * 2, $vTxid, $vMatch);
@@ -166,30 +147,30 @@ class PartialMerkleTree extends Serializable
     /**
      * Traverse the Merkle Tree hashes and extract those which have a matching bit.
      *
-     * @param int $height
-     * @param int $position
-     * @param int $nBitsUsed
-     * @param int $nHashUsed
-     * @param BufferInterface[] $vMatch
-     * @return BufferInterface
+     * @param  int  $nBitsUsed
+     * @param  int  $nHashUsed
+     * @param  BufferInterface[]  $vMatch
      */
     public function traverseAndExtract(int $height, int $position, &$nBitsUsed, &$nHashUsed, &$vMatch): BufferInterface
     {
         if ($nBitsUsed >= count($this->vFlagBits)) {
             $this->fBad = true;
-            return new Buffer();
+
+            return new Buffer;
         }
 
         $parent = $this->vFlagBits[$nBitsUsed++];
-        if (0 === $height || !$parent) {
+        if ($height === 0 || ! $parent) {
             if ($nHashUsed >= count($this->vHashes)) {
                 $this->fBad = true;
-                return new Buffer();
+
+                return new Buffer;
             }
             $hash = $this->vHashes[$nHashUsed++];
             if ($height === 0 && $parent) {
                 $vMatch[] = $hash->flip();
             }
+
             return $hash;
         } else {
             $left = $this->traverseAndExtract($height - 1, $position * 2, $nBitsUsed, $nHashUsed, $vMatch);
@@ -209,14 +190,15 @@ class PartialMerkleTree extends Serializable
     /**
      * Extract matches from the tree into provided $vMatch reference.
      *
-     * @param BufferInterface[] $vMatch - reference to array of extracted 'matching' hashes
+     * @param  BufferInterface[]  $vMatch  - reference to array of extracted 'matching' hashes
      * @return BufferInterface - this will be the merkle root
+     *
      * @throws \Exception
      */
     public function extractMatches(array &$vMatch): BufferInterface
     {
         $nTx = $this->getTxCount();
-        if (0 === $nTx) {
+        if ($nTx === 0) {
             throw new \Exception('ntx = 0');
         }
 
@@ -241,7 +223,7 @@ class PartialMerkleTree extends Serializable
             throw new \Exception('bad data');
         }
 
-        if (ceil(($nBitsUsed + 7) / 8) !== ceil((count($this->vFlagBits)+7)/8)) {
+        if (ceil(($nBitsUsed + 7) / 8) !== ceil((count($this->vFlagBits) + 7) / 8)) {
             throw new \Exception('Not all bits consumed');
         }
 
@@ -252,11 +234,8 @@ class PartialMerkleTree extends Serializable
         return $merkleRoot;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getBuffer(): BufferInterface
     {
-        return (new PartialMerkleTreeSerializer())->serialize($this);
+        return (new PartialMerkleTreeSerializer)->serialize($this);
     }
 }

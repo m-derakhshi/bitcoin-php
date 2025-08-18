@@ -31,8 +31,7 @@ class MerkleRoot
     /**
      * Instantiate the class when given a block
      *
-     * @param Math $math
-     * @param TransactionInterface[] $txCollection
+     * @param  TransactionInterface[]  $txCollection
      */
     public function __construct(Math $math, array $txCollection)
     {
@@ -41,11 +40,9 @@ class MerkleRoot
     }
 
     /**
-     * @param callable|null $hashFunction
-     * @return BufferInterface
      * @throws MerkleTreeEmpty
      */
-    public function calculateHash(callable $hashFunction = null): BufferInterface
+    public function calculateHash(?callable $hashFunction = null): BufferInterface
     {
         if ($this->lastHash instanceof BufferInterface) {
             return $this->lastHash;
@@ -75,7 +72,7 @@ class MerkleRoot
             }
 
             // Check if we need to repeat the last hash (odd number of transactions)
-            if (!($txCount % 2 === 0)) {
+            if (! ($txCount % 2 === 0)) {
                 $tree->set($txCount, $last);
             }
 
@@ -83,6 +80,7 @@ class MerkleRoot
         }
 
         $this->lastHash = (new Buffer($binary))->flip();
+
         return $this->lastHash;
     }
 }

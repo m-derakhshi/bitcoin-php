@@ -27,16 +27,15 @@ class P2shScript extends Script
 
     /**
      * P2shScript constructor.
-     * @param ScriptInterface $script
-     * @param Opcodes|null $opcodes
+     *
      * @throws P2shScriptException
      */
-    public function __construct(ScriptInterface $script, Opcodes $opcodes = null)
+    public function __construct(ScriptInterface $script, ?Opcodes $opcodes = null)
     {
         if ($script instanceof WitnessScript) {
             $script = $script->getOutputScript();
-        } else if ($script instanceof self) {
-            throw new P2shScriptException("Cannot nest P2SH scripts.");
+        } elseif ($script instanceof self) {
+            throw new P2shScriptException('Cannot nest P2SH scripts.');
         }
 
         parent::__construct($script->getBuffer(), $opcodes);
@@ -51,20 +50,14 @@ class P2shScript extends Script
      */
     public function getWitnessScriptHash(): BufferInterface
     {
-        throw new P2shScriptException("Cannot compute witness-script-hash for a P2shScript");
+        throw new P2shScriptException('Cannot compute witness-script-hash for a P2shScript');
     }
 
-    /**
-     * @return ScriptInterface
-     */
     public function getOutputScript(): ScriptInterface
     {
         return $this->outputScript;
     }
 
-    /**
-     * @return ScriptHashAddress
-     */
     public function getAddress(): ScriptHashAddress
     {
         return $this->address;

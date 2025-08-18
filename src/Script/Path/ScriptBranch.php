@@ -25,9 +25,8 @@ class ScriptBranch
 
     /**
      * ScriptBranch constructor.
-     * @param ScriptInterface $fullScript
-     * @param bool[] $logicalPath
-     * @param array $scriptSections
+     *
+     * @param  bool[]  $logicalPath
      */
     public function __construct(ScriptInterface $fullScript, array $logicalPath, array $scriptSections)
     {
@@ -52,15 +51,13 @@ class ScriptBranch
         return $this->scriptSections;
     }
 
-    /**
-     * @return array
-     */
     public function getOps(): array
     {
         $sequence = [];
         foreach ($this->getScriptSections() as $segment) {
             $sequence = array_merge($sequence, $segment);
         }
+
         return $sequence;
     }
 }

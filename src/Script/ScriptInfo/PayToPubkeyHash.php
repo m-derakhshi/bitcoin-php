@@ -13,7 +13,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 class PayToPubkeyHash
 {
-
     /**
      * @var BufferInterface
      */
@@ -31,9 +30,6 @@ class PayToPubkeyHash
 
     /**
      * PayToPubkeyHash constructor.
-     * @param int $opcode
-     * @param BufferInterface $hash160
-     * @param bool $allowVerify
      */
     public function __construct(int $opcode, BufferInterface $hash160, bool $allowVerify = false)
     {
@@ -43,10 +39,10 @@ class PayToPubkeyHash
 
         if ($opcode === Opcodes::OP_CHECKSIG) {
             $verify = false;
-        } else if ($allowVerify && $opcode === Opcodes::OP_CHECKSIGVERIFY) {
+        } elseif ($allowVerify && $opcode === Opcodes::OP_CHECKSIGVERIFY) {
             $verify = true;
         } else {
-            throw new \RuntimeException("Malformed pay-to-pubkey-hash script - invalid opcode");
+            throw new \RuntimeException('Malformed pay-to-pubkey-hash script - invalid opcode');
         }
 
         $this->hash = $hash160;
@@ -55,9 +51,7 @@ class PayToPubkeyHash
     }
 
     /**
-     * @param Operation[] $chunks
-     * @param bool $allowVerify
-     * @return PayToPubKeyHash
+     * @param  Operation[]  $chunks
      */
     public static function fromDecodedScript(array $chunks, bool $allowVerify = false): PayToPubKeyHash
     {
@@ -76,8 +70,6 @@ class PayToPubkeyHash
     }
 
     /**
-     * @param ScriptInterface $script
-     * @param bool $allowVerify
      * @return PayToPubkeyHash
      */
     public static function fromScript(ScriptInterface $script, bool $allowVerify = false)
@@ -85,50 +77,31 @@ class PayToPubkeyHash
         return self::fromDecodedScript($script->getScriptParser()->decode(), $allowVerify);
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return ScriptType::P2PK;
     }
 
-    /**
-     * @return int
-     */
     public function getRequiredSigCount(): int
     {
         return 1;
     }
 
-    /**
-     * @return int
-     */
     public function getKeyCount(): int
     {
         return 1;
     }
 
-    /**
-     * @return bool
-     */
     public function isChecksigVerify(): bool
     {
         return $this->verify;
     }
 
-    /**
-     * @param PublicKeyInterface $publicKey
-     * @return bool
-     */
     public function checkInvolvesKey(PublicKeyInterface $publicKey): bool
     {
         return $publicKey->getPubKeyHash()->equals($this->hash);
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getPubKeyHash(): BufferInterface
     {
         return $this->hash;

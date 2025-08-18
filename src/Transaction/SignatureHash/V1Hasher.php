@@ -38,47 +38,36 @@ class V1Hasher extends SigHash
 
     /**
      * V1Hasher constructor.
-     * @param TransactionInterface $transaction
-     * @param int $amount
-     * @param OutPointSerializerInterface $outpointSerializer
-     * @param TransactionOutputSerializer|null $outputSerializer
      */
     public function __construct(
         TransactionInterface $transaction,
         int $amount,
-        OutPointSerializerInterface $outpointSerializer = null,
-        TransactionOutputSerializer $outputSerializer = null
+        ?OutPointSerializerInterface $outpointSerializer = null,
+        ?TransactionOutputSerializer $outputSerializer = null
     ) {
         $this->amount = $amount;
-        $this->outputSerializer = $outputSerializer ?: new TransactionOutputSerializer();
-        $this->outpointSerializer = $outpointSerializer ?: new OutPointSerializer();
+        $this->outputSerializer = $outputSerializer ?: new TransactionOutputSerializer;
+        $this->outpointSerializer = $outpointSerializer ?: new OutPointSerializer;
         parent::__construct($transaction);
     }
 
-    /**
-     * @param int $sighashType
-     * @return BufferInterface
-     */
     public function hashPrevOuts(int $sighashType): BufferInterface
     {
-        if (!($sighashType & SigHash::ANYONECANPAY)) {
+        if (! ($sighashType & SigHash::ANYONECANPAY)) {
             $binary = '';
             foreach ($this->tx->getInputs() as $input) {
                 $binary .= $this->outpointSerializer->serialize($input->getOutPoint())->getBinary();
             }
+
             return Hash::sha256d(new Buffer($binary));
         }
 
         return new Buffer('', 32);
     }
 
-    /**
-     * @param int $sighashType
-     * @return BufferInterface
-     */
     public function hashSequences(int $sighashType): BufferInterface
     {
-        if (!($sighashType & SigHash::ANYONECANPAY) && ($sighashType & 0x1f) !== SigHash::SINGLE && ($sighashType & 0x1f) !== SigHash::NONE) {
+        if (! ($sighashType & SigHash::ANYONECANPAY) && ($sighashType & 0x1F) !== SigHash::SINGLE && ($sighashType & 0x1F) !== SigHash::NONE) {
             $binary = '';
             foreach ($this->tx->getInputs() as $input) {
                 $binary .= pack('V', $input->getSequence());
@@ -90,20 +79,16 @@ class V1Hasher extends SigHash
         return new Buffer('', 32);
     }
 
-    /**
-     * @param int $sighashType
-     * @param int $inputToSign
-     * @return BufferInterface
-     */
     public function hashOutputs(int $sighashType, int $inputToSign): BufferInterface
     {
-        if (($sighashType & 0x1f) !== SigHash::SINGLE && ($sighashType & 0x1f) !== SigHash::NONE) {
+        if (($sighashType & 0x1F) !== SigHash::SINGLE && ($sighashType & 0x1F) !== SigHash::NONE) {
             $binary = '';
             foreach ($this->tx->getOutputs() as $output) {
                 $binary .= $this->outputSerializer->serialize($output)->getBinary();
             }
+
             return Hash::sha256d(new Buffer($binary));
-        } elseif (($sighashType & 0x1f) === SigHash::SINGLE && $inputToSign < count($this->tx->getOutputs())) {
+        } elseif (($sighashType & 0x1F) === SigHash::SINGLE && $inputToSign < count($this->tx->getOutputs())) {
             return Hash::sha256d($this->outputSerializer->serialize($this->tx->getOutput($inputToSign)));
         }
 
@@ -115,10 +100,6 @@ class V1Hasher extends SigHash
      * spend $txOut, and are signing $inputToSign. The SigHashType defaults to
      * SIGHASH_ALL
      *
-     * @param ScriptInterface $txOutScript
-     * @param int $inputToSign
-     * @param int $sighashType
-     * @return BufferInterface
      * @throws \Exception
      */
     public function calculate(
@@ -134,16 +115,16 @@ class V1Hasher extends SigHash
 
         $scriptBuf = $txOutScript->getBuffer();
         $preimage = new Buffer(
-            pack("V", $this->tx->getVersion()) .
-            $hashPrevOuts->getBinary() .
-            $hashSequence->getBinary() .
-            $this->outpointSerializer->serialize($input->getOutPoint())->getBinary() .
-            Buffertools::numToVarInt($scriptBuf->getSize())->getBinary() . $scriptBuf->getBinary() .
-            pack("P", $this->amount) .
-            pack("V", $input->getSequence()) .
-            $hashOutputs->getBinary() .
-            pack("V", $this->tx->getLockTime()) .
-            pack("V", $sighashType)
+            pack('V', $this->tx->getVersion()).
+            $hashPrevOuts->getBinary().
+            $hashSequence->getBinary().
+            $this->outpointSerializer->serialize($input->getOutPoint())->getBinary().
+            Buffertools::numToVarInt($scriptBuf->getSize())->getBinary().$scriptBuf->getBinary().
+            pack('P', $this->amount).
+            pack('V', $input->getSequence()).
+            $hashOutputs->getBinary().
+            pack('V', $this->tx->getLockTime()).
+            pack('V', $sighashType)
         );
 
         return Hash::sha256d($preimage);

@@ -9,19 +9,19 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class LogicOpNodeTest extends AbstractTestCase
 {
-    public function testGetChildWithNoneThrowsError()
+    public function test_get_child_with_none_throws_error()
     {
-        $logicNode = new LogicOpNode();
+        $logicNode = new LogicOpNode;
         $this->assertFalse($logicNode->hasChildren());
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("Child not found");
+        $this->expectExceptionMessage('Child not found');
 
         $logicNode->getChild(0);
     }
 
-    public function testNodeWontSplitTwice()
+    public function test_node_wont_split_twice()
     {
-        $logicNode = new LogicOpNode();
+        $logicNode = new LogicOpNode;
         $this->assertFalse($logicNode->hasChildren());
         $logicNode->split();
 

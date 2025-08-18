@@ -13,11 +13,11 @@ use BitWasp\Buffertools\Buffer;
 
 class InputMutatorTest extends AbstractTestCase
 {
-    public function testMutatesInputs()
+    public function test_mutates_inputs()
     {
         $input = new TransactionInput(
             new OutPoint(Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000'), 0),
-            new Script(),
+            new Script,
             0
         );
 
@@ -40,11 +40,11 @@ class InputMutatorTest extends AbstractTestCase
         $this->assertEquals($newSequence, $new->getSequence());
     }
 
-    public function testNull()
+    public function test_null()
     {
         $input = new TransactionInput(
             new OutPoint(Buffer::hex('0203000000000000000000000000000000000000000000000000000000000000'), 0),
-            new Script(),
+            new Script,
             0
         );
 
@@ -54,6 +54,6 @@ class InputMutatorTest extends AbstractTestCase
             ->done();
 
         $this->assertEquals(Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000', 32), $new->getOutPoint()->getTxId());
-        $this->assertEquals(0xffffffff, $new->getOutPoint()->getVout());
+        $this->assertEquals(0xFFFFFFFF, $new->getOutPoint()->getVout());
     }
 }

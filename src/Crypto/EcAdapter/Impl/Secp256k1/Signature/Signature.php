@@ -18,7 +18,7 @@ class Signature extends Serializable implements SignatureInterface
     private $r;
 
     /**
-     * @var  \GMP
+     * @var \GMP
      */
     private $s;
 
@@ -33,17 +33,14 @@ class Signature extends Serializable implements SignatureInterface
     private $secp256k1_sig;
 
     /**
-     * @param EcAdapter $adapter
-     * @param \GMP $r
-     * @param \GMP $s
-     * @param resource $secp256k1_ecdsa_signature_t
+     * @param  resource  $secp256k1_ecdsa_signature_t
      */
     public function __construct(EcAdapter $adapter, \GMP $r, \GMP $s, $secp256k1_ecdsa_signature_t)
     {
-        if (!is_resource($secp256k1_ecdsa_signature_t) ||
-            !get_resource_type($secp256k1_ecdsa_signature_t) === SECP256K1_TYPE_SIG
+        if (! is_resource($secp256k1_ecdsa_signature_t) ||
+            ! get_resource_type($secp256k1_ecdsa_signature_t) === SECP256K1_TYPE_SIG
         ) {
-            throw new \InvalidArgumentException('Secp256k1\Signature\Signature expects ' . SECP256K1_TYPE_SIG . ' resource');
+            throw new \InvalidArgumentException('Secp256k1\Signature\Signature expects '.SECP256K1_TYPE_SIG.' resource');
         }
 
         $this->secp256k1_sig = $secp256k1_ecdsa_signature_t;
@@ -76,10 +73,6 @@ class Signature extends Serializable implements SignatureInterface
         return $this->secp256k1_sig;
     }
 
-    /**
-     * @param Signature $other
-     * @return bool
-     */
     private function doEquals(Signature $other): bool
     {
         $a = '';
@@ -90,19 +83,12 @@ class Signature extends Serializable implements SignatureInterface
         return hash_equals($a, $b);
     }
 
-    /**
-     * @param SignatureInterface $signature
-     * @return bool
-     */
     public function equals(SignatureInterface $signature): bool
     {
         /** @var Signature $signature */
         return $this->doEquals($signature);
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getBuffer(): BufferInterface
     {
         return (new DerSignatureSerializer($this->ecAdapter))->serialize($this);

@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class SuperfluousScriptData extends ScriptQualificationError
-{
-
-}
+class SuperfluousScriptData extends ScriptQualificationError {}

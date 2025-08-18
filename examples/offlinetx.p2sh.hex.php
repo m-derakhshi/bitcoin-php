@@ -1,18 +1,18 @@
 <?php
 
-require __DIR__ . "/../vendor/autoload.php";
+require __DIR__.'/../vendor/autoload.php';
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
+use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Transaction\Factory\SignData;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\Factory\SignData;
-use BitWasp\Bitcoin\Script\P2shScript;
+use BitWasp\Buffertools\Buffer;
 
 $ecAdapter = Bitcoin::getEcAdapter();
 $math = $ecAdapter->getMath();
@@ -26,7 +26,7 @@ $amount = '161662670';
 $fee = '12345';
 $amountAfterFee = $amount - $fee;
 
-$privKeyFactory = new PrivateKeyFactory();
+$privKeyFactory = new PrivateKeyFactory;
 // Two users independently create private keys.
 $pk1 = $privKeyFactory->fromHexUncompressed($privHex1);
 $addr1 = new PayToPubKeyHashAddress($pk1->getPublicKey()->getPubKeyHash());
@@ -42,10 +42,10 @@ $spendTx = TransactionFactory::build()
     ->payToAddress($amountAfterFee, $addr1)
     ->get();
 
-echo "Unsigned transaction: " . $spendTx->getHex() . PHP_EOL;
+echo 'Unsigned transaction: '.$spendTx->getHex().PHP_EOL;
 
 // A redeem script is required for this transaction
-$signData = new SignData();
+$signData = new SignData;
 $signData->p2sh($redeemScript);
 
 // Two parties sign the transaction (can be done in steps)
@@ -56,4 +56,4 @@ $signer
 
 $signed = $signer->get();
 
-echo "Fully signed transaction: " . $signed->getHex() . "\n";
+echo 'Fully signed transaction: '.$signed->getHex()."\n";

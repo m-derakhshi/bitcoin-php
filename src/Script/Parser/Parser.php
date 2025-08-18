@@ -56,12 +56,10 @@ class Parser implements \Iterator
     /**
      * @var Operation[]
      */
-    private $array = array();
+    private $array = [];
 
     /**
      * ScriptParser constructor.
-     * @param Math $math
-     * @param ScriptInterface $script
      */
     public function __construct(Math $math, ScriptInterface $script)
     {
@@ -73,17 +71,12 @@ class Parser implements \Iterator
         $this->empty = new Buffer('', 0);
     }
 
-    /**
-     * @return int
-     */
     public function getPosition(): int
     {
         return $this->position;
     }
 
     /**
-     * @param string $packFormat
-     * @param integer $strSize
      * @return array|bool
      */
     private function unpackSize(string $packFormat, int $strSize)
@@ -100,7 +93,6 @@ class Parser implements \Iterator
     }
 
     /**
-     * @param int $ptr
      * @return Operation
      */
     private function doNext(int $ptr)
@@ -116,9 +108,9 @@ class Parser implements \Iterator
         if ($opCode <= Opcodes::OP_PUSHDATA4) {
             if ($opCode < Opcodes::OP_PUSHDATA1) {
                 $dataSize = $opCode;
-            } else if ($opCode === Opcodes::OP_PUSHDATA1) {
+            } elseif ($opCode === Opcodes::OP_PUSHDATA1) {
                 $dataSize = $this->unpackSize('C', 1);
-            } else if ($opCode === Opcodes::OP_PUSHDATA2) {
+            } elseif ($opCode === Opcodes::OP_PUSHDATA2) {
                 $dataSize = $this->unpackSize('v', 2);
             } else {
                 $dataSize = $this->unpackSize('V', 4);
@@ -143,41 +135,33 @@ class Parser implements \Iterator
     }
 
     /**
-     * @param int $begin
-     * @param null|int $length
      * @return Script
      */
-    public function slice(int $begin, int $length = null)
+    public function slice(int $begin, ?int $length = null)
     {
         if ($begin < 0) {
-            throw new \RuntimeException("Invalid start of script - cannot be negative or ");
+            throw new \RuntimeException('Invalid start of script - cannot be negative or ');
         }
 
         $maxLength = $this->end - $begin;
 
-        if (null === $length) {
+        if ($length === null) {
             $length = $maxLength;
         } else {
             if ($length > $maxLength) {
-                throw new \RuntimeException("Cannot slice this much from script");
+                throw new \RuntimeException('Cannot slice this much from script');
             }
         }
 
         return new Script(new Buffer(substr($this->data, $begin, $length)));
     }
 
-    /**
-     *
-     */
-    public function rewind():void
+    public function rewind(): void
     {
         $this->execPtr = 0;
         $this->position = 0;
     }
 
-    /**
-     * @return Operation
-     */
     public function current(): Operation
     {
         if (isset($this->array[$this->execPtr])) {
@@ -189,9 +173,6 @@ class Parser implements \Iterator
         return $exec;
     }
 
-    /**
-     * @return int
-     */
     public function key(): int
     {
         return $this->execPtr;
@@ -200,20 +181,18 @@ class Parser implements \Iterator
     /**
      * @return Operation|null
      */
-    public function next():void
+    public function next(): void
     {
         $ptr = $this->execPtr;
         if (isset($this->array[$ptr])) {
             $this->execPtr++;
+
             return $this->array[$ptr];
         }
 
         return null;
     }
 
-    /**
-     * @return bool
-     */
     public function valid(): bool
     {
         return isset($this->array[$this->execPtr]) || $this->position < $this->end;
@@ -232,9 +211,6 @@ class Parser implements \Iterator
         return $result;
     }
 
-    /**
-     * @return string
-     */
     public function getHumanReadable(): string
     {
         return implode(' ', array_map(
@@ -242,7 +218,7 @@ class Parser implements \Iterator
                 $op = $operation->getOp();
                 if ($op === Opcodes::OP_0 || $op === Opcodes::OP_1NEGATE || $op >= Opcodes::OP_1 && $op <= Opcodes::OP_16) {
                     return $this->script->getOpcodes()->getOp($op);
-                } else if ($operation->isPush()) {
+                } elseif ($operation->isPush()) {
                     return $operation->getData()->getHex();
                 } else {
                     return $this->script->getOpcodes()->getOp($operation->getOp());

@@ -12,7 +12,6 @@ use BitWasp\Buffertools\Buffer;
 
 class ParserTest extends AbstractTestCase
 {
-
     /**
      * @var ScriptInterface
      */
@@ -20,11 +19,11 @@ class ParserTest extends AbstractTestCase
 
     public function getInvalidScripts()
     {
-        $start = array(
-            ['',255, null, false],
-            ['0200',2,null, false],
-            ['4c',76,null, false]
-        );
+        $start = [
+            ['', 255, null, false],
+            ['0200', 2, null, false],
+            ['4c', 76, null, false],
+        ];
 
         $s = '';
         for ($j = 1; $j < 250; $j++) {
@@ -47,13 +46,14 @@ class ParserTest extends AbstractTestCase
         for ($j = 1; $j < 260; $j++) {
             $t .= '41';
         }
-        //$t1 = pack("cvH*", 0x4d, 260, $t);
+        // $t1 = pack("cvH*", 0x4d, 260, $t);
 
         $start = [
             ['0100', 1, chr(0), true],
-            [$s1, 76, pack("H*", $s), true],
-            //[bin2hex($t1), 77, pack("H*", $t), true]
+            [$s1, 76, pack('H*', $s), true],
+            // [bin2hex($t1), 77, pack("H*", $t), true]
         ];
+
         return $start;
     }
 
@@ -64,12 +64,10 @@ class ParserTest extends AbstractTestCase
 
     /**
      * @dataProvider getTestPushScripts
-     * @param string $script
-     * @param int $expectedOp
-     * @param string $expectedPushData
-     * @param bool $result
+     *
+     * @param  string  $expectedPushData
      */
-    public function testPush(string $script, int $expectedOp, $expectedPushData, bool $result)
+    public function test_push(string $script, int $expectedOp, $expectedPushData, bool $result)
     {
         $parser = ScriptFactory::fromHex($script)->getScriptParser();
 
@@ -85,7 +83,7 @@ class ParserTest extends AbstractTestCase
         }
     }
 
-    public function testParse()
+    public function test_parse()
     {
         $buf = Buffer::hex('0f9947c2b0fdd82ef3153232ee23d5c0bed84a02');
         $script = ScriptFactory::create()->opcode(Opcodes::OP_HASH160)->push($buf)->opcode(Opcodes::OP_EQUAL)->getScript();
@@ -100,7 +98,7 @@ class ParserTest extends AbstractTestCase
         $this->assertSame($parse[2]->getOp(), Opcodes::OP_EQUAL);
     }
 
-    public function testParseNullByte()
+    public function test_parse_null_byte()
     {
         $script = ScriptFactory::create()->opcode(Opcodes::OP_0)->getScript();
         $parse = $script->getScriptParser()->decode();
@@ -110,7 +108,7 @@ class ParserTest extends AbstractTestCase
         $this->assertSame('', $data->getData()->getBinary());
     }
 
-    public function testParseScripts()
+    public function test_parse_scripts()
     {
         $f = $this->dataFile('script.asm.json');
         $json = json_decode($f);
@@ -196,7 +194,7 @@ class ParserTest extends AbstractTestCase
         $this->assertSame(Opcodes::OP_DEPTH, $script8[5]->getOp());
     }
 
-    public function testDataSize()
+    public function test_data_size()
     {
         $buffer = new Buffer('', 40);
         $script = ScriptFactory::create()->push($buffer)->opcode(Opcodes::OP_HASH160)->getScript();

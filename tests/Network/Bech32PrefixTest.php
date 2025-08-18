@@ -11,43 +11,43 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class Bech32PrefixTest extends AbstractTestCase
 {
-    public function testHasKnownBech32Byte()
+    public function test_has_known_bech32_byte()
     {
         $method = new \ReflectionMethod(Bitcoin::class, 'hasBech32Prefix');
         $method->setAccessible(true);
-        $hasPrefix = $method->invoke(new Bitcoin(), Network::BECH32_PREFIX_SEGWIT);
+        $hasPrefix = $method->invoke(new Bitcoin, Network::BECH32_PREFIX_SEGWIT);
         $this->assertTrue($hasPrefix);
     }
 
-    public function testHasUnknownBech32Byte()
+    public function test_has_unknown_bech32_byte()
     {
         $method = new \ReflectionMethod(Bitcoin::class, 'hasBech32Prefix');
         $method->setAccessible(true);
-        $hasPrefix = $method->invoke(new Bitcoin(), "don't know this one");
+        $hasPrefix = $method->invoke(new Bitcoin, "don't know this one");
         $this->assertFalse($hasPrefix);
     }
 
-    public function testGetKnownBech32Byte()
+    public function test_get_known_bech32_byte()
     {
         $method = new \ReflectionMethod(Bitcoin::class, 'getBech32Prefix');
         $method->setAccessible(true);
-        $prefix = $method->invoke(new Bitcoin(), Network::BECH32_PREFIX_SEGWIT);
+        $prefix = $method->invoke(new Bitcoin, Network::BECH32_PREFIX_SEGWIT);
         $this->assertSame('bc', $prefix);
     }
 
-    public function testGetUnknownBech32Byte()
+    public function test_get_unknown_bech32_byte()
     {
         $method = new \ReflectionMethod(Bitcoin::class, 'getBech32Prefix');
         $method->setAccessible(true);
 
         $this->expectException(MissingBech32Prefix::class);
 
-        $method->invoke(new Bitcoin(), "unknown!");
+        $method->invoke(new Bitcoin, 'unknown!');
     }
 
-    public function testGetBech32TypeByte()
+    public function test_get_bech32_type_byte()
     {
-        $network = new Bitcoin();
+        $network = new Bitcoin;
         $method = new \ReflectionProperty(Bitcoin::class, 'bech32PrefixMap');
         $method->setAccessible(true);
 

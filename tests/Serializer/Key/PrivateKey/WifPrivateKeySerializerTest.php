@@ -18,10 +18,9 @@ use BitWasp\Buffertools\Buffer;
 class WifPrivateKeySerializerTest extends AbstractBip39Case
 {
     /**
-     * @param EcAdapterInterface $ecAdapter
      * @dataProvider getEcAdapters
      */
-    public function testSerializer(EcAdapterInterface $ecAdapter)
+    public function test_serializer(EcAdapterInterface $ecAdapter)
     {
         $network = NetworkFactory::bitcoin();
 
@@ -29,7 +28,7 @@ class WifPrivateKeySerializerTest extends AbstractBip39Case
         $wifSerializer = new WifPrivateKeySerializer($hexSerializer);
 
         $factory = new PrivateKeyFactory($ecAdapter);
-        $valid = $factory->generateUncompressed(new Random());
+        $valid = $factory->generateUncompressed(new Random);
         $this->assertEquals($valid, $wifSerializer->parse($wifSerializer->serialize($network, $valid), $network));
 
         $invalid = Buffer::hex('8041414141414141414141414141414141');

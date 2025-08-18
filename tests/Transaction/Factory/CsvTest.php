@@ -24,21 +24,18 @@ use BitWasp\Bitcoin\Transaction\TransactionOutput;
 class CsvTest extends AbstractTestCase
 {
     /**
-     * @param int $locktime
-     * @param int $sequence
-     * @param int $version
      * @return TransactionInterface
      */
     public function txFixture(int $locktime, int $sequence, int $version = 2)
     {
-        $addrCreator = new AddressCreator();
-        return (new TxBuilder())
+        $addrCreator = new AddressCreator;
+
+        return (new TxBuilder)
             ->version($version)
             ->input('abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234', 0, null, $sequence)
-            ->output(90000000, $addrCreator->fromString("1BQLNJtMDKmMZ4PyqVFfRuBNvoGhjigBKF")->getScriptPubKey())
+            ->output(90000000, $addrCreator->fromString('1BQLNJtMDKmMZ4PyqVFfRuBNvoGhjigBKF')->getScriptPubKey())
             ->locktime($locktime)
-            ->get()
-            ;
+            ->get();
     }
 
     /**
@@ -49,10 +46,10 @@ class CsvTest extends AbstractTestCase
         $blocks100 = 100;
         $seconds512 = TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG | 1;
 
-        $errTxVersion = "Transaction version must be 2 or greater for CSV";
-        $errCsvNotSeconds = "CSV was for timestamp, but txin sequence was in block range";
-        $errCsvNotBlocks = "CSV was for block height, but txin sequence was in timestamp range";
-        $errSequenceFinal = "Sequence LOCKTIME_DISABLE_FLAG is set - not allowed on CSV output";
+        $errTxVersion = 'Transaction version must be 2 or greater for CSV';
+        $errCsvNotSeconds = 'CSV was for timestamp, but txin sequence was in block range';
+        $errCsvNotBlocks = 'CSV was for block height, but txin sequence was in timestamp range';
+        $errSequenceFinal = 'Sequence LOCKTIME_DISABLE_FLAG is set - not allowed on CSV output';
 
         return [
             [
@@ -74,23 +71,19 @@ class CsvTest extends AbstractTestCase
                 $blocks100, $this->txFixture(0, $seconds512, 2), \RuntimeException::class, $errCsvNotBlocks,
             ],
             [
-                $blocks100, $this->txFixture(0, 0xffffffff, 2), \RuntimeException::class, $errSequenceFinal,
+                $blocks100, $this->txFixture(0, 0xFFFFFFFF, 2), \RuntimeException::class, $errSequenceFinal,
             ],
         ];
     }
 
     /**
-     * @param int $verifySequence
-     * @param TransactionInterface $unsigned
-     * @param null|string $exception
-     * @param null|string $exceptionMsg
      * @dataProvider getCltvCases
      */
-    public function testCsv(int $verifySequence, TransactionInterface $unsigned, string $exception = null, string $exceptionMsg = null)
+    public function test_csv(int $verifySequence, TransactionInterface $unsigned, ?string $exception = null, ?string $exceptionMsg = null)
     {
         /** @var PrivateKeyInterface[] $keys */
-        $factory = new PrivateKeyFactory();
-        $key = $factory->fromHexCompressed("4200000042000000420000004200000042000000420000004200000042000000");
+        $factory = new PrivateKeyFactory;
+        $key = $factory->fromHexCompressed('4200000042000000420000004200000042000000420000004200000042000000');
 
         $s = ScriptFactory::sequence([
             Number::int($verifySequence)->getBuffer(), Opcodes::OP_CHECKSEQUENCEVERIFY, Opcodes::OP_DROP,
@@ -105,28 +98,25 @@ class CsvTest extends AbstractTestCase
 
         $flags = Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_CHECKSEQUENCEVERIFY;
 
-        $signData = (new SignData())
+        $signData = (new SignData)
             ->p2sh($rs)
             ->p2wsh($ws)
-            ->signaturePolicy($flags)
-        ;
+            ->signaturePolicy($flags);
 
         $signer = (new Signer($unsigned))
-            ->allowComplexScripts(true)
-        ;
+            ->allowComplexScripts(true);
 
-        if (null !== $exception) {
+        if ($exception !== null) {
             $this->expectException($exception);
             $this->expectExceptionMessage($exceptionMsg);
         }
 
         $input = $signer
             ->input(0, $txOut, $signData)
-            ->signStep(1, $key)
-        ;
+            ->signStep(1, $key);
 
         if ($exception) {
-            $this->fail("expected failure before verification can commence");
+            $this->fail('expected failure before verification can commence');
         }
 
         $this->assertTrue($input->verify());

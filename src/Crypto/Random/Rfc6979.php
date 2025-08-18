@@ -14,7 +14,6 @@ use Mdanter\Ecc\Random\RandomNumberGeneratorInterface;
 
 class Rfc6979 implements RbgInterface
 {
-
     /**
      * @var EcAdapterInterface
      */
@@ -25,12 +24,6 @@ class Rfc6979 implements RbgInterface
      */
     private $hmac;
 
-    /**
-     * @param EcAdapterInterface $ecAdapter
-     * @param PrivateKeyInterface $privateKey
-     * @param BufferInterface $messageHash
-     * @param string $algo
-     */
     public function __construct(
         EcAdapterInterface $ecAdapter,
         PrivateKeyInterface $privateKey,
@@ -42,13 +35,10 @@ class Rfc6979 implements RbgInterface
         $this->hmac = RandomGeneratorFactory::getHmacRandomGenerator($mdPk, gmp_init($messageHash->getInt(), 10), $algo);
     }
 
-    /**
-     * @param int $bytes
-     * @return BufferInterface
-     */
     public function bytes(int $bytes): BufferInterface
     {
         $integer = $this->hmac->generate($this->ecAdapter->getOrder());
+
         return Buffer::int(gmp_strval($integer, 10), $bytes);
     }
 }

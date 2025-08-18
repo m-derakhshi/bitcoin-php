@@ -1,11 +1,11 @@
 <?php
 
-require __DIR__ . "/../../../vendor/autoload.php";
+require __DIR__.'/../../../vendor/autoload.php';
 
+use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface as I;
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Script\Opcodes;
-use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface as I;
 
 $flags = I::VERIFY_NONE;
 $scriptSig = ScriptFactory::create()->int(1)->getScript();
@@ -18,5 +18,5 @@ $tx = TransactionFactory::build()
 $consensus = ScriptFactory::consensus();
 $nIn = 0;
 $amount = 0;
-echo $consensus->verify($tx, $scriptPubKey, $nIn, $flags, $amount) ? "correct" : "incorrect";
+echo $consensus->verify($tx, $scriptPubKey, $nIn, $flags, $amount) ? 'correct' : 'incorrect';
 echo PHP_EOL;

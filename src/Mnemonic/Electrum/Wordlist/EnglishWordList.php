@@ -12,20 +12,14 @@ class EnglishWordList extends WordList implements ElectrumWordListInterface
      */
     private $wordsFlipped;
 
-    /**
-     * @return int
-     */
     public function count(): int
     {
         return count($this->getWords());
     }
 
-    /**
-     * @return array
-     */
     public function getWords(): array
     {
-        return array('like', 'just', 'love', 'know', 'never', 'want', 'time',
+        return ['like', 'just', 'love', 'know', 'never', 'want', 'time',
             'out', 'there', 'make', 'look', 'eye', 'down', 'only', 'think',
             'heart', 'back', 'then', 'into', 'about', 'more', 'away', 'still',
             'them', 'take', 'thing', 'even', 'through', 'long', 'always',
@@ -261,22 +255,18 @@ class EnglishWordList extends WordList implements ElectrumWordListInterface
             'pathetic', 'pattern', 'pie', 'prefer', 'puff', 'rape', 'rare',
             'revenge', 'rude', 'scrape', 'spiral', 'squeeze', 'strain', 'sunset',
             'suspend', 'sympathy', 'thigh', 'throne', 'total', 'unseen',
-            'weapon', 'weary');
+            'weapon', 'weary'];
     }
 
-    /**
-     * @param string $word
-     * @return int
-     */
     public function getIndex(string $word): int
     {
         // create a flipped word list to speed up the searching of words
-        if (null === $this->wordsFlipped) {
+        if ($this->wordsFlipped === null) {
             $this->wordsFlipped = array_flip($this->getWords());
         }
 
-        if (!isset($this->wordsFlipped[$word])) {
-            throw new \InvalidArgumentException(__CLASS__ . ' does not contain word ' . $word);
+        if (! isset($this->wordsFlipped[$word])) {
+            throw new \InvalidArgumentException(__CLASS__.' does not contain word '.$word);
         }
 
         return $this->wordsFlipped[$word];

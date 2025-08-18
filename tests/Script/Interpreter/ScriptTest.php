@@ -18,7 +18,6 @@ use BitWasp\Bitcoin\Tests\Script\ScriptCheckTestBase;
  */
 class ScriptTest extends ScriptCheckTestBase
 {
-
     /**
      * @return array
      */
@@ -26,9 +25,9 @@ class ScriptTest extends ScriptCheckTestBase
     {
         $vectors = [];
         foreach ($this->prepareTestData() as $fixture) {
-            list ($flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest) = $fixture;
+            [$flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest] = $fixture;
             foreach ($this->getEcAdapters() as $ecAdapterFixture) {
-                list ($ecAdapter) = $ecAdapterFixture;
+                [$ecAdapter] = $ecAdapterFixture;
                 $vectors[] = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
             }
         }
@@ -37,17 +36,9 @@ class ScriptTest extends ScriptCheckTestBase
     }
 
     /**
-     * @param EcAdapterInterface $ecAdapter
-     * @param Interpreter $interpreter
-     * @param int $flags
-     * @param bool $expectedResult
-     * @param ScriptWitnessInterface $scriptWitness
-     * @param ScriptInterface $scriptSig
-     * @param ScriptInterface $scriptPubKey
-     * @param int $amount
      * @dataProvider prepareInterpreterTests
      */
-    public function testScript(
+    public function test_script(
         EcAdapterInterface $ecAdapter,
         Interpreter $interpreter,
         int $flags,

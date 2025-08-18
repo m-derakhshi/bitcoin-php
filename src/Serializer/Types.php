@@ -29,15 +29,15 @@ class Types
     public static function factory()
     {
         static $factory;
-        if (null === $factory) {
-            $factory = new CachingTypeFactory();
+        if ($factory === null) {
+            $factory = new CachingTypeFactory;
         }
 
         return $factory;
     }
 
     /**
-     * @param int $length
+     * @param  int  $length
      * @return ByteString
      */
     public static function bytestring($length)
@@ -46,7 +46,7 @@ class Types
     }
 
     /**
-     * @param int $length
+     * @param  int  $length
      * @return ByteString
      */
     public static function bytestringle($length)
@@ -263,7 +263,6 @@ class Types
     }
 
     /**
-     * @param callable $reader
      * @return \BitWasp\Buffertools\Types\Vector
      */
     public static function vector(callable $reader)

@@ -15,11 +15,11 @@ class BitcoinTestnetRegistryTest extends AbstractTestCase
      * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
      * @throws \BitWasp\Bitcoin\Exceptions\MissingBip32Prefix
      */
-    public function testXpubP2pkh()
+    public function test_xpub_p2pkh()
     {
-        $network = new BitcoinTestnet();
-        $registry = new BitcoinTestnetRegistry();
-        list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2PKH);
+        $network = new BitcoinTestnet;
+        $registry = new BitcoinTestnetRegistry;
+        [$priv, $pub] = $registry->getPrefixes(ScriptType::P2PKH);
 
         $this->assertEquals(
             $network->getHDPubByte(),
@@ -31,15 +31,16 @@ class BitcoinTestnetRegistryTest extends AbstractTestCase
             $priv
         );
     }
+
     /**
      * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
      * @throws \BitWasp\Bitcoin\Exceptions\MissingBip32Prefix
      */
-    public function testXpubP2shP2pkh()
+    public function test_xpub_p2sh_p2pkh()
     {
-        $network = new BitcoinTestnet();
-        $registry = new BitcoinTestnetRegistry();
-        list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2SH . "|" . ScriptType::P2PKH);
+        $network = new BitcoinTestnet;
+        $registry = new BitcoinTestnetRegistry;
+        [$priv, $pub] = $registry->getPrefixes(ScriptType::P2SH.'|'.ScriptType::P2PKH);
 
         $this->assertEquals(
             $network->getHDPubByte(),
@@ -52,39 +53,39 @@ class BitcoinTestnetRegistryTest extends AbstractTestCase
         );
     }
 
-    public function testypubP2shP2wpkh()
+    public function testypub_p2sh_p2wpkh()
     {
-        $registry = new BitcoinTestnetRegistry();
-        list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2SH . "|" . ScriptType::P2WKH);
+        $registry = new BitcoinTestnetRegistry;
+        [$priv, $pub] = $registry->getPrefixes(ScriptType::P2SH.'|'.ScriptType::P2WKH);
 
-        $this->assertEquals("044a5262", $pub);
-        $this->assertEquals("044a4e28", $priv);
+        $this->assertEquals('044a5262', $pub);
+        $this->assertEquals('044a4e28', $priv);
     }
 
-    public function testYpubP2shP2wshP2pkh()
+    public function test_ypub_p2sh_p2wsh_p2pkh()
     {
-        $this->expectExceptionMessage("Unknown script type");
+        $this->expectExceptionMessage('Unknown script type');
         $this->expectException(\InvalidArgumentException::class);
 
-        $registry = new BitcoinTestnetRegistry();
-        $registry->getPrefixes(ScriptType::P2SH . "|" . ScriptType::P2WSH . "|" . ScriptType::P2PKH);
+        $registry = new BitcoinTestnetRegistry;
+        $registry->getPrefixes(ScriptType::P2SH.'|'.ScriptType::P2WSH.'|'.ScriptType::P2PKH);
     }
 
-    public function testzpubP2wpkh()
+    public function testzpub_p2wpkh()
     {
-        $registry = new BitcoinTestnetRegistry();
-        list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2WKH);
+        $registry = new BitcoinTestnetRegistry;
+        [$priv, $pub] = $registry->getPrefixes(ScriptType::P2WKH);
 
-        $this->assertEquals("045f1cf6", $pub);
-        $this->assertEquals("045f18bc", $priv);
+        $this->assertEquals('045f1cf6', $pub);
+        $this->assertEquals('045f18bc', $priv);
     }
 
-    public function testZpubP2shP2wshP2pkh()
+    public function test_zpub_p2sh_p2wsh_p2pkh()
     {
-        $registry = new BitcoinTestnetRegistry();
-        list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2WSH . "|" . ScriptType::P2PKH);
+        $registry = new BitcoinTestnetRegistry;
+        [$priv, $pub] = $registry->getPrefixes(ScriptType::P2WSH.'|'.ScriptType::P2PKH);
 
-        $this->assertEquals("02575483", $pub);
-        $this->assertEquals("02575048", $priv);
+        $this->assertEquals('02575483', $pub);
+        $this->assertEquals('02575048', $priv);
     }
 }

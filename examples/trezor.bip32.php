@@ -7,7 +7,7 @@ use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
 use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 
-require __DIR__ . "/../vendor/autoload.php";
+require __DIR__.'/../vendor/autoload.php';
 
 function getScriptPubKey(HierarchicalKey $key, $purpose)
 {
@@ -16,23 +16,24 @@ function getScriptPubKey(HierarchicalKey $key, $purpose)
             return ScriptFactory::scriptPubKey()->p2pkh($key->getPublicKey()->getPubKeyHash());
         case 49:
             $rs = new P2shScript(ScriptFactory::scriptPubKey()->p2wkh($key->getPublicKey()->getPubKeyHash()));
+
             return $rs->getOutputScript();
         default:
-            throw new \InvalidArgumentException("Invalid purpose");
+            throw new \InvalidArgumentException('Invalid purpose');
     }
 }
 
-$mnemonic = "rain enhance term seminar upper must gun uniform huge brown fresh gun warrior mesh tag";
+$mnemonic = 'rain enhance term seminar upper must gun uniform huge brown fresh gun warrior mesh tag';
 
-$bip39 = new Bip39SeedGenerator();
+$bip39 = new Bip39SeedGenerator;
 $seed = $bip39->getSeed($mnemonic);
 
 $purpose = 44;
 
-$factory = new HierarchicalKeyFactory();
+$factory = new HierarchicalKeyFactory;
 $root = $factory->fromEntropy($seed);
-echo "Root key (m): " . $root->toExtendedKey() . PHP_EOL;
-echo "Root key (M): " . $root->toExtendedPublicKey() . PHP_EOL;
+echo 'Root key (m): '.$root->toExtendedKey().PHP_EOL;
+echo 'Root key (M): '.$root->toExtendedPublicKey().PHP_EOL;
 
 echo "\n\n -------------- \n\n";
 
@@ -47,7 +48,7 @@ try {
     $rootPub = $root->withoutPrivateKey();
     $rootPub->derivePath("{$purpose}'/0'/0'");
 } catch (\Exception $e) {
-    echo "caught exception, yes this is impossible: " . $e->getMessage().PHP_EOL;
+    echo 'caught exception, yes this is impossible: '.$e->getMessage().PHP_EOL;
 }
 
 $purposePub = $purposePriv->toExtendedPublicKey();
@@ -58,8 +59,8 @@ echo "initialize from xpub (M/{$purpose}'/0'/0'): \n";
 
 $xpub = $factory->fromExtended($purposePub);
 
-$addressCreator = new AddressCreator();
-$script0 = getScriptPubKey($xpub->derivePath("0/0"), $purpose);
-$script1 = getScriptPubKey($xpub->derivePath("0/1"), $purpose);
-echo "0/0: ".$addressCreator->fromOutputScript($script0)->getAddress().PHP_EOL;
-echo "0/1: ".$addressCreator->fromOutputScript($script1)->getAddress().PHP_EOL;
+$addressCreator = new AddressCreator;
+$script0 = getScriptPubKey($xpub->derivePath('0/0'), $purpose);
+$script1 = getScriptPubKey($xpub->derivePath('0/1'), $purpose);
+echo '0/0: '.$addressCreator->fromOutputScript($script0)->getAddress().PHP_EOL;
+echo '0/1: '.$addressCreator->fromOutputScript($script1)->getAddress().PHP_EOL;

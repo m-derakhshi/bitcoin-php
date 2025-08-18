@@ -15,7 +15,7 @@ use BitWasp\Buffertools\Buffer;
 
 class TxMutatorTest extends AbstractTestCase
 {
-    public function testModifiesTransaction()
+    public function test_modifies_transaction()
     {
         $tx = new Transaction(
             1,
@@ -31,15 +31,14 @@ class TxMutatorTest extends AbstractTestCase
         $mutator = new TxMutator($tx);
         $mutator
             ->version($newVersion)
-            ->locktime($newLockTime)
-        ;
+            ->locktime($newLockTime);
 
         $mutator->inputs([
-            new TransactionInput(new OutPoint(Buffer::hex('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 1), new Script())
+            new TransactionInput(new OutPoint(Buffer::hex('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 1), new Script),
         ]);
 
         $mutator->outputs([
-            new TransactionOutput(50, new Script())
+            new TransactionOutput(50, new Script),
         ]);
 
         $newTx = $mutator->done();

@@ -17,23 +17,20 @@ class SignatureSort implements SignatureSortInterface
 
     /**
      * SignatureSort constructor.
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(EcAdapterInterface $ecAdapter = null)
+    public function __construct(?EcAdapterInterface $ecAdapter = null)
     {
         $this->ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
     }
 
     /**
-     * @param \BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface[] $signatures
-     * @param \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface[] $publicKeys
-     * @param BufferInterface $messageHash
-     * @return \SplObjectStorage
+     * @param  \BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface[]  $signatures
+     * @param  \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface[]  $publicKeys
      */
     public function link(array $signatures, array $publicKeys, BufferInterface $messageHash): \SplObjectStorage
     {
         $sigCount = count($signatures);
-        $storage = new \SplObjectStorage();
+        $storage = new \SplObjectStorage;
         foreach ($signatures as $signature) {
             foreach ($publicKeys as $key) {
                 if ($key->verify($messageHash, $signature)) {

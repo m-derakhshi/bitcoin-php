@@ -14,13 +14,13 @@ class StackTest extends AbstractTestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testPopException()
+    public function test_pop_exception()
     {
         $stack = new Stack;
         $stack->pop();
     }
 
-    public function testAdd()
+    public function test_add()
     {
         $alpha = Buffer::hex('65');
         $beta = Buffer::hex('41');
@@ -42,9 +42,7 @@ class StackTest extends AbstractTestCase
         $this->assertSame($stack[-1], $beta);
     }
 
-    /**
-     */
-    public function testPush()
+    public function test_push()
     {
         $stack = new Stack;
         $stack->push(Buffer::hex('41'));
@@ -52,7 +50,7 @@ class StackTest extends AbstractTestCase
         $this->assertTrue(count($stack) == 1);
     }
 
-    public function testErase()
+    public function test_erase()
     {
         $stack = new Stack;
         $stack->push(Buffer::hex('41'));
@@ -66,15 +64,15 @@ class StackTest extends AbstractTestCase
     /**
      * @expectedException \Exception
      */
-    public function testEraseException()
+    public function test_erase_exception()
     {
         $stack = new Stack;
         unset($stack[0]);
     }
 
-    public function testPop()
+    public function test_pop()
     {
-        $list =  ['41', '44', '4e'];
+        $list = ['41', '44', '4e'];
         $arr = array_map(function ($v) {
             return Buffer::hex($v);
         }, $list);
@@ -92,10 +90,10 @@ class StackTest extends AbstractTestCase
         }
     }
 
-    public function testRelativeAccess()
+    public function test_relative_access()
     {
-        $stack = new Stack();
-        $list =  ['41', '44', '99'];
+        $stack = new Stack;
+        $list = ['41', '44', '99'];
         array_walk($list, function ($v) use ($stack) {
             $stack->push(Buffer::hex($v));
         });
@@ -105,10 +103,10 @@ class StackTest extends AbstractTestCase
         $this->assertSame($stack[-3]->getHex(), '41');
     }
 
-    public function testInsert()
+    public function test_insert()
     {
-        $stack = new Stack();
-        $list =  ['41', '44', '99'];
+        $stack = new Stack;
+        $list = ['41', '44', '99'];
         array_walk($list, function ($v) use ($stack) {
             $stack->push(Buffer::hex($v));
         });
@@ -125,7 +123,7 @@ class StackTest extends AbstractTestCase
         $this->assertSame('df', $stack[-5]->getHex());
     }
 
-    public function testCount()
+    public function test_count()
     {
         $stack = new Stack;
         $this->assertEquals(0, count($stack));
@@ -139,9 +137,9 @@ class StackTest extends AbstractTestCase
         $this->assertEquals(3, count($stack));
     }
 
-    public function testSwap()
+    public function test_swap()
     {
-        $stack = new Stack();
+        $stack = new Stack;
         $stack->push(Buffer::hex('00'));
         $stack->push(Buffer::hex('11'));
 

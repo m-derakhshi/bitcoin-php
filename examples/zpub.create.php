@@ -7,23 +7,23 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\NetworkConfig;
-use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\Deterministic\Slip132\Slip132;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\KeyToScriptHelper;
-use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;
 use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\Base58ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 
-require __DIR__ . "/../vendor/autoload.php";
+require __DIR__.'/../vendor/autoload.php';
 
 $adapter = Bitcoin::getEcAdapter();
-$addrCreator = new AddressCreator();
+$addrCreator = new AddressCreator;
 
 // We're using bitcoin and want the zpub.
 // Grab bitcoin registry, use that to make our prefix.
 $btc = NetworkFactory::bitcoin();
-$bitcoinPrefixes = new BitcoinRegistry();
+$bitcoinPrefixes = new BitcoinRegistry;
 
 // If you want to produce different addresses,
 // set a different prefix/factory here.
@@ -36,7 +36,7 @@ $scriptFactory = $prefix->getScriptDataFactory();
 // We just need a ScriptDataFactory. (see the KeyToScript
 // helpers on how to create custom script factories)
 
-$random = new Random();
+$random = new Random;
 $hdFactory = new HierarchicalKeyFactory($adapter);
 $masterKey = $hdFactory->generateMasterKey($random, $scriptFactory);
 
@@ -44,17 +44,17 @@ $masterKey = $hdFactory->generateMasterKey($random, $scriptFactory);
 $scriptAndSignData = $masterKey->getScriptAndSignData();
 $spk = $scriptAndSignData->getScriptPubKey();
 $signData = $scriptAndSignData->getSignData();
-echo "scriptPubKey: " . $spk->getHex() . PHP_EOL;
+echo 'scriptPubKey: '.$spk->getHex().PHP_EOL;
 if ($signData->hasRedeemScript()) {
-    echo "redeemScript: " . $signData->getRedeemScript()->getHex().PHP_EOL;
+    echo 'redeemScript: '.$signData->getRedeemScript()->getHex().PHP_EOL;
 }
 if ($signData->hasWitnessScript()) {
-    echo "witnessScript: " . $signData->getWitnessScript()->getHex().PHP_EOL;
+    echo 'witnessScript: '.$signData->getWitnessScript()->getHex().PHP_EOL;
 }
 
 // Drawing on the spk, we can try and make an address
 $address = $masterKey->getAddress($addrCreator);
-echo "address: " . $address->getAddress($btc) . PHP_EOL;
+echo 'address: '.$address->getAddress($btc).PHP_EOL;
 
 // Doh - you wanna serialize NOW?
 // Well, the toExtendedKey() method will error because
@@ -70,11 +70,11 @@ try {
 
 $config = new GlobalPrefixConfig([
     new NetworkConfig($btc, [
-        $prefix
+        $prefix,
     ]),
 ]);
 
 $serializer = new Base58ExtendedKeySerializer(new ExtendedKeySerializer($adapter, $config));
 
 $serialized = $serializer->serialize($btc, $masterKey);
-echo "master key: " . $serialized . PHP_EOL;
+echo 'master key: '.$serialized.PHP_EOL;

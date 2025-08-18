@@ -12,11 +12,11 @@ use BitWasp\Buffertools\Buffer;
 
 class OutputMutatorTest extends AbstractTestCase
 {
-    public function testModifiesOutput()
+    public function test_modifies_output()
     {
         $value = 50;
         $newValue = 150;
-        $script = new Script();
+        $script = new Script;
         $newScript = new Script(new Buffer('a'));
         $output = new TransactionOutput($value, $script);
         $modifier = new OutputMutator($output);

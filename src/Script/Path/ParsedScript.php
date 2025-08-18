@@ -25,14 +25,13 @@ class ParsedScript
 
     /**
      * ParsedScript constructor.
-     * @param ScriptInterface $script
-     * @param LogicOpNode $ast
-     * @param ScriptBranch[] $branches
+     *
+     * @param  ScriptBranch[]  $branches
      */
     public function __construct(ScriptInterface $script, LogicOpNode $ast, array $branches)
     {
-        if (!$ast->isRoot()) {
-            throw new \RuntimeException("LogicOpNode was not for root");
+        if (! $ast->isRoot()) {
+            throw new \RuntimeException('LogicOpNode was not for root');
         }
 
         $descriptorIdx = 0;
@@ -41,7 +40,7 @@ class ParsedScript
             $descriptor = $branch->getPath();
             $descriptorKey = json_encode($descriptor);
             if (array_key_exists($descriptorKey, $keyedIdxMap)) {
-                throw new \RuntimeException("Duplicate logical pathway, invalid ScriptBranch found");
+                throw new \RuntimeException('Duplicate logical pathway, invalid ScriptBranch found');
             }
 
             $keyedIdxMap[$descriptorKey] = $branch;
@@ -79,14 +78,13 @@ class ParsedScript
     /**
      * Look up the branch by it's path
      *
-     * @param array $branchDesc
      * @return bool|ScriptBranch
      */
     public function getBranchByPath(array $branchDesc)
     {
         $key = json_encode($branchDesc);
-        if (!array_key_exists($key, $this->descriptorMap)) {
-            throw new \RuntimeException("Unknown logical pathway");
+        if (! array_key_exists($key, $this->descriptorMap)) {
+            throw new \RuntimeException('Unknown logical pathway');
         }
 
         return $this->descriptorMap[$key];

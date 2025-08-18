@@ -20,16 +20,16 @@ use BitWasp\Buffertools\Buffertools;
 
 class OutputClassifierTest extends AbstractTestCase
 {
-    public function testIsKnown()
+    public function test_is_known()
     {
-        $script = new Script();
-        $classifier = new OutputClassifier();
+        $script = new Script;
+        $classifier = new OutputClassifier;
         $this->assertEquals(ScriptType::NONSTANDARD, $classifier->classify($script));
     }
 
     public function getVectors()
     {
-        $classifier = new OutputClassifier();
+        $classifier = new OutputClassifier;
         $data = json_decode($this->dataFile('outputclassifier.json'), true);
 
         $vectors = [];
@@ -46,15 +46,16 @@ class OutputClassifierTest extends AbstractTestCase
 
             $vectors[] = [$classifier, $script, $expectedSolution, $vector[2]];
         }
+
         return $vectors;
     }
 
-    public function testIsPayToPublicKey()
+    public function test_is_pay_to_public_key()
     {
-        $classifier = new OutputClassifier();
+        $classifier = new OutputClassifier;
         $this->assertFalse($classifier->isPayToPublicKey(ScriptFactory::sequence([Opcodes::OP_DUP])));
         $this->assertFalse($classifier->isPayToPublicKey(ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_CHECKSIG])));
-        $this->assertFalse($classifier->isPayToPublicKey(ScriptFactory::sequence([new Buffer(), new Buffer()])));
+        $this->assertFalse($classifier->isPayToPublicKey(ScriptFactory::sequence([new Buffer, new Buffer])));
         $this->assertFalse($classifier->isPayToPublicKey(ScriptFactory::sequence([new Buffer('', 20), Opcodes::OP_CHECKSIG])));
         $this->assertFalse($classifier->isPayToPublicKey(ScriptFactory::sequence([new Buffer('', 33), Opcodes::OP_CHECKMULTISIG])));
 
@@ -62,38 +63,37 @@ class OutputClassifierTest extends AbstractTestCase
         $this->assertTrue($classifier->isPayToPublicKey(ScriptFactory::sequence([$pub, Opcodes::OP_CHECKSIG])));
     }
 
-    public function testIsPayToPublicKeyHash()
+    public function test_is_pay_to_public_key_hash()
     {
-        $classifier = new OutputClassifier();
+        $classifier = new OutputClassifier;
         $this->assertFalse($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_DUP, Opcodes::OP_DUP, Opcodes::OP_DUP])));
-        $this->assertFalse($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([new Buffer(), Opcodes::OP_DUP, Opcodes::OP_DUP, Opcodes::OP_DUP, Opcodes::OP_DUP])));
+        $this->assertFalse($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([new Buffer, Opcodes::OP_DUP, Opcodes::OP_DUP, Opcodes::OP_DUP, Opcodes::OP_DUP])));
 
         $hash = new Buffer("\x04", 20);
         $this->assertFalse($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_DUP, $hash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG])));
-
 
         $hash = new Buffer("\x04", 20);
         $this->assertTrue($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG])));
     }
 
-    public function testIsMultisig()
+    public function test_is_multisig()
     {
         $pub = Buffertools::concat(new Buffer("\x03"), new Buffer('', 32));
 
-        $classifier = new OutputClassifier();
+        $classifier = new OutputClassifier;
         $this->assertFalse($classifier->isMultisig(ScriptFactory::sequence([Opcodes::OP_0, Opcodes::OP_0, Opcodes::OP_0])));
-        $this->assertFalse($classifier->isMultisig(ScriptFactory::sequence([new Buffer(), new Buffer(), Opcodes::OP_1, Opcodes::OP_CHECKMULTISIG])));
+        $this->assertFalse($classifier->isMultisig(ScriptFactory::sequence([new Buffer, new Buffer, Opcodes::OP_1, Opcodes::OP_CHECKMULTISIG])));
         $this->assertFalse($classifier->isMultisig(ScriptFactory::sequence([Opcodes::OP_1, Opcodes::OP_DUP, Opcodes::OP_1, Opcodes::OP_CHECKMULTISIG])));
         $this->assertFalse($classifier->isMultisig(ScriptFactory::sequence([Opcodes::OP_1, $pub, Opcodes::OP_1, Opcodes::OP_CHECKMULTISIGVERIFY])));
 
         $this->assertTrue($classifier->isMultisig(ScriptFactory::sequence([Opcodes::OP_1, $pub, Opcodes::OP_1, Opcodes::OP_CHECKMULTISIG])));
     }
 
-    public function testIsWitness()
+    public function test_is_witness()
     {
-        $classifier = new OutputClassifier();
+        $classifier = new OutputClassifier;
         $this->assertFalse($classifier->isWitness(new Script(new Buffer('', 3))));
-        $this->assertFalse($classifier->isWitness(ScriptFactory::sequence([new Buffer()])));
+        $this->assertFalse($classifier->isWitness(ScriptFactory::sequence([new Buffer])));
         $this->assertFalse($classifier->isWitness(ScriptFactory::sequence([Opcodes::OP_0, Opcodes::OP_0])));
         $this->assertFalse($classifier->isWitness(ScriptFactory::sequence([Opcodes::OP_0, Opcodes::OP_0, Opcodes::OP_0, Opcodes::OP_0])));
 
@@ -104,14 +104,14 @@ class OutputClassifierTest extends AbstractTestCase
         $this->assertTrue($classifier->isWitness(ScriptFactory::sequence([Opcodes::OP_0, $hash])));
     }
 
-    public function testIsNullData()
+    public function test_is_null_data()
     {
-        $classifier = new OutputClassifier();
+        $classifier = new OutputClassifier;
         $embedded = Buffer::hex('41');
 
         $nullDataScript = ScriptFactory::sequence([Opcodes::OP_RETURN, $embedded]);
 
-        $this->assertFalse($classifier->isNullData(new Script(new Buffer())));
+        $this->assertFalse($classifier->isNullData(new Script(new Buffer)));
         $this->assertFalse($classifier->isNullData(ScriptFactory::sequence([Buffer::hex('6a')])));
         $this->assertTrue($classifier->isNullData($nullDataScript));
 
@@ -122,13 +122,13 @@ class OutputClassifierTest extends AbstractTestCase
         $this->assertTrue($embedded->equals($extracted));
     }
 
-    public function testIsPayToScriptHash()
+    public function test_is_pay_to_script_hash()
     {
-        $classifier = new OutputClassifier();
+        $classifier = new OutputClassifier;
         $hash = new Buffer('', 20);
         $this->assertFalse($classifier->isPayToScriptHash(ScriptFactory::sequence([Opcodes::OP_DUP, $hash])));
         $this->assertFalse($classifier->isPayToScriptHash(ScriptFactory::sequence([Opcodes::OP_HASH256, $hash, Opcodes::OP_EQUAL])));
-        $this->assertFalse($classifier->isPayToScriptHash(ScriptFactory::sequence([new Buffer(), $hash, Opcodes::OP_EQUAL])));
+        $this->assertFalse($classifier->isPayToScriptHash(ScriptFactory::sequence([new Buffer, $hash, Opcodes::OP_EQUAL])));
 
         $this->assertFalse($classifier->isPayToScriptHash(ScriptFactory::sequence([Opcodes::OP_HASH160, Opcodes::OP_0, Opcodes::OP_EQUAL])));
         $this->assertFalse($classifier->isPayToScriptHash(ScriptFactory::sequence([Opcodes::OP_HASH160, new Buffer('', 16), Opcodes::OP_EQUAL])));
@@ -136,17 +136,15 @@ class OutputClassifierTest extends AbstractTestCase
 
         $this->assertTrue($classifier->isPayToScriptHash(ScriptFactory::sequence([Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUAL])));
     }
-    
+
     /**
      * @dataProvider getVectors
-     * @param OutputClassifier $classifier
-     * @param ScriptInterface $script
-     * @param BufferInterface|BufferInterface[] $eSolution
-     * @param string $classification
+     *
+     * @param  BufferInterface|BufferInterface[]  $eSolution
      */
-    public function testCases(OutputClassifier $classifier, ScriptInterface $script, $eSolution, string $classification)
+    public function test_cases(OutputClassifier $classifier, ScriptInterface $script, $eSolution, string $classification)
     {
-        $pubKeyFactory = new PublicKeyFactory();
+        $pubKeyFactory = new PublicKeyFactory;
         $factory = ScriptFactory::scriptPubKey();
         $solution = '';
         $type = $classifier->classify($script, $solution);

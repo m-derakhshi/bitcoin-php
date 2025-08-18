@@ -12,15 +12,11 @@ use BitWasp\Buffertools\Buffer;
 
 abstract class AbstractBip39Case extends AbstractTestCase
 {
-    /**
-     * @param string $language
-     * @return Bip39WordListInterface
-     */
     public function getWordList(string $language): Bip39WordListInterface
     {
         switch (strtolower($language)) {
             case 'english':
-                return new EnglishWordList();
+                return new EnglishWordList;
             default:
                 throw new \InvalidArgumentException('Unknown wordlist');
         }
@@ -43,7 +39,7 @@ abstract class AbstractBip39Case extends AbstractTestCase
                     $bip39,
                     Buffer::hex($set[0]),
                     $set[1],
-                    Buffer::hex($set[2])
+                    Buffer::hex($set[2]),
                 ];
             }
         }

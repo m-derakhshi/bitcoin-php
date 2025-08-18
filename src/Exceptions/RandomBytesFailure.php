@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class RandomBytesFailure extends \Exception
-{
-
-}
+class RandomBytesFailure extends \Exception {}

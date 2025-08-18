@@ -28,10 +28,6 @@ class BlockLocatorSerializer
         $this->bytestring32le = Types::bytestringle(32);
     }
 
-    /**
-     * @param Parser $parser
-     * @return BlockLocator
-     */
     public function fromParser(Parser $parser): BlockLocator
     {
         $numHashes = $this->varint->read($parser);
@@ -45,18 +41,12 @@ class BlockLocatorSerializer
         return new BlockLocator($hashes, $hashStop);
     }
 
-    /**
-     * @param BufferInterface $data
-     * @return BlockLocator
-     */
     public function parse(BufferInterface $data): BlockLocator
     {
         return $this->fromParser(new Parser($data));
     }
 
     /**
-     * @param BlockLocator $blockLocator
-     * @return BufferInterface
      * @throws \Exception
      */
     public function serialize(BlockLocator $blockLocator): BufferInterface
@@ -67,6 +57,7 @@ class BlockLocatorSerializer
         }
 
         $binary .= $this->bytestring32le->write($blockLocator->getHashStop());
+
         return new Buffer($binary);
     }
 }

@@ -16,7 +16,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 class Script extends Serializable implements ScriptInterface
 {
-
     /**
      * @var Opcodes
      */
@@ -37,27 +36,17 @@ class Script extends Serializable implements ScriptInterface
      */
     protected $witnessScriptHash;
 
-    /**
-     * @param BufferInterface $script
-     * @param Opcodes|null $opCodes
-     */
-    public function __construct(BufferInterface $script = null, Opcodes $opCodes = null)
+    public function __construct(?BufferInterface $script = null, ?Opcodes $opCodes = null)
     {
         $this->script = $script instanceof BufferInterface ? $script->getBinary() : '';
-        $this->opCodes = $opCodes ?: new Opcodes();
+        $this->opCodes = $opCodes ?: new Opcodes;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getBuffer(): BufferInterface
     {
         return new Buffer($this->script);
     }
 
-    /**
-     * @return Parser
-     */
     public function getScriptParser(): Parser
     {
         return new Parser(Bitcoin::getMath(), $this);
@@ -65,8 +54,6 @@ class Script extends Serializable implements ScriptInterface
 
     /**
      * Get all opcodes
-     *
-     * @return Opcodes
      */
     public function getOpCodes(): Opcodes
     {
@@ -75,12 +62,10 @@ class Script extends Serializable implements ScriptInterface
 
     /**
      * Return a buffer containing the HASH160 of this script.
-     *
-     * @return BufferInterface
      */
     public function getScriptHash(): BufferInterface
     {
-        if (null === $this->scriptHash) {
+        if ($this->scriptHash === null) {
             $this->scriptHash = Hash::sha256ripe160($this->getBuffer());
         }
 
@@ -89,12 +74,10 @@ class Script extends Serializable implements ScriptInterface
 
     /**
      * Return a buffer containing the SHA256 of this script.
-     *
-     * @return BufferInterface
      */
     public function getWitnessScriptHash(): BufferInterface
     {
-        if (null === $this->witnessScriptHash) {
+        if ($this->witnessScriptHash === null) {
             $this->witnessScriptHash = Hash::sha256($this->getBuffer());
         }
 
@@ -102,15 +85,14 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
-     * @param bool|true $accurate
-     * @return int
+     * @param  bool|true  $accurate
      */
     public function countSigOps(bool $accurate = true): int
     {
         $count = 0;
         $parser = $this->getScriptParser();
 
-        $lastOp = 0xff;
+        $lastOp = 0xFF;
         try {
             foreach ($parser as $exec) {
                 $op = $exec->getOp();
@@ -135,17 +117,13 @@ class Script extends Serializable implements ScriptInterface
         return $count;
     }
 
-    /**
-     * @param WitnessProgram $program
-     * @param ScriptWitnessInterface $scriptWitness
-     * @return int
-     */
     private function witnessSigOps(WitnessProgram $program, ScriptWitnessInterface $scriptWitness): int
     {
         if ($program->getVersion() === 0) {
             $size = $program->getProgram()->getSize();
             if ($size === 32 && count($scriptWitness) > 0) {
                 $script = new Script($scriptWitness->bottom());
+
                 return $script->countSigOps(true);
             }
 
@@ -157,12 +135,6 @@ class Script extends Serializable implements ScriptInterface
         return 0;
     }
 
-    /**
-     * @param ScriptInterface $scriptSig
-     * @param ScriptWitnessInterface $scriptWitness
-     * @param int $flags
-     * @return int
-     */
     public function countWitnessSigOps(ScriptInterface $scriptSig, ScriptWitnessInterface $scriptWitness, int $flags): int
     {
         if (($flags & InterpreterInterface::VERIFY_WITNESS) === 0) {
@@ -175,7 +147,7 @@ class Script extends Serializable implements ScriptInterface
             return $this->witnessSigOps($program, $scriptWitness);
         }
 
-        if ((new OutputClassifier())->isPayToScriptHash($this)) {
+        if ((new OutputClassifier)->isPayToScriptHash($this)) {
             $parsed = $scriptSig->getScriptParser()->decode();
             $count = count($parsed);
             if ($count > 0) {
@@ -190,13 +162,9 @@ class Script extends Serializable implements ScriptInterface
         return 0;
     }
 
-    /**
-     * @param ScriptInterface $scriptSig
-     * @return int
-     */
     public function countP2shSigOps(ScriptInterface $scriptSig): int
     {
-        if (!(new OutputClassifier())->isPayToScriptHash($this)) {
+        if (! (new OutputClassifier)->isPayToScriptHash($this)) {
             return $this->countSigOps(true);
         }
 
@@ -212,7 +180,7 @@ class Script extends Serializable implements ScriptInterface
                 }
             }
 
-            if (!$data instanceof BufferInterface) {
+            if (! $data instanceof BufferInterface) {
                 return 0;
             }
 
@@ -222,11 +190,7 @@ class Script extends Serializable implements ScriptInterface
         }
     }
 
-    /**
-     * @param array|null $ops
-     * @return bool
-     */
-    public function isPushOnly(array&$ops = null): bool
+    public function isPushOnly(?array &$ops = null): bool
     {
         $decoded = $this->getScriptParser()->decode();
         $data = [];
@@ -236,7 +200,8 @@ class Script extends Serializable implements ScriptInterface
             }
 
             if ($entity->getOp() === 0) {
-                $data[] = new Buffer();
+                $data[] = new Buffer;
+
                 continue;
             }
 
@@ -248,14 +213,14 @@ class Script extends Serializable implements ScriptInterface
             }
         }
         $ops = $data;
+
         return true;
     }
 
     /**
-     * @param WitnessProgram|null $program
-     * @return bool
+     * @param  WitnessProgram|null  $program
      */
-    public function isWitness(& $program = null): bool
+    public function isWitness(&$program = null): bool
     {
         $buffer = $this->getBuffer();
         $size = $buffer->getSize();
@@ -264,7 +229,7 @@ class Script extends Serializable implements ScriptInterface
         }
 
         $script = $this->getScriptParser()->decode();
-        if (!isset($script[0]) || !isset($script[1])) {
+        if (! isset($script[0]) || ! isset($script[1])) {
             return false;
         }
 
@@ -276,6 +241,7 @@ class Script extends Serializable implements ScriptInterface
         $witness = $script[1];
         if ($script[1]->isPush() && $size === $witness->getDataSize() + 2) {
             $program = new WitnessProgram(decodeOpN($version), $witness->getData());
+
             return true;
         }
 
@@ -283,10 +249,9 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
-     * @param BufferInterface $scriptHash
-     * @return bool
+     * @param  BufferInterface  $scriptHash
      */
-    public function isP2SH(& $scriptHash): bool
+    public function isP2SH(&$scriptHash): bool
     {
         if (strlen($this->script) === 23
             && $this->script[0] = Opcodes::OP_HASH160
@@ -294,16 +259,13 @@ class Script extends Serializable implements ScriptInterface
             && $this->script[22] = Opcodes::OP_EQUAL
         ) {
             $scriptHash = new Buffer(substr($this->script, 2, 20));
+
             return true;
         }
 
         return false;
     }
 
-    /**
-     * @param ScriptInterface $script
-     * @return bool
-     */
     public function equals(ScriptInterface $script): bool
     {
         return strcmp($this->script, $script->getBinary()) === 0;
@@ -319,9 +281,10 @@ class Script extends Serializable implements ScriptInterface
         } catch (\Exception $e) {
             $decoded = 'decode failed';
         }
+
         return [
             'hex' => bin2hex($this->script),
-            'asm' => $decoded
+            'asm' => $decoded,
         ];
     }
 }

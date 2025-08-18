@@ -30,11 +30,6 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
      */
     private $hashType;
 
-    /**
-     * @param EcAdapterInterface $ecAdapter
-     * @param SignatureInterface $signature
-     * @param int $hashType
-     */
     public function __construct(EcAdapterInterface $ecAdapter, SignatureInterface $signature, int $hashType)
     {
         $this->ecAdapter = $ecAdapter;
@@ -42,26 +37,16 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
         $this->hashType = $hashType;
     }
 
-    /**
-     * @return SignatureInterface
-     */
     public function getSignature(): SignatureInterface
     {
         return $this->signature;
     }
 
-    /**
-     * @return int
-     */
     public function getHashType(): int
     {
         return $this->hashType;
     }
 
-    /**
-     * @param TransactionSignatureInterface $other
-     * @return bool
-     */
     public function equals(TransactionSignatureInterface $other): bool
     {
         return $this->signature->equals($other->getSignature())
@@ -71,25 +56,23 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
     private static function verifyElement(string $fieldName, int $start, int $length, string $binaryString)
     {
         if ($length === 0) {
-            throw new SignatureNotCanonical('Signature ' . $fieldName . ' length is zero');
+            throw new SignatureNotCanonical('Signature '.$fieldName.' length is zero');
         }
         $typePrefix = ord($binaryString[$start - 2]);
         if ($typePrefix !== 0x02) {
-            throw new SignatureNotCanonical('Signature ' . $fieldName . ' value type mismatch');
+            throw new SignatureNotCanonical('Signature '.$fieldName.' value type mismatch');
         }
 
         $first = ord($binaryString[$start + 0]);
         if (($first & 0x80) === 128) {
-            throw new SignatureNotCanonical('Signature ' . $fieldName . ' value is negative');
+            throw new SignatureNotCanonical('Signature '.$fieldName.' value is negative');
         }
         if ($length > 1 && $first === 0 && (ord($binaryString[$start + 1]) & 0x80) === 0) {
-            throw new SignatureNotCanonical('Signature ' . $fieldName . ' value excessively padded');
+            throw new SignatureNotCanonical('Signature '.$fieldName.' value excessively padded');
         }
     }
 
     /**
-     * @param BufferInterface $sig
-     * @return bool
      * @throws SignatureNotCanonical
      */
     public static function isDERSignature(BufferInterface $sig): bool
@@ -130,9 +113,6 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
         return true;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getBuffer(): BufferInterface
     {
         $txSigSerializer = new TransactionSignatureSerializer(

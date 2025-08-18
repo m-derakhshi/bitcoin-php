@@ -8,34 +8,33 @@ use BitWasp\Bitcoin\Locktime;
 
 class LocktimeTest extends AbstractTestCase
 {
-
-    public function testToTimestamp()
+    public function test_to_timestamp()
     {
         $nTime = 1951606400;
-        $locktime = new Locktime();
+        $locktime = new Locktime;
         $timestamp = $locktime->toTimestamp($nTime);
         $this->assertEquals($nTime - Locktime::BLOCK_MAX, $timestamp);
     }
 
-    public function testFromTimestamp()
+    public function test_from_timestamp()
     {
         $timestamp = 1451606400;
-        $locktime = new Locktime();
+        $locktime = new Locktime;
         $nTime = $locktime->fromTimestamp($timestamp);
         $this->assertEquals($timestamp, ($nTime - Locktime::BLOCK_MAX));
     }
 
-    public function testFromBlockHeight()
+    public function test_from_block_height()
     {
         $height = 101011;
-        $locktime = new Locktime();
+        $locktime = new Locktime;
         $this->assertEquals($height, $locktime->fromBlockHeight($height));
     }
 
-    public function testToBlockHeight()
+    public function test_to_block_height()
     {
         $height = $nTime = 999999;
-        $locktime = new Locktime();
+        $locktime = new Locktime;
         $this->assertEquals($height, $locktime->toBlockHeight($nTime));
     }
 
@@ -43,11 +42,12 @@ class LocktimeTest extends AbstractTestCase
      * Test that fromTimestamp rejects timestamps that exceed the max (0xffffffff - 500000000)
      *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage Timestamp out of range
      */
-    public function testMaxFromTimestamp()
+    public function test_max_from_timestamp()
     {
-        $locktime = new Locktime();
+        $locktime = new Locktime;
 
         // One under the maximum
         $allowed = Locktime::TIME_MAX;
@@ -64,11 +64,12 @@ class LocktimeTest extends AbstractTestCase
      * but rejects anything higher
      *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage Lock time too large
      */
-    public function testMaxToTimestamp()
+    public function test_max_to_timestamp()
     {
-        $locktime = new Locktime();
+        $locktime = new Locktime;
 
         $allowed = Locktime::INT_MAX;
         $timestamp = $locktime->toTimestamp($allowed);
@@ -80,32 +81,35 @@ class LocktimeTest extends AbstractTestCase
 
     /**
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage Lock time out of range for timestamp
      */
-    public function testToTimeStampButTooLow()
+    public function test_to_time_stamp_but_too_low()
     {
-        $locktime = new Locktime();
+        $locktime = new Locktime;
         $locktime->toTimestamp(1);
     }
 
     /**
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage This block height is too high
      */
-    public function testFromBlockHeightTooHigh()
+    public function test_from_block_height_too_high()
     {
-        $locktime = new Locktime();
+        $locktime = new Locktime;
         $disallowed = Locktime::BLOCK_MAX + 1;
         $locktime->fromBlockHeight($disallowed);
     }
 
     /**
      * @expectedException \Exception
+     *
      * @expcetedExceptionMessage This locktime is out of range for a block height
      */
-    public function testToBlockHeightF()
+    public function test_to_block_height_f()
     {
-        $locktime = new Locktime();
+        $locktime = new Locktime;
 
         $allowed = Locktime::BLOCK_MAX;
         $this->assertEquals($allowed, $locktime->toBlockHeight($allowed));

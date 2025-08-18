@@ -6,7 +6,7 @@ namespace BitWasp\Bitcoin;
 
 class Locktime
 {
-    const INT_MAX = 0xffffffff;
+    const INT_MAX = 0xFFFFFFFF;
 
     /**
      * Maximum block height that can be used in locktime, as beyond
@@ -20,10 +20,6 @@ class Locktime
      */
     const TIME_MAX = self::INT_MAX - self::BLOCK_MAX;
 
-    /**
-     * @param int $nLockTime
-     * @return bool
-     */
     public function isLockedToBlock(int $nLockTime): bool
     {
         return $nLockTime > 0 && $nLockTime <= self::BLOCK_MAX;
@@ -33,8 +29,6 @@ class Locktime
      * Convert a $timestamp to a locktime.
      * Max timestamp is 3794967296 - 04/04/2090 @ 5:34am (UTC)
      *
-     * @param int $timestamp
-     * @return int
      * @throws \Exception
      */
     public function fromTimestamp(int $timestamp): int
@@ -44,6 +38,7 @@ class Locktime
         }
 
         $locktime = self::BLOCK_MAX + $timestamp;
+
         return $locktime;
     }
 
@@ -53,8 +48,6 @@ class Locktime
      *  - Lock time appears to be in the block locktime range ( < Locktime::BLOCK_MAX )
      *  - When the lock time exceeds the max possible lock time ( > Locktime::INT_MAX )
      *
-     * @param int $lockTime
-     * @return int
      * @throws \Exception
      */
     public function toTimestamp(int $lockTime): int
@@ -68,6 +61,7 @@ class Locktime
         }
 
         $timestamp = $lockTime - self::BLOCK_MAX;
+
         return $timestamp;
     }
 
@@ -75,8 +69,6 @@ class Locktime
      * Convert $blockHeight to lock time. Doesn't convert anything really,
      * but does check the bounds of the given block height.
      *
-     * @param int $blockHeight
-     * @return int
      * @throws \Exception
      */
     public function fromBlockHeight(int $blockHeight): int
@@ -92,8 +84,6 @@ class Locktime
      * Convert locktime to block height tx is locked to. Doesn't convert anything
      * really, but does check the bounds of the supplied locktime.
      *
-     * @param int $lockTime
-     * @return int
      * @throws \Exception
      */
     public function toBlockHeight(int $lockTime): int

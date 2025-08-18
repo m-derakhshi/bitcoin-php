@@ -12,20 +12,20 @@ use BitWasp\Buffertools\Buffer;
 
 class OutputCollectionMutatorTest extends AbstractTestCase
 {
-    public function testMutatesOutputCollection()
+    public function test_mutates_output_collection()
     {
         $value1 = 12;
         $script1 = new Script(new Buffer('0'));
         $value2 = 20;
         $script2 = new Script(new Buffer('1'));
         $collection = [
-            new TransactionOutput(5, new Script()),
-            new TransactionOutput(10, new Script()),
+            new TransactionOutput(5, new Script),
+            new TransactionOutput(10, new Script),
         ];
 
         $mutator = new OutputCollectionMutator($collection);
         $mutator[0]->script($script1)
-                ->value($value1);
+            ->value($value1);
 
         $mutator[1]->script($script2)->value($value2);
 
@@ -36,25 +36,25 @@ class OutputCollectionMutatorTest extends AbstractTestCase
         $this->assertEquals($script2, $new[1]->getScript());
     }
 
-    public function testAdds()
+    public function test_adds()
     {
         $collection = [
-            new TransactionOutput(5, new Script()),
-            new TransactionOutput(10, new Script()),
+            new TransactionOutput(5, new Script),
+            new TransactionOutput(10, new Script),
         ];
 
         $mutator = new OutputCollectionMutator($collection);
-        $mutator->add(new TransactionOutput(15, new Script()));
+        $mutator->add(new TransactionOutput(15, new Script));
         $outputs = $mutator->done();
 
         $this->assertEquals(3, count($outputs));
     }
 
-    public function testSlice()
+    public function test_slice()
     {
         $collection = [
-            new TransactionOutput(5, new Script()),
-            new TransactionOutput(10, new Script()),
+            new TransactionOutput(5, new Script),
+            new TransactionOutput(10, new Script),
         ];
 
         $mutator = new OutputCollectionMutator($collection);
@@ -67,7 +67,7 @@ class OutputCollectionMutatorTest extends AbstractTestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testInvalidSlice()
+    public function test_invalid_slice()
     {
         $collection = [
         ];
@@ -76,11 +76,11 @@ class OutputCollectionMutatorTest extends AbstractTestCase
         $mutator->slice(0, 1);
     }
 
-    public function testNull()
+    public function test_null()
     {
         $collection = [
-            new TransactionOutput(5, new Script()),
-            new TransactionOutput(10, new Script()),
+            new TransactionOutput(5, new Script),
+            new TransactionOutput(10, new Script),
         ];
 
         $mutator = new OutputCollectionMutator($collection);
@@ -90,15 +90,15 @@ class OutputCollectionMutatorTest extends AbstractTestCase
         $this->assertEquals(0, count($outputs));
     }
 
-    public function testSet()
+    public function test_set()
     {
         $collection = [
-            new TransactionOutput(5, new Script()),
-            new TransactionOutput(10, new Script()),
+            new TransactionOutput(5, new Script),
+            new TransactionOutput(10, new Script),
         ];
 
         $mutator = new OutputCollectionMutator($collection);
-        $mutator->set(0, new TransactionOutput(1, new Script()));
+        $mutator->set(0, new TransactionOutput(1, new Script));
         $newCollection = $mutator->done();
         $this->assertEquals(1, $newCollection[0]->getValue());
     }
@@ -106,7 +106,7 @@ class OutputCollectionMutatorTest extends AbstractTestCase
     /**
      * @expectedException \OutOfRangeException
      */
-    public function testInvalidIndex()
+    public function test_invalid_index()
     {
         $mutator = new OutputCollectionMutator([]);
         $mutator->offsetGet(10);

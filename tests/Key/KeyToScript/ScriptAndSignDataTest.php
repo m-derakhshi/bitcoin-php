@@ -13,10 +13,10 @@ use BitWasp\Buffertools\Buffer;
 
 class ScriptAndSignDataTest extends AbstractTestCase
 {
-    public function testScriptAndSignDataSpk()
+    public function test_script_and_sign_data_spk()
     {
-        $script1 = ScriptFactory::scriptPubKey()->p2pkh(new Buffer("A", 20));
-        $signData = new SignData();
+        $script1 = ScriptFactory::scriptPubKey()->p2pkh(new Buffer('A', 20));
+        $signData = new SignData;
 
         $scriptAndSignData = new ScriptAndSignData($script1, $signData);
 
@@ -24,12 +24,11 @@ class ScriptAndSignDataTest extends AbstractTestCase
         $this->assertEquals($signData, $scriptAndSignData->getSignData());
     }
 
-    public function testScriptAndSignDataRs()
+    public function test_script_and_sign_data_rs()
     {
-        $redeemScript = new P2shScript(ScriptFactory::scriptPubKey()->p2pkh(new Buffer("A", 20)));
-        $signData = (new SignData())
-            ->p2sh($redeemScript)
-        ;
+        $redeemScript = new P2shScript(ScriptFactory::scriptPubKey()->p2pkh(new Buffer('A', 20)));
+        $signData = (new SignData)
+            ->p2sh($redeemScript);
 
         $scriptAndSignData = new ScriptAndSignData($redeemScript->getOutputScript(), $signData);
 

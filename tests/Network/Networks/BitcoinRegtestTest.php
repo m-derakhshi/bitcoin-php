@@ -10,10 +10,10 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class BitcoinRegtestTest extends AbstractTestCase
 {
-    public function testLikeTestnet()
+    public function test_like_testnet()
     {
-        $testnet = new BitcoinTestnet();
-        $regtest = new BitcoinRegtest();
+        $testnet = new BitcoinTestnet;
+        $regtest = new BitcoinRegtest;
         $this->assertEquals($testnet->getAddressByte(), $regtest->getAddressByte());
         $this->assertEquals($testnet->getP2shByte(), $regtest->getP2shByte());
         $this->assertEquals($testnet->getPrivByte(), $regtest->getPrivByte());

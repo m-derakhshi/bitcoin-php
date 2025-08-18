@@ -10,10 +10,10 @@ use BitWasp\Buffertools\Buffer;
 
 class RandomTest extends AbstractTestCase
 {
-    public function testBytes()
+    public function test_bytes()
     {
-        $random = new Random();
-        $bytes  = $random->bytes(32);
+        $random = new Random;
+        $bytes = $random->bytes(32);
         $this->assertInstanceOf(Buffer::class, $bytes);
         $this->assertEquals(32, $bytes->getSize());
     }

@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . "/../vendor/autoload.php";
+require __DIR__.'/../vendor/autoload.php';
 
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 
@@ -15,7 +15,7 @@ function parseSighashFlags($bits)
 
     $main = null;
     foreach ([[SigHash::ALL, 'ALL'], [SigHash::NONE, 'NONE'], [SigHash::SINGLE, 'SINGLE']] as $arr) {
-        list ($sh, $str) = $arr;
+        [$sh, $str] = $arr;
         if ($bits == $sh) {
             $main = $str;
             break;
@@ -29,9 +29,9 @@ function parseSighashFlags($bits)
 }
 
 foreach ([
-        SigHash::ALL,    SigHash::ALL|SigHash::ANYONECANPAY,
-        SigHash::NONE,   SigHash::NONE|SigHash::ANYONECANPAY,
-        SigHash::SINGLE, SigHash::SINGLE|SigHash::ANYONECANPAY,
-    ] as $flag) {
+    SigHash::ALL,    SigHash::ALL | SigHash::ANYONECANPAY,
+    SigHash::NONE,   SigHash::NONE | SigHash::ANYONECANPAY,
+    SigHash::SINGLE, SigHash::SINGLE | SigHash::ANYONECANPAY,
+] as $flag) {
     var_dump(parseSighashFlags($flag));
 }

@@ -11,8 +11,8 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\RpcTest;
 
 use Nbobtc\Http\Driver\DriverInterface;
-use Psr\Http\Message\RequestInterface;
 use Nbobtc\Http\Message\Response;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * Uses cURL to send Requests
@@ -29,16 +29,16 @@ class CurlDriver implements DriverInterface
     /**
      * @var array
      */
-    protected $curlOptions = array();
+    protected $curlOptions = [];
 
     /**
      * @since 2.0.0
      */
     public function __destruct()
     {
-        if (null !== $this->ch) {
+        if ($this->ch !== null) {
             curl_close($this->ch);
-            $this->ch=null;
+            $this->ch = null;
         }
     }
 
@@ -50,7 +50,7 @@ class CurlDriver implements DriverInterface
     {
         $uri = $request->getUri();
 
-        if (null === $this->ch) {
+        if ($this->ch === null) {
             $this->ch = curl_init();
         }
 
@@ -59,7 +59,7 @@ class CurlDriver implements DriverInterface
         curl_setopt($this->ch, CURLOPT_URL, sprintf('%s://%s@%s', $uri->getScheme(), $uri->getUserInfo(), $uri->getHost()));
         curl_setopt($this->ch, CURLOPT_PORT, $uri->getPort());
 
-        $headers = array();
+        $headers = [];
         foreach ($request->getHeaders() as $header => $values) {
             $headers[] = $header.': '.implode(', ', $values);
         }
@@ -76,11 +76,11 @@ class CurlDriver implements DriverInterface
         /** @var string */
         $error = curl_error($this->ch);
 
-        if (!empty($error)) {
+        if (! empty($error)) {
             throw new \Exception($error);
         }
 
-        $response = new Response();
+        $response = new Response;
         $response->withStatus($info['http_code']);
         $response->getBody()->write($result);
 
@@ -91,8 +91,9 @@ class CurlDriver implements DriverInterface
      * Add options to use for cURL requests
      *
      * @since 2.0.0
-     * @param integer $option
-     * @param mixed   $value
+     *
+     * @param  int  $option
+     * @param  mixed  $value
      */
     public function addCurlOption($option, $value)
     {
@@ -105,15 +106,16 @@ class CurlDriver implements DriverInterface
      * Returns an array of cURL options
      *
      * @since 2.0.0
+     *
      * @return array
      */
     protected function getDefaultCurlOptions()
     {
-        return array(
-            CURLOPT_POST           => true,
+        return [
+            CURLOPT_POST => true,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => 5,
-            CURLOPT_TIMEOUT        => 10,
-        );
+            CURLOPT_TIMEOUT => 10,
+        ];
     }
 }

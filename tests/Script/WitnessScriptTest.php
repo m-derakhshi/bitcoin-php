@@ -21,17 +21,15 @@ class WitnessScriptTest extends AbstractTestCase
     public function getCannotNestVectors()
     {
         return [
-            [new WitnessScript(new Script(new Buffer())), "Cannot nest V0 P2WSH scripts."],
-            [new P2shScript(new Script(new Buffer())), "Cannot embed a P2SH script in a V0 P2WSH script."],
+            [new WitnessScript(new Script(new Buffer)), 'Cannot nest V0 P2WSH scripts.'],
+            [new P2shScript(new Script(new Buffer)), 'Cannot embed a P2SH script in a V0 P2WSH script.'],
         ];
     }
 
     /**
-     * @param ScriptInterface $testScript
-     * @param string $exceptionMsg
      * @dataProvider getCannotNestVectors
      */
-    public function testCannotNestWitnessScripts(ScriptInterface $testScript, string $exceptionMsg)
+    public function test_cannot_nest_witness_scripts(ScriptInterface $testScript, string $exceptionMsg)
     {
         $this->expectException(WitnessScriptException::class);
         $this->expectExceptionMessage($exceptionMsg);
@@ -39,9 +37,9 @@ class WitnessScriptTest extends AbstractTestCase
         new WitnessScript($testScript);
     }
 
-    public function testNormalScriptHasSameBuffer()
+    public function test_normal_script_has_same_buffer()
     {
-        $script = new Script(new Buffer());
+        $script = new Script(new Buffer);
         $witnessScriptHash = $script->getWitnessScriptHash();
 
         $witnessScript = new WitnessScript($script);

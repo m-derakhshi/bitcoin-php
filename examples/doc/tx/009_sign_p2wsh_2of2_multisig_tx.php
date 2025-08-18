@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
-require __DIR__ . "/../../../vendor/autoload.php";
+require __DIR__.'/../../../vendor/autoload.php';
 
 /**
  * This example shows a 2-of-2 P2WSH multisig
@@ -24,13 +24,11 @@ require __DIR__ . "/../../../vendor/autoload.php";
  * because the unsigned transaction doesn't have the
  * witnessScript yet.
  */
-
-
-$privKeyFactory = new PrivateKeyFactory();
+$privKeyFactory = new PrivateKeyFactory;
 $privateKey1 = $privKeyFactory->fromHexCompressed('7bca8cbb9e0c108445281ade9d8f6b7d8bb18edb0b5ca4dc3aa660362b96f831', true);
 $publicKey1 = $privateKey1->getPublicKey();
 
-$privateKey2 = $privKeyFactory->fromHexCompressed("108445281ade9d8f6b7d8bb1825ca40bedb67bca8cdc3aa6603b9b6f831b9e0c", true);
+$privateKey2 = $privKeyFactory->fromHexCompressed('108445281ade9d8f6b7d8bb1825ca40bedb67bca8cdc3aa6603b9b6f831b9e0c', true);
 $publicKey2 = $privateKey2->getPublicKey();
 
 // The witnessScript needs to be known when spending
@@ -39,12 +37,12 @@ $witnessScript = new WitnessScript(
 );
 
 $spendFromAddress = $witnessScript->getAddress();
-$addressCreator = new AddressCreator();
+$addressCreator = new AddressCreator;
 $sendToAddress = $addressCreator->fromString('1DUzqgG31FvNubNL6N1FVdzPbKYWZG2Mb6');
 echo "Spend from {$spendFromAddress->getAddress()}\n";
 echo "Send to {$sendToAddress->getAddress()}\n";
 
-$addressCreator = new AddressCreator();
+$addressCreator = new AddressCreator;
 $transaction = TransactionFactory::build()
     ->input('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1', 0)
     ->payToAddress(1500000, $sendToAddress)
@@ -52,9 +50,8 @@ $transaction = TransactionFactory::build()
     ->get();
 
 $txOut = new TransactionOutput(1501000, $witnessScript->getOutputScript());
-$signData = (new SignData())
-    ->p2wsh($witnessScript)
-;
+$signData = (new SignData)
+    ->p2wsh($witnessScript);
 
 $signer = new Signer($transaction);
 $input = $signer->input(0, $txOut, $signData);
@@ -65,4 +62,4 @@ $signed = $signer->get();
 
 echo "txid: {$signed->getTxId()->getHex()}\n";
 echo "raw: {$signed->getHex()}\n";
-echo "input valid? " . ($input->verify() ? "true" : "false") . PHP_EOL;
+echo 'input valid? '.($input->verify() ? 'true' : 'false').PHP_EOL;

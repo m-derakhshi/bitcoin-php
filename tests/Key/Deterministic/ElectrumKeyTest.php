@@ -15,7 +15,6 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class ElectrumKeyTest extends AbstractTestCase
 {
-
     /**
      * @return array
      */
@@ -31,9 +30,9 @@ class ElectrumKeyTest extends AbstractTestCase
                     [0, '15ZL6i899dDBXm8NoXwn7oup4J5yQJi1NH'],
                     [1, '1FQS2H5mcgh1btw9oxxZs3onfEdvwAPPiP'],
                     [2, '1CBYszxw91ArPx8jHCD3jH8P8VwzeQdC2Z'],
-                    [3, '1N9qHajqjoMpY9FnWzwEAsorUcmbdAjA2F']
-                ]
-            ]
+                    [3, '1N9qHajqjoMpY9FnWzwEAsorUcmbdAjA2F'],
+                ],
+            ],
         ];
 
         $data = [];
@@ -54,13 +53,12 @@ class ElectrumKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getTestKeys
-     * @param EcAdapterInterface $ecAdapter
-     * @param string $mnemonic
-     * @param string $eSecExp
-     * @param string $eMPK
-     * @param array $eAddrList
+     *
+     * @param  string  $mnemonic
+     * @param  string  $eSecExp
+     * @param  string  $eMPK
      */
-    public function testCKD(EcAdapterInterface $ecAdapter, $mnemonic, $eSecExp, $eMPK, array $eAddrList = array())
+    public function test_ckd(EcAdapterInterface $ecAdapter, $mnemonic, $eSecExp, $eMPK, array $eAddrList = [])
     {
         $electrumFactory = new ElectrumKeyFactory($ecAdapter);
         $keyPriv = $electrumFactory->fromMnemonic($mnemonic);
@@ -70,7 +68,7 @@ class ElectrumKeyTest extends AbstractTestCase
         $this->assertEquals($eMPK, $keyPriv->getMPK()->getHex());
 
         foreach ($eAddrList as $vector) {
-            list ($sequence, $eAddr) = $vector;
+            [$sequence, $eAddr] = $vector;
             $childPriv = $keyPriv->deriveChild($sequence);
             $keyHash = $childPriv->getPubKeyHash();
             $this->assertEquals($eAddr, (new PayToPubKeyHashAddress($keyHash))->getAddress());
@@ -83,15 +81,16 @@ class ElectrumKeyTest extends AbstractTestCase
 
     /**
      * @expectedException \RuntimeException
+     *
      * @expectedExceptionMessage Electrum keys are not compressed
      */
-    public function testFromKey()
+    public function test_from_key()
     {
-        $random = new Random();
-        $privKeyFactory = new PrivateKeyFactory();
+        $random = new Random;
+        $privKeyFactory = new PrivateKeyFactory;
         $key = $privKeyFactory->generateUncompressed($random);
 
-        $electrumFactory = new ElectrumKeyFactory();
+        $electrumFactory = new ElectrumKeyFactory;
         $e = $electrumFactory->fromKey($key);
         $this->assertInstanceOf(ElectrumKey::class, $e);
 
@@ -99,24 +98,25 @@ class ElectrumKeyTest extends AbstractTestCase
         $electrumFactory->fromKey($key);
     }
 
-    public function testGenerate()
+    public function test_generate()
     {
-        $random = new Random();
+        $random = new Random;
         $bytes = $random->bytes(32);
-        $electrumFactory = new ElectrumKeyFactory();
+        $electrumFactory = new ElectrumKeyFactory;
         $key = $electrumFactory->getKeyFromSeed($bytes);
         $this->assertInstanceOf(ElectrumKey::class, $key);
     }
 
     /**
      * @expectedException \RuntimeException
+     *
      * @expectedExceptionMessage Cannot produce master private key from master public key
      */
-    public function testFailsWithoutMasterPrivateKey()
+    public function test_fails_without_master_private_key()
     {
-        $pubKeyFactory = new PublicKeyFactory();
+        $pubKeyFactory = new PublicKeyFactory;
         $key = $pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
-        $electrumFactory = new ElectrumKeyFactory();
+        $electrumFactory = new ElectrumKeyFactory;
         $e = $electrumFactory->fromKey($key);
         $e->getMasterPrivateKey();
     }

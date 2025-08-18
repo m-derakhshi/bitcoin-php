@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class MissingNetworkParameter extends \Exception
-{
-
-}
+class MissingNetworkParameter extends \Exception {}

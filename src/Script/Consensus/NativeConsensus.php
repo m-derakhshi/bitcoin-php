@@ -18,25 +18,17 @@ class NativeConsensus implements ConsensusInterface
 
     /**
      * NativeConsensus constructor.
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(EcAdapterInterface $ecAdapter = null)
+    public function __construct(?EcAdapterInterface $ecAdapter = null)
     {
         $this->adapter = $ecAdapter ?: Bitcoin::getEcAdapter();
     }
 
-    /**
-     * @param TransactionInterface $tx
-     * @param ScriptInterface $scriptPubKey
-     * @param int $nInputToSign
-     * @param int $flags
-     * @param int $amount
-     * @return bool
-     */
     public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, int $flags, int $nInputToSign, int $amount): bool
     {
         $inputs = $tx->getInputs();
         $interpreter = new Interpreter($this->adapter);
+
         return $interpreter->verify(
             $inputs[$nInputToSign]->getScript(),
             $scriptPubKey,

@@ -20,9 +20,6 @@ class Base58
 
     /**
      * Encode a given hex string in base58
-     *
-     * @param BufferInterface $buffer
-     * @return string
      */
     public static function encode(BufferInterface $buffer): string
     {
@@ -47,7 +44,7 @@ class Base58
 
         // Leading zeros
         for ($i = 0; $i < $size && $orig[$i] === "\x00"; $i++) {
-            $return = '1' . $return;
+            $return = '1'.$return;
         }
 
         return $return;
@@ -55,8 +52,7 @@ class Base58
 
     /**
      * Decode a base58 string
-     * @param string $base58
-     * @return BufferInterface
+     *
      * @throws Base58InvalidCharacter
      */
     public static function decode(string $base58): BufferInterface
@@ -72,23 +68,19 @@ class Base58
         for ($i = 0; $i < $length; $i++) {
             $loc = strpos(self::$base58chars, $base58[$i]);
             if ($loc === false) {
-                throw new Base58InvalidCharacter('Found character that is not allowed in base58: ' . $base58[$i]);
+                throw new Base58InvalidCharacter('Found character that is not allowed in base58: '.$base58[$i]);
             }
             $return = gmp_add(gmp_mul($return, $_58), gmp_init($loc, 10));
         }
 
         $binary = gmp_cmp($return, gmp_init(0)) === 0 ? '' : Buffer::int(gmp_strval($return, 10))->getBinary();
         for ($i = 0; $i < $length && $original[$i] === '1'; $i++) {
-            $binary = "\x00" . $binary;
+            $binary = "\x00".$binary;
         }
 
         return new Buffer($binary);
     }
 
-    /**
-     * @param BufferInterface $data
-     * @return BufferInterface
-     */
     public static function checksum(BufferInterface $data): BufferInterface
     {
         return Hash::sha256d($data)->slice(0, 4);
@@ -96,8 +88,7 @@ class Base58
 
     /**
      * Decode a base58 checksum string and validate checksum
-     * @param string $base58
-     * @return BufferInterface
+     *
      * @throws Base58ChecksumFailure
      * @throws Base58InvalidCharacter
      * @throws \Exception
@@ -107,13 +98,13 @@ class Base58
         $decoded = self::decode($base58);
         $checksumLength = 4;
         if ($decoded->getSize() < $checksumLength) {
-            throw new Base58ChecksumFailure("Missing base58 checksum");
+            throw new Base58ChecksumFailure('Missing base58 checksum');
         }
 
         $data = $decoded->slice(0, -$checksumLength);
         $csVerify = $decoded->slice(-$checksumLength);
 
-        if (!hash_equals(self::checksum($data)->getBinary(), $csVerify->getBinary())) {
+        if (! hash_equals(self::checksum($data)->getBinary(), $csVerify->getBinary())) {
             throw new Base58ChecksumFailure('Failed to verify checksum');
         }
 
@@ -122,9 +113,6 @@ class Base58
 
     /**
      * Encode the given data in base58, with a checksum to check integrity.
-     *
-     * @param BufferInterface $data
-     * @return string
      */
     public static function encodeCheck(BufferInterface $data): string
     {

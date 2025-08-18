@@ -15,15 +15,7 @@ interface DerSignatureSerializerInterface
      */
     public function getEcAdapter();
 
-    /**
-     * @param SignatureInterface $signature
-     * @return BufferInterface
-     */
     public function serialize(SignatureInterface $signature): BufferInterface;
 
-    /**
-     * @param BufferInterface $derSignature
-     * @return SignatureInterface
-     */
     public function parse(BufferInterface $derSignature): SignatureInterface;
 }

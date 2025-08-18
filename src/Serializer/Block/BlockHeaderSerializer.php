@@ -37,8 +37,6 @@ class BlockHeaderSerializer
     }
 
     /**
-     * @param BufferInterface $buffer
-     * @return BlockHeaderInterface
      * @throws ParserOutOfRange
      */
     public function parse(BufferInterface $buffer): BlockHeaderInterface
@@ -47,8 +45,6 @@ class BlockHeaderSerializer
     }
 
     /**
-     * @param Parser $parser
-     * @return BlockHeaderInterface
      * @throws ParserOutOfRange
      */
     public function fromParser(Parser $parser): BlockHeaderInterface
@@ -67,18 +63,14 @@ class BlockHeaderSerializer
         }
     }
 
-    /**
-     * @param BlockHeaderInterface $header
-     * @return BufferInterface
-     */
     public function serialize(BlockHeaderInterface $header): BufferInterface
     {
         return new Buffer(
-            $this->int32le->write($header->getVersion()) .
-            $this->hash->write($header->getPrevBlock()) .
-            $this->hash->write($header->getMerkleRoot()) .
-            $this->uint32le->write($header->getTimestamp()) .
-            $this->uint32le->write($header->getBits()) .
+            $this->int32le->write($header->getVersion()).
+            $this->hash->write($header->getPrevBlock()).
+            $this->hash->write($header->getMerkleRoot()).
+            $this->uint32le->write($header->getTimestamp()).
+            $this->uint32le->write($header->getBits()).
             $this->uint32le->write($header->getNonce())
         );
     }

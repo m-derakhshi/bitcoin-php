@@ -11,57 +11,57 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class ScriptPrefixTest extends AbstractTestCase
 {
-    public function testScriptPrefix()
+    public function test_script_prefix()
     {
-        $factory = new P2wpkhScriptDataFactory();
-        $pubPrefix = "04b24746";
-        $privPrefix = "04b2430c";
+        $factory = new P2wpkhScriptDataFactory;
+        $pubPrefix = '04b24746';
+        $privPrefix = '04b2430c';
         $prefix = new ScriptPrefix($factory, $privPrefix, $pubPrefix);
         $this->assertEquals($pubPrefix, $prefix->getPublicPrefix());
         $this->assertEquals($privPrefix, $prefix->getPrivatePrefix());
         $this->assertEquals($factory, $prefix->getScriptDataFactory());
     }
 
-    public function testBadLengthPrivatePrefix()
+    public function test_bad_length_private_prefix()
     {
-        $factory = new P2wpkhScriptDataFactory();
-        $pubPrefix = "04b24746";
-        $privPrefix = "dadd0c";
+        $factory = new P2wpkhScriptDataFactory;
+        $pubPrefix = '04b24746';
+        $privPrefix = 'dadd0c';
         $this->expectException(InvalidNetworkParameter::class);
-        $this->expectExceptionMessage("Invalid HD private prefix: wrong length");
+        $this->expectExceptionMessage('Invalid HD private prefix: wrong length');
 
         new ScriptPrefix($factory, $privPrefix, $pubPrefix);
     }
 
-    public function testBadHexPrivatePrefix()
+    public function test_bad_hex_private_prefix()
     {
-        $factory = new P2wpkhScriptDataFactory();
-        $pubPrefix = "04b24746";
-        $privPrefix = "dadgad0c";
+        $factory = new P2wpkhScriptDataFactory;
+        $pubPrefix = '04b24746';
+        $privPrefix = 'dadgad0c';
         $this->expectException(InvalidNetworkParameter::class);
-        $this->expectExceptionMessage("Invalid HD private prefix: expecting hex");
+        $this->expectExceptionMessage('Invalid HD private prefix: expecting hex');
 
         new ScriptPrefix($factory, $privPrefix, $pubPrefix);
     }
 
-    public function testBadLengthPublicPrefix()
+    public function test_bad_length_public_prefix()
     {
-        $factory = new P2wpkhScriptDataFactory();
-        $privPrefix = "04b24746";
-        $pubPrefix = "dadd0c";
+        $factory = new P2wpkhScriptDataFactory;
+        $privPrefix = '04b24746';
+        $pubPrefix = 'dadd0c';
         $this->expectException(InvalidNetworkParameter::class);
-        $this->expectExceptionMessage("Invalid HD public prefix: wrong length");
+        $this->expectExceptionMessage('Invalid HD public prefix: wrong length');
 
         new ScriptPrefix($factory, $privPrefix, $pubPrefix);
     }
 
-    public function testBadHexPublicPrefix()
+    public function test_bad_hex_public_prefix()
     {
-        $factory = new P2wpkhScriptDataFactory();
-        $privPrefix = "04b24746";
-        $pubPrefix = "dadgad0c";
+        $factory = new P2wpkhScriptDataFactory;
+        $privPrefix = '04b24746';
+        $pubPrefix = 'dadgad0c';
         $this->expectException(InvalidNetworkParameter::class);
-        $this->expectExceptionMessage("Invalid HD public prefix: expecting hex");
+        $this->expectExceptionMessage('Invalid HD public prefix: expecting hex');
 
         new ScriptPrefix($factory, $privPrefix, $pubPrefix);
     }

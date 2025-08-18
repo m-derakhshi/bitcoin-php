@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class UnsupportedScript extends \RuntimeException
-{
-
-}
+class UnsupportedScript extends \RuntimeException {}

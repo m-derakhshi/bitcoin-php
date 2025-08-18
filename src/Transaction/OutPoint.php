@@ -25,8 +25,7 @@ class OutPoint extends Serializable implements OutPointInterface
 
     /**
      * OutPoint constructor.
-     * @param BufferInterface $hashPrevOutput
-     * @param int $nPrevOutput
+     *
      * @throws InvalidHashLengthException
      */
     public function __construct(BufferInterface $hashPrevOutput, int $nPrevOutput)
@@ -43,34 +42,21 @@ class OutPoint extends Serializable implements OutPointInterface
         $this->nPrevOutput = $nPrevOutput;
     }
 
-    /**
-     * @return OutPointInterface
-     */
     public static function makeCoinbase(): OutPointInterface
     {
-        return new OutPoint(new Buffer("", 32), 0xffffffff);
+        return new OutPoint(new Buffer('', 32), 0xFFFFFFFF);
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getTxId(): BufferInterface
     {
         return $this->hashPrevOutput;
     }
 
-    /**
-     * @return int
-     */
     public function getVout(): int
     {
         return $this->nPrevOutput;
     }
 
-    /**
-     * @param OutPointInterface $outPoint
-     * @return bool
-     */
     public function equals(OutPointInterface $outPoint): bool
     {
         $txid = strcmp($this->getTxId()->getBinary(), $outPoint->getTxId()->getBinary());
@@ -81,11 +67,8 @@ class OutPoint extends Serializable implements OutPointInterface
         return gmp_cmp($this->getVout(), $outPoint->getVout()) === 0;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getBuffer(): BufferInterface
     {
-        return (new OutPointSerializer())->serialize($this);
+        return (new OutPointSerializer)->serialize($this);
     }
 }

@@ -1,12 +1,12 @@
 <?php
 
-require __DIR__ . "/../vendor/autoload.php";
+require __DIR__.'/../vendor/autoload.php';
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\P2shScript;
-use BitWasp\Bitcoin\Script\WitnessScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\WitnessScript;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Transaction\OutPoint;
@@ -14,8 +14,8 @@ use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 
 // Setup network and private key to segnet
-$privKeyFactory = new PrivateKeyFactory();
-$key = $privKeyFactory->fromHexCompressed("4242424242424242424242424242424242424242424242424242424242424242");
+$privKeyFactory = new PrivateKeyFactory;
+$key = $privKeyFactory->fromHexCompressed('4242424242424242424242424242424242424242424242424242424242424242');
 
 $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPubKeyHash());
 
@@ -27,7 +27,7 @@ $txOut = new TransactionOutput(100000000, $scriptPubKey);
 $p2wsh = new WitnessScript($scriptPubKey);
 $p2sh = new P2shScript($p2wsh);
 
-$unsigned = (new TxBuilder())
+$unsigned = (new TxBuilder)
     ->spendOutPoint($outpoint)
     ->output(95590000, $p2sh->getOutputScript())
     ->get();
@@ -36,4 +36,4 @@ $signed = (new Signer($unsigned, Bitcoin::getEcAdapter()))
     ->sign(0, $key, $txOut)
     ->get();
 
-echo $signed->getHex() . PHP_EOL;
+echo $signed->getHex().PHP_EOL;

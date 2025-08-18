@@ -2,6 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class Base58ChecksumFailure extends \Exception
-{
-}
+class Base58ChecksumFailure extends \Exception {}

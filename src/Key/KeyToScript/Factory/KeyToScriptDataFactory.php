@@ -21,28 +21,19 @@ abstract class KeyToScriptDataFactory extends ScriptDataFactory
 
     /**
      * KeyToP2PKScriptFactory constructor.
-     * @param PublicKeySerializerInterface|null $pubKeySerializer
      */
-    public function __construct(PublicKeySerializerInterface $pubKeySerializer = null)
+    public function __construct(?PublicKeySerializerInterface $pubKeySerializer = null)
     {
-        if (null === $pubKeySerializer) {
+        if ($pubKeySerializer === null) {
             $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true);
         }
 
         $this->pubKeySerializer = $pubKeySerializer;
     }
 
-    /**
-     * @param PublicKeyInterface ...$keys
-     * @return ScriptAndSignData
-     */
     abstract protected function convertKeyToScriptData(PublicKeyInterface ...$keys): ScriptAndSignData;
 
-    /**
-     * @param KeyInterface ...$keys
-     * @return ScriptAndSignData
-     */
-    public function convertKey(KeyInterface... $keys): ScriptAndSignData
+    public function convertKey(KeyInterface ...$keys): ScriptAndSignData
     {
         $pubs = [];
         foreach ($keys as $key) {

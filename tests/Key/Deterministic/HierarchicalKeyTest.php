@@ -10,14 +10,14 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shP2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkScriptDataFactory;
-use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
-use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -29,7 +29,6 @@ use Mdanter\Ecc\EccFactory;
 
 class HierarchicalKeyTest extends AbstractTestCase
 {
-
     /**
      * @var Network
      */
@@ -37,28 +36,22 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * Used for testing skipped keys
+     *
      * @var int
      */
     private $HK_run_count = 0;
 
-    /**
-     *
-     */
-    public function setUp()
+    protected function setUp()
     {
         $this->network = NetworkFactory::bitcoin();
     }
 
-    /**
-     * @param HierarchicalKey $key
-     * @param \stdClass $vector
-     */
     private function compareToPrivVectors(\BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey $key, \stdClass $vector)
     {
         $this->assertSame($vector->secret_wif, $key->getPrivateKey()->toWif($this->network));
         $this->assertSame($vector->secret_wif, $key->getPrivateKey()->toWif());
 
-        $this->assertSame($vector->address, $key->getAddress(new AddressCreator())->getAddress($this->network));
+        $this->assertSame($vector->address, $key->getAddress(new AddressCreator)->getAddress($this->network));
 
         $this->assertSame($vector->xprv_b58, $key->toExtendedPrivateKey($this->network), 'correct xprv');
         $this->assertSame($vector->xprv_b58, $key->toExtendedPrivateKey(), 'correct xprv');
@@ -68,11 +61,10 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testGenerateNew(EcAdapterInterface $ecAdapter)
+    public function test_generate_new(EcAdapterInterface $ecAdapter)
     {
-        $random = new Random();
+        $random = new Random;
         $factory = new HierarchicalKeyFactory($ecAdapter);
         $key = $factory->generateMasterKey($random);
         $this->assertInstanceOf(HierarchicalKey::class, $key);
@@ -80,27 +72,27 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage A HierarchicalKey must always be compressed
      */
-    public function testFailsWithUncompressed()
+    public function test_fails_with_uncompressed()
     {
-        $privFactory = new PrivateKeyFactory();
+        $privFactory = new PrivateKeyFactory;
         new HierarchicalKey(
             Bitcoin::getEcAdapter(),
-            new P2pkhScriptDataFactory(),
+            new P2pkhScriptDataFactory,
             1,
             1,
             1,
             new Buffer('', 32),
-            $privFactory->generateUncompressed(new Random())
+            $privFactory->generateUncompressed(new Random)
         );
     }
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testFromEntropy(EcAdapterInterface $ecAdapter)
+    public function test_from_entropy(EcAdapterInterface $ecAdapter)
     {
         $hdFactory = new HierarchicalKeyFactory($ecAdapter);
         $entropy = Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141');
@@ -129,12 +121,10 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getBip32Vectors
-     * @param EcAdapterInterface $ecAdapter
-     * @param BufferInterface $entropy
-     * @param \stdClass[] $details
-     * @param array $derivs
+     *
+     * @param  \stdClass[]  $details
      */
-    public function testTestVectors(EcAdapterInterface $ecAdapter, BufferInterface $entropy, \stdClass $details, array $derivs)
+    public function test_test_vectors(EcAdapterInterface $ecAdapter, BufferInterface $entropy, \stdClass $details, array $derivs)
     {
         $hdFactory = new HierarchicalKeyFactory($ecAdapter);
         $key = $hdFactory->fromEntropy($entropy);
@@ -148,52 +138,51 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
+     *
      * @throws \Exception
      */
-    public function testDerivePath(EcAdapterInterface $ecAdapter)
+    public function test_derive_path(EcAdapterInterface $ecAdapter)
     {
         $network = NetworkFactory::bitcoin();
-        $entropy = Buffer::hex("000102030405060708090a0b0c0d0e0f");
+        $entropy = Buffer::hex('000102030405060708090a0b0c0d0e0f');
         $hdFactory = new HierarchicalKeyFactory($ecAdapter);
         $masterKey = $hdFactory->fromEntropy($entropy);
-        $this->assertEquals("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi", $masterKey->toExtendedKey($network));
+        $this->assertEquals('xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi', $masterKey->toExtendedKey($network));
 
-        $firstChildKey = $masterKey->derivePath("0");
-        $this->assertEquals("xprv9uHRZZhbkedL37eZEnyrNsQPFZYRAvjy5rt6M1nbEkLSo378x1CQQLo2xxBvREwiK6kqf7GRNvsNEchwibzXaV6i5GcsgyjBeRguXhKsi4R", $firstChildKey->toExtendedKey($network));
+        $firstChildKey = $masterKey->derivePath('0');
+        $this->assertEquals('xprv9uHRZZhbkedL37eZEnyrNsQPFZYRAvjy5rt6M1nbEkLSo378x1CQQLo2xxBvREwiK6kqf7GRNvsNEchwibzXaV6i5GcsgyjBeRguXhKsi4R', $firstChildKey->toExtendedKey($network));
 
         $bip44ChildKey = $masterKey->derivePath("44'/0'/0'/0/0");
-        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey($network));
+        $this->assertEquals('xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U', $bip44ChildKey->toExtendedKey($network));
 
         // get the "m/44'/0'/0'/0/0" derivation, in 2 steps
         $bip44ChildKey = $masterKey->derivePath("44'/0'");
         $bip44ChildKey = $bip44ChildKey->derivePath("0'/0/0");
-        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey($network));
+        $this->assertEquals('xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U', $bip44ChildKey->toExtendedKey($network));
 
         // get the "m/44'/0'/0'/0/0" derivation, in 2 steps
         $bip44ChildKey = $masterKey->derivePath("44'/0'/0'");
-        $bip44ChildKey = $bip44ChildKey->derivePath("0/0");
-        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey($network));
+        $bip44ChildKey = $bip44ChildKey->derivePath('0/0');
+        $this->assertEquals('xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U', $bip44ChildKey->toExtendedKey($network));
 
         // get the "m/44'/0'/0'/0/0" derivation, in 2 steps
         $bip44ChildKey = $masterKey->derivePath("44'/0'/0'/0");
-        $bip44ChildKey = $bip44ChildKey->derivePath("0");
-        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey($network));
+        $bip44ChildKey = $bip44ChildKey->derivePath('0');
+        $this->assertEquals('xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U', $bip44ChildKey->toExtendedKey($network));
 
         // get the "m/44'/0'/0'/0/0" derivation, in single steps
         $bip44ChildKey = $masterKey->derivePath("44'");
         $bip44ChildKey = $bip44ChildKey->derivePath("0'");
         $bip44ChildKey = $bip44ChildKey->derivePath("0'");
-        $bip44ChildKey = $bip44ChildKey->derivePath("0");
-        $bip44ChildKey = $bip44ChildKey->derivePath("0");
-        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey($network));
+        $bip44ChildKey = $bip44ChildKey->derivePath('0');
+        $bip44ChildKey = $bip44ChildKey->derivePath('0');
+        $this->assertEquals('xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U', $bip44ChildKey->toExtendedKey($network));
     }
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testCreateHeirarchicalPrivateKey(EcAdapterInterface $ecAdapter)
+    public function test_create_heirarchical_private_key(EcAdapterInterface $ecAdapter)
     {
         $xPrv = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU';
         $hdFactory = new HierarchicalKeyFactory($ecAdapter);
@@ -215,13 +204,15 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * This tests if the key being decoded has bytes which match the network.
+     *
      * @expectedException \InvalidArgumentException
+     *
      * @expectedExceptionMessage  HD key magic bytes do not match network magic bytes
      */
-    public function testCreateWithInvalidNetwork()
+    public function test_create_with_invalid_network()
     {
-        $network = new BitcoinTestnet();
-        $hdFactory = new HierarchicalKeyFactory();
+        $network = new BitcoinTestnet;
+        $hdFactory = new HierarchicalKeyFactory;
         $key = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
         $hdFactory->fromExtended($key, $network);
     }
@@ -229,23 +220,22 @@ class HierarchicalKeyTest extends AbstractTestCase
     /**
      * @expectedException \Exception
      */
-    public function testCreateWithInvalidLength()
+    public function test_create_with_invalid_length()
     {
         $key = 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA';
-        $hdFactory = new HierarchicalKeyFactory();
+        $hdFactory = new HierarchicalKeyFactory;
         $hdFactory->fromExtended($key, $this->network);
     }
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testFromExtended(EcAdapterInterface $ecAdapter)
+    public function test_from_extended(EcAdapterInterface $ecAdapter)
     {
         $xprv = 'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
         $xpub = 'xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8';
 
-        $hdFactory = new HierarchicalKeyFactory();
+        $hdFactory = new HierarchicalKeyFactory;
         $key = $hdFactory->fromExtended($xprv, $this->network);
 
         $this->assertSame($xprv, $key->toExtendedKey($this->network));
@@ -256,46 +246,43 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
+     *
      * @expectedException \Exception
      */
-    public function testGetExtendedPrivateKeyFailure(EcAdapterInterface $ecAdapter)
+    public function test_get_extended_private_key_failure(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $hdFactory = new HierarchicalKeyFactory();
+        $hdFactory = new HierarchicalKeyFactory;
         $key = $hdFactory->fromExtended($xPub, $this->network);
         $key->toExtendedPrivateKey($this->network);
     }
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testMasterKeyDepthIsZero(EcAdapterInterface $ecAdapter)
+    public function test_master_key_depth_is_zero(EcAdapterInterface $ecAdapter)
     {
         $xPrv = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU';
-        $hdFactory = new HierarchicalKeyFactory();
+        $hdFactory = new HierarchicalKeyFactory;
         $key = $hdFactory->fromExtended($xPrv, $this->network);
         $this->assertSame($key->getDepth(), 0);
     }
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testGetDepth(EcAdapterInterface $ecAdapter)
+    public function test_get_depth(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $hdFactory = new HierarchicalKeyFactory();
+        $hdFactory = new HierarchicalKeyFactory;
         $key = $hdFactory->fromExtended($xPub, $this->network);
         $this->assertSame($key->getDepth(), 2);
     }/**/
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testIsHardened(EcAdapterInterface $ecAdapter)
+    public function test_is_hardened(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $hdFactory = new HierarchicalKeyFactory($ecAdapter);
@@ -309,33 +296,30 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testGetFingerprint(EcAdapterInterface $ecAdapter)
+    public function test_get_fingerprint(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $hdFactory = new HierarchicalKeyFactory($ecAdapter);
         $key = $hdFactory->fromExtended($xPub, $this->network);
-        $this->assertSame(0x615914f3, $key->getFingerprint());
+        $this->assertSame(0x615914F3, $key->getFingerprint());
     }/**/
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testGetChildFingerprint(EcAdapterInterface $ecAdapter)
+    public function test_get_child_fingerprint(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $hdFactory = new HierarchicalKeyFactory($ecAdapter);
         $key = $hdFactory->fromExtended($xPub, $this->network);
-        $this->assertSame(0xa282920f, $key->getChildFingerprint());
+        $this->assertSame(0xA282920F, $key->getChildFingerprint());
     }/**/
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testGetPrivateKey(EcAdapterInterface $ecAdapter)
+    public function test_get_private_key(EcAdapterInterface $ecAdapter)
     {
         $xPrv = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
         $hdFactory = new HierarchicalKeyFactory($ecAdapter);
@@ -345,11 +329,12 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @depends testGetPrivateKey
-     * @param EcAdapterInterface $ecAdapter
+     *
+     * @depends test_get_private_key
+     *
      * @expectedException \Exception
      */
-    public function testGetPrivateKeyFailure(EcAdapterInterface $ecAdapter)
+    public function test_get_private_key_failure(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $hdFactory = new HierarchicalKeyFactory($ecAdapter);
@@ -359,9 +344,8 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testGetPublicKey(EcAdapterInterface $ecAdapter)
+    public function test_get_public_key(EcAdapterInterface $ecAdapter)
     {
         $xpub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $factory = new HierarchicalKeyFactory($ecAdapter);
@@ -371,10 +355,10 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
+     *
      * @expectedException \Exception
      */
-    public function testDeriveFailure(EcAdapterInterface $ecAdapter)
+    public function test_derive_failure(EcAdapterInterface $ecAdapter)
     {
         $k = 'xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8';
         $factory = new HierarchicalKeyFactory($ecAdapter);
@@ -393,60 +377,67 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getInvalidSequences
-     * @param int $sequence
+     *
+     * @param  int  $sequence
+     *
      * @expectedException \InvalidArgumentException
+     *
      * @expectedExceptionMessage Sequence is outside valid range
      */
-    public function testInvalidSequenceGetHmac($sequence)
+    public function test_invalid_sequence_get_hmac($sequence)
     {
         $xPrv = 'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
-        $hdFactory = new HierarchicalKeyFactory();
+        $hdFactory = new HierarchicalKeyFactory;
         $key = $hdFactory->fromExtended($xPrv, $this->network);
         $key->getHmacSeed($sequence);
     }
 
     /**
      * @dataProvider getInvalidSequences
-     * @param int $sequence
+     *
+     * @param  int  $sequence
+     *
      * @expectedException \InvalidArgumentException
+     *
      * @expectedExceptionMessage Sequence is outside valid range, must be >= 0 && <= (2^31)-1
      */
-    public function testInvalidSequenceDeriveChild($sequence)
+    public function test_invalid_sequence_derive_child($sequence)
     {
         $factory = new HierarchicalKeyFactory(Bitcoin::getEcAdapter());
         $key = $factory->fromExtended('xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi', $this->network);
         $key->deriveChild($sequence);
     }
 
-    public function testDerivedKeyWithLeadingZeroes()
+    public function test_derived_key_with_leading_zeroes()
     {
-        $seed = "d13de7bd1e54422d1a3b3b699a27fb460de2849e7e66a005c647e8e4a54075cb";
+        $seed = 'd13de7bd1e54422d1a3b3b699a27fb460de2849e7e66a005c647e8e4a54075cb';
         $buffer = Buffer::hex($seed);
-        $factory = new HierarchicalKeyFactory();
+        $factory = new HierarchicalKeyFactory;
         $root = $factory->fromEntropy($buffer);
 
-        $this->assertEquals("c23ab32b36ddff49fae350a1bed8ec6b4d9fc252238dd789b7273ba4416054eb", $root->getChainCode()->getHex());
-        $this->assertEquals("xpub661MyMwAqRbcGUbHLLJ5n2DzFAt8mmaDxbmbdimh68m8EiXGEQPiJya4BJat5yMzy4e68VSUoLGCu5uvzf8dUoGvwuJsLE6F1cibmWsxFNn", $root->toExtendedPublicKey());
-        $this->assertEquals("xprv9s21ZrQH143K3zWpEJm5QtHFh93eNJrNbNqzqLN5XoE9MvC7gs5TmBFaL2PpaXpDc8FBYVe5EChc73ApjSQ5fWsXS7auHy1MmG6hdpywE1q", $root->toExtendedPrivateKey());
-        $this->assertEquals("0000081d1e4bad6731c84450c9a3dbb70e8ba30118d3419f2c74077b7996a078", $root->getPrivateKey()->getHex());
+        $this->assertEquals('c23ab32b36ddff49fae350a1bed8ec6b4d9fc252238dd789b7273ba4416054eb', $root->getChainCode()->getHex());
+        $this->assertEquals('xpub661MyMwAqRbcGUbHLLJ5n2DzFAt8mmaDxbmbdimh68m8EiXGEQPiJya4BJat5yMzy4e68VSUoLGCu5uvzf8dUoGvwuJsLE6F1cibmWsxFNn', $root->toExtendedPublicKey());
+        $this->assertEquals('xprv9s21ZrQH143K3zWpEJm5QtHFh93eNJrNbNqzqLN5XoE9MvC7gs5TmBFaL2PpaXpDc8FBYVe5EChc73ApjSQ5fWsXS7auHy1MmG6hdpywE1q', $root->toExtendedPrivateKey());
+        $this->assertEquals('0000081d1e4bad6731c84450c9a3dbb70e8ba30118d3419f2c74077b7996a078', $root->getPrivateKey()->getHex());
 
         $child = $root->derivePath("44'/0'/0'/0/0'");
-        $this->assertEquals("ca27553aa89617e982e621637d6478f564b32738f8bbe2e48d0a58a8e0f6da40", $child->getChainCode()->getHex());
-        $this->assertEquals("xpub6GcBnm7FfDg5ERWACCvtuotN6Tdoc37r3SZ1asBHvCWzPkqWn3MVKPWKzy6GsfmdMUGanR3D12dH1cp5tJauuubwc4FAJDn67SH2uUjwAT1", $child->toExtendedPublicKey());
-        $this->assertEquals("xprvA3cqPFaMpr7n1wRh6BPtYfwdYRoKCaPzgDdQnUmgMrz1WxWNEW3EmbBr9ieh9BJAsRGKFPLvotb4p4Aq79jddUVKPVJt7exVzLHcv777JVf", $child->toExtendedPrivateKey());
+        $this->assertEquals('ca27553aa89617e982e621637d6478f564b32738f8bbe2e48d0a58a8e0f6da40', $child->getChainCode()->getHex());
+        $this->assertEquals('xpub6GcBnm7FfDg5ERWACCvtuotN6Tdoc37r3SZ1asBHvCWzPkqWn3MVKPWKzy6GsfmdMUGanR3D12dH1cp5tJauuubwc4FAJDn67SH2uUjwAT1', $child->toExtendedPublicKey());
+        $this->assertEquals('xprvA3cqPFaMpr7n1wRh6BPtYfwdYRoKCaPzgDdQnUmgMrz1WxWNEW3EmbBr9ieh9BJAsRGKFPLvotb4p4Aq79jddUVKPVJt7exVzLHcv777JVf', $child->toExtendedPrivateKey());
     }
 
     /**
      * @expectedException \BitWasp\Bitcoin\Exceptions\InvalidDerivationException
+     *
      * @expectedExceptionMessage Derived invalid key for index 1, use next index
      */
-    public function testSkipsInvalidKey()
+    public function test_skips_invalid_key()
     {
-        $math = new Math();
+        $math = new Math;
         $generator = EccFactory::getSecgCurves($math)->generator256k1();
 
         $k = $math->sub($generator->getOrder(), gmp_init(1));
-        $pubKeyFactory = new PublicKeyFactory();
+        $pubKeyFactory = new PublicKeyFactory;
         $startPub = $pubKeyFactory->fromHex('0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798');
 
         $mock = $this->getMockBuilder('\BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface')
@@ -458,7 +449,7 @@ class HierarchicalKeyTest extends AbstractTestCase
                 'getPrivateKey',
                 'getOrder',
                 'recover',
-                'validatePrivateKey'
+                'validatePrivateKey',
             ])
             ->getMock();
 
@@ -475,6 +466,7 @@ class HierarchicalKeyTest extends AbstractTestCase
                         $return = false;
                     }
                     $this->HK_run_count++;
+
                     return $return;
                 }
             );
@@ -499,7 +491,7 @@ class HierarchicalKeyTest extends AbstractTestCase
                 'getBuffer',
                 'getInt',
                 'getHex',
-                'getBinary'
+                'getBinary',
             ]);
 
         $invalidPriv = $privMockBuilder->getMock();
@@ -538,7 +530,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         /** @var PrivateKeyInterface $mockPriv */
         $key = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey(
             $mock,
-            new P2pkScriptDataFactory(),
+            new P2pkScriptDataFactory,
             0,
             0,
             0,
@@ -552,16 +544,16 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
+     *
      * @throws \Exception
      */
-    public function testExposesScriptDataFactory(EcAdapterInterface $ecAdapter)
+    public function test_exposes_script_data_factory(EcAdapterInterface $ecAdapter)
     {
         $factories = [
-            new P2pkScriptDataFactory(),
-            new P2shScriptDecorator(new P2pkScriptDataFactory()),
-            new P2wshScriptDecorator(new P2pkScriptDataFactory()),
-            new P2shP2wshScriptDecorator(new P2pkScriptDataFactory()),
+            new P2pkScriptDataFactory,
+            new P2shScriptDecorator(new P2pkScriptDataFactory),
+            new P2wshScriptDecorator(new P2pkScriptDataFactory),
+            new P2shP2wshScriptDecorator(new P2pkScriptDataFactory),
         ];
 
         $pkFactory = new PrivateKeyFactory($ecAdapter);

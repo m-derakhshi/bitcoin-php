@@ -26,12 +26,9 @@ class PartialMerkleTreeSerializer
         $this->template = $this->getTemplate();
     }
 
-    /**
-     * @return Template
-     */
     public function getTemplate(): Template
     {
-        return (new TemplateFactory())
+        return (new TemplateFactory)
             ->uint32le()
             ->vector(function (Parser $parser) {
                 return $parser->readBytes(32);
@@ -43,9 +40,8 @@ class PartialMerkleTreeSerializer
     }
 
     /**
-     * @param int $last
-     * @param BufferInterface[] $vBytes
-     * @return array
+     * @param  int  $last
+     * @param  BufferInterface[]  $vBytes
      */
     private function buffersToBitArray($last, array $vBytes): array
     {
@@ -53,7 +49,7 @@ class PartialMerkleTreeSerializer
         $vBits = [];
 
         for ($p = 0; $p < $size; $p++) {
-            $byteIndex = (int)floor($p / 8);
+            $byteIndex = (int) floor($p / 8);
             $byte = ord($vBytes[$byteIndex]->getBinary());
             $vBits[$p] = (int) (($byte & (1 << ($p % 8))) !== 0);
         }
@@ -61,41 +57,29 @@ class PartialMerkleTreeSerializer
         return array_slice($vBits, 0, $last);
     }
 
-    /**
-     * @param Parser $parser
-     * @return PartialMerkleTree
-     */
     public function fromParser(Parser $parser): PartialMerkleTree
     {
-        list ($txCount, $vHash, $vBits) = $this->template->parse($parser);
+        [$txCount, $vHash, $vBits] = $this->template->parse($parser);
 
         return new PartialMerkleTree(
-            (int)$txCount,
+            (int) $txCount,
             $vHash,
             $this->buffersToBitArray($txCount, $vBits)
         );
     }
 
-    /**
-     * @param BufferInterface $buffer
-     * @return PartialMerkleTree
-     */
     public function parse(BufferInterface $buffer): PartialMerkleTree
     {
         return $this->fromParser(new Parser($buffer));
     }
 
-    /**
-     * @param array $bits
-     * @return array
-     */
     private function bitsToBuffers(array $bits): array
     {
-        $vBuffers = str_split(str_pad('', (int)((count($bits)+7)/8), '0', STR_PAD_LEFT));
+        $vBuffers = str_split(str_pad('', (int) ((count($bits) + 7) / 8), '0', STR_PAD_LEFT));
         $nBits = count($bits);
 
         for ($p = 0; $p < $nBits; $p++) {
-            $index = (int)floor($p / 8);
+            $index = (int) floor($p / 8);
             $vBuffers[$index] |= $bits[$p] << ($p % 8);
         }
 
@@ -107,16 +91,12 @@ class PartialMerkleTreeSerializer
         return $vBuffers;
     }
 
-    /**
-     * @param PartialMerkleTree $tree
-     * @return BufferInterface
-     */
     public function serialize(PartialMerkleTree $tree): BufferInterface
     {
         return $this->template->write([
             $tree->getTxCount(),
             $tree->getHashes(),
-            $this->bitsToBuffers($tree->getFlagBits())
+            $this->bitsToBuffers($tree->getFlagBits()),
         ]);
     }
 }

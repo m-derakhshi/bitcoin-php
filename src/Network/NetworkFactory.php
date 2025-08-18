@@ -7,38 +7,32 @@ namespace BitWasp\Bitcoin\Network;
 class NetworkFactory
 {
     /**
-     * @return NetworkInterface
      * @throws \Exception
      */
     public static function bitcoin(): NetworkInterface
     {
-        return new Networks\Bitcoin();
+        return new Networks\Bitcoin;
     }
 
     /**
-     * @return NetworkInterface
      * @throws \Exception
      */
     public static function bitcoinTestnet(): NetworkInterface
     {
-        return new Networks\BitcoinTestnet();
+        return new Networks\BitcoinTestnet;
     }
 
     /**
-     * @return NetworkInterface
      * @throws \Exception
      */
     public static function bitcoinRegtest(): NetworkInterface
     {
-        return new Networks\BitcoinRegtest();
+        return new Networks\BitcoinRegtest;
     }
 
-    /**
-     * @return NetworkInterface
-     */
     public static function litecoin(): NetworkInterface
     {
-        return new Networks\Litecoin();
+        return new Networks\Litecoin;
     }
 
     /**
@@ -46,7 +40,7 @@ class NetworkFactory
      */
     public static function litecoinTestnet(): NetworkInterface
     {
-        return new Networks\LitecoinTestnet();
+        return new Networks\LitecoinTestnet;
     }
 
     /**
@@ -54,7 +48,7 @@ class NetworkFactory
      */
     public static function viacoin(): NetworkInterface
     {
-        return new Networks\Viacoin();
+        return new Networks\Viacoin;
     }
 
     /**
@@ -62,7 +56,7 @@ class NetworkFactory
      */
     public static function viacoinTestnet(): NetworkInterface
     {
-        return new Networks\ViacoinTestnet();
+        return new Networks\ViacoinTestnet;
     }
 
     /**
@@ -70,7 +64,7 @@ class NetworkFactory
      */
     public static function dogecoin(): NetworkInterface
     {
-        return new Networks\Dogecoin();
+        return new Networks\Dogecoin;
     }
 
     /**
@@ -78,7 +72,7 @@ class NetworkFactory
      */
     public static function dogecoinTestnet(): NetworkInterface
     {
-        return new Networks\DogecoinTestnet();
+        return new Networks\DogecoinTestnet;
     }
 
     /**
@@ -86,7 +80,7 @@ class NetworkFactory
      */
     public static function dash(): NetworkInterface
     {
-        return new Networks\Dash();
+        return new Networks\Dash;
     }
 
     /**
@@ -94,7 +88,7 @@ class NetworkFactory
      */
     public static function dashTestnet(): NetworkInterface
     {
-        return new Networks\DashTestnet();
+        return new Networks\DashTestnet;
     }
 
     /**
@@ -102,6 +96,6 @@ class NetworkFactory
      */
     public static function zcash()
     {
-        return new Networks\Zcash();
+        return new Networks\Zcash;
     }
 }

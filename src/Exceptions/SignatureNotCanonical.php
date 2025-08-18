@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class SignatureNotCanonical extends \Exception
-{
-
-}
+class SignatureNotCanonical extends \Exception {}

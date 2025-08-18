@@ -34,13 +34,9 @@ class BloomFilterSerializer
         $this->varint = Types::varint();
     }
 
-    /**
-     * @param BloomFilter $filter
-     * @return BufferInterface
-     */
     public function serialize(BloomFilter $filter): BufferInterface
     {
-        $parser = new Parser();
+        $parser = new Parser;
         $parser->appendBinary($this->varint->write(count($filter->getData())));
         foreach ($filter->getData() as $i) {
             $parser->appendBinary(pack('c', $i));
@@ -53,10 +49,6 @@ class BloomFilterSerializer
         return $parser->getBuffer();
     }
 
-    /**
-     * @param Parser $parser
-     * @return BloomFilter
-     */
     public function fromParser(Parser $parser): BloomFilter
     {
         $varint = (int) $this->varint->read($parser);
@@ -78,10 +70,6 @@ class BloomFilterSerializer
         );
     }
 
-    /**
-     * @param BufferInterface $data
-     * @return BloomFilter
-     */
     public function parse(BufferInterface $data): BloomFilter
     {
         return $this->fromParser(new Parser($data));

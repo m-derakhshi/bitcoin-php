@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class ScriptTypeTest extends AbstractTestCase
 {
-    public function testConstants()
+    public function test_constants()
     {
         $this->assertEquals('pubkey', ScriptType::P2PK);
         $this->assertEquals('pubkey', OutputClassifier::P2PK);

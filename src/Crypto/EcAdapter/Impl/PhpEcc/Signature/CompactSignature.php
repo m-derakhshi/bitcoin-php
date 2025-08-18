@@ -25,13 +25,6 @@ class CompactSignature extends Signature implements CompactSignatureInterface
      */
     private $compressed;
 
-    /**
-     * @param EcAdapter $adapter
-     * @param \GMP $r
-     * @param \GMP $s
-     * @param int $recid
-     * @param bool $compressed
-     */
     public function __construct(EcAdapter $adapter, \GMP $r, \GMP $s, int $recid, bool $compressed)
     {
         $this->ecAdapter = $adapter;
@@ -40,41 +33,26 @@ class CompactSignature extends Signature implements CompactSignatureInterface
         parent::__construct($adapter, $r, $s);
     }
 
-    /**
-     * @return Signature
-     */
     public function convert(): Signature
     {
         return new Signature($this->ecAdapter, $this->getR(), $this->getS());
     }
 
-    /**
-     * @return int
-     */
     public function getRecoveryId(): int
     {
         return $this->recid;
     }
 
-    /**
-     * @return bool
-     */
     public function isCompressed(): bool
     {
         return $this->compressed;
     }
 
-    /**
-     * @return int
-     */
     public function getFlags(): int
     {
         return $this->getRecoveryId() + 27 + ($this->isCompressed() ? 4 : 0);
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function getBuffer(): BufferInterface
     {
         return (new CompactSignatureSerializer($this->ecAdapter))->serialize($this);

@@ -11,18 +11,18 @@ use Mdanter\Ecc\EccFactory;
 
 class BitcoinTest extends AbstractTestCase
 {
-    public function testGetMath()
+    public function test_get_math()
     {
-        $this->assertEquals(new Math(), Bitcoin::getMath());
+        $this->assertEquals(new Math, Bitcoin::getMath());
     }
 
-    public function testGetGenerator()
+    public function test_get_generator()
     {
         $default = EccFactory::getSecgCurves(Bitcoin::getMath())->generator256k1();
         $this->assertEquals($default, Bitcoin::getGenerator());
     }
 
-    public function testGetNetwork()
+    public function test_get_network()
     {
         $default = Bitcoin::getDefaultNetwork();
         $bitcoin = NetworkFactory::bitcoin();

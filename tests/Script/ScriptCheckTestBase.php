@@ -24,8 +24,6 @@ use BitWasp\Buffertools\Buffer;
 abstract class ScriptCheckTestBase extends AbstractTestCase
 {
     /**
-     * @param ScriptInterface $scriptPubKey
-     * @param int $amount
      * @return Transaction
      */
     public function buildCreditingTransaction(ScriptInterface $scriptPubKey, int $amount = 0)
@@ -34,29 +32,23 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
             1,
             [
                 new TransactionInput(
-                    new OutPoint(new Buffer("\x00", 32), 0xffffffff),
+                    new OutPoint(new Buffer("\x00", 32), 0xFFFFFFFF),
                     ScriptFactory::sequence([Opcodes::OP_0, Opcodes::OP_0]),
                     TransactionInput::SEQUENCE_FINAL
-                )
+                ),
             ],
             [
-                new TransactionOutput($amount, $scriptPubKey)
+                new TransactionOutput($amount, $scriptPubKey),
             ],
             [],
             0
         );
     }
 
-    /**
-     * @param TransactionInterface $tx
-     * @param ScriptInterface $scriptSig
-     * @param ScriptWitnessInterface|null $scriptWitness
-     * @return TransactionInterface
-     */
     public function buildSpendTransaction(
         TransactionInterface $tx,
         ScriptInterface $scriptSig,
-        ScriptWitnessInterface $scriptWitness = null
+        ?ScriptWitnessInterface $scriptWitness = null
     ): TransactionInterface {
         return new Transaction(
             1,
@@ -65,10 +57,10 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
                     $tx->makeOutPoint(0),
                     $scriptSig,
                     TransactionInput::SEQUENCE_FINAL
-                )
+                ),
             ],
             [
-                new TransactionOutput($tx->getOutput(0)->getValue(), new Script())
+                new TransactionOutput($tx->getOutput(0)->getValue(), new Script),
             ],
             $scriptWitness == null ? [] : [$scriptWitness],
             0
@@ -76,24 +68,19 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
     }
 
     /**
-     * @param string $data
-     * @return ScriptInterface
+     * @param  string  $data
      */
     public function parseTestScript($data): ScriptInterface
     {
         if (is_array($data)) {
             return ScriptFactory::sequence($data);
-        } else if (is_string($data)) {
+        } elseif (is_string($data)) {
             return ScriptFactory::fromHex($data);
         }
 
         throw new \RuntimeException('Invalid data for test case: supports array (interpreted as sequence), or string (interpreted as hex)');
     }
 
-    /**
-     * @param Opcodes $opcodes
-     * @return array
-     */
     public function calcMapOpNames(Opcodes $opcodes): array
     {
         $mapOpNames = [];
@@ -103,7 +90,7 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
             }
 
             $name = $opcodes->getOp($op);
-            if ($name === "OP_UNKNOWN") {
+            if ($name === 'OP_UNKNOWN') {
                 continue;
             }
 
@@ -114,47 +101,39 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
         return $mapOpNames;
     }
 
-    /**
-     * @param array $mapOpNames
-     * @param string $string
-     * @return ScriptInterface
-     */
     public function calcScriptFromString(array $mapOpNames, string $string): ScriptInterface
     {
         $builder = ScriptFactory::create();
-        $split = explode(" ", $string);
+        $split = explode(' ', $string);
         foreach ($split as $item) {
             if ($item === 'NOP3') {
                 $item = 'OP_CHECKSEQUENCEVERIFY';
             }
 
             if (strlen($item) == '') {
-            } else if (preg_match("/^[0-9]*$/", $item) || substr($item, 0, 1) === "-" && preg_match("/^[0-9]*$/", substr($item, 1))) {
+            } elseif (preg_match('/^[0-9]*$/', $item) || substr($item, 0, 1) === '-' && preg_match('/^[0-9]*$/', substr($item, 1))) {
                 $builder->int((int) $item);
-            } else if (substr($item, 0, 2) === "0x") {
+            } elseif (substr($item, 0, 2) === '0x') {
                 $scriptConcat = new Script(Buffer::hex(substr($item, 2)));
                 $builder->concat($scriptConcat);
-            } else if (strlen($item) >= 2 && substr($item, 0, 1) === "'" && substr($item, -1) === "'") {
+            } elseif (strlen($item) >= 2 && substr($item, 0, 1) === "'" && substr($item, -1) === "'") {
                 $buffer = new Buffer(substr($item, 1, strlen($item) - 2));
                 $builder->push($buffer);
-            } else if (isset($mapOpNames[$item])) {
+            } elseif (isset($mapOpNames[$item])) {
                 $builder->sequence([$mapOpNames[$item]]);
             } else {
-                throw new \RuntimeException('Script parse error: element "' . $item . '"');
+                throw new \RuntimeException('Script parse error: element "'.$item.'"');
             }
         }
 
         return $builder->getScript();
     }
 
-    /**
-     * @return array
-     */
     public function prepareTestData(): array
     {
-        $opcodes = new Opcodes();
+        $opcodes = new Opcodes;
         $mapOpNames = $this->calcMapOpNames($opcodes);
-        $object = json_decode($this->dataFile("script_tests.json"), true);
+        $object = json_decode($this->dataFile('script_tests.json'), true);
         $testCount = count($object);
         $vectors = [];
         for ($idx = 0; $idx < $testCount; $idx++) {
@@ -199,17 +178,17 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
     }
 
     /**
-     * @param array $ecAdapterFixtures - array<array<EcAdapterInterface>>
+     * @param  array  $ecAdapterFixtures  - array<array<EcAdapterInterface>>
      * @return array - array<array<ConsensusInterface,EcAdapterInterface>>
      */
     public function getConsensusAdapters(array $ecAdapterFixtures): array
     {
         $adapters = [];
         foreach ($ecAdapterFixtures as $ecAdapterFixture) {
-            list ($ecAdapter) = $ecAdapterFixture;
+            [$ecAdapter] = $ecAdapterFixture;
             $adapters[] = [new NativeConsensus($ecAdapter)];
             if (extension_loaded('bitcoinconsensus')) {
-                $adapters[] = [new BitcoinConsensus()];
+                $adapters[] = [new BitcoinConsensus];
             }
         }
 

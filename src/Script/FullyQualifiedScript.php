@@ -18,7 +18,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 class FullyQualifiedScript
 {
-
     /**
      * @var OutputData
      */
@@ -51,47 +50,43 @@ class FullyQualifiedScript
      *
      * It rejects superfluous redeem & witness scripts, and refuses
      * to construct unless all necessary scripts are provided.
-     *
-     * @param OutputData $spkData
-     * @param OutputData|null $rsData
-     * @param OutputData|null $wsData
      */
     public function __construct(
         OutputData $spkData,
-        OutputData $rsData = null,
-        OutputData $wsData = null
+        ?OutputData $rsData = null,
+        ?OutputData $wsData = null
     ) {
         $signScript = $spkData;
         $sigVersion = SigHash::V0;
 
         if ($spkData->getType() === ScriptType::P2SH) {
-            if (!($rsData instanceof OutputData)) {
-                throw new MissingScriptException("Missing redeemScript");
+            if (! ($rsData instanceof OutputData)) {
+                throw new MissingScriptException('Missing redeemScript');
             }
-            if (!$rsData->getScript()->getScriptHash()->equals($spkData->getSolution())) {
-                throw new ScriptHashMismatch("Redeem script fails to solve pay-to-script-hash");
+            if (! $rsData->getScript()->getScriptHash()->equals($spkData->getSolution())) {
+                throw new ScriptHashMismatch('Redeem script fails to solve pay-to-script-hash');
             }
             $signScript = $rsData;
-        } else if ($rsData) {
-            throw new SuperfluousScriptData("Data provided for redeemScript was not necessary");
+        } elseif ($rsData) {
+            throw new SuperfluousScriptData('Data provided for redeemScript was not necessary');
         }
 
         if ($signScript->getType() === ScriptType::P2WKH) {
-            $classifier = new OutputClassifier();
+            $classifier = new OutputClassifier;
             $signScript = $classifier->decode(ScriptFactory::scriptPubKey()->p2pkh($signScript->getSolution()));
             $sigVersion = SigHash::V1;
-        } else if ($signScript->getType() === ScriptType::P2WSH) {
-            if (!($wsData instanceof OutputData)) {
-                throw new MissingScriptException("Missing witnessScript");
+        } elseif ($signScript->getType() === ScriptType::P2WSH) {
+            if (! ($wsData instanceof OutputData)) {
+                throw new MissingScriptException('Missing witnessScript');
             }
-            if (!$wsData->getScript()->getWitnessScriptHash()->equals($signScript->getSolution())) {
-                $origin = $rsData ? "redeemScript" : "scriptPubKey";
+            if (! $wsData->getScript()->getWitnessScriptHash()->equals($signScript->getSolution())) {
+                $origin = $rsData ? 'redeemScript' : 'scriptPubKey';
                 throw new ScriptHashMismatch("Witness script does not match witness program in $origin");
             }
             $signScript = $wsData;
             $sigVersion = SigHash::V1;
-        } else if ($wsData) {
-            throw new SuperfluousScriptData("Data provided for witnessScript was not necessary");
+        } elseif ($wsData) {
+            throw new SuperfluousScriptData('Data provided for witnessScript was not necessary');
         }
 
         $this->spkData = $spkData;
@@ -106,8 +101,7 @@ class FullyQualifiedScript
      * or defers to SignData. If both are provided, it checks the
      * value obtained from $chunks against SignData.
      *
-     * @param BufferInterface[] $chunks
-     * @param SignData $signData
+     * @param  BufferInterface[]  $chunks
      * @return P2shScript
      */
     public static function findRedeemScript(array $chunks, SignData $signData)
@@ -115,18 +109,18 @@ class FullyQualifiedScript
         if (count($chunks) > 0) {
             $redeemScript = new Script($chunks[count($chunks) - 1]);
             if ($signData->hasRedeemScript()) {
-                if (!$redeemScript->equals($signData->getRedeemScript())) {
+                if (! $redeemScript->equals($signData->getRedeemScript())) {
                     throw new ScriptQualificationError('Extracted redeemScript did not match sign data');
                 }
             }
         } else {
-            if (!$signData->hasRedeemScript()) {
+            if (! $signData->hasRedeemScript()) {
                 throw new ScriptQualificationError('Redeem script not provided in sign data or scriptSig');
             }
             $redeemScript = $signData->getRedeemScript();
         }
 
-        if (!($redeemScript instanceof P2shScript)) {
+        if (! ($redeemScript instanceof P2shScript)) {
             $redeemScript = new P2shScript($redeemScript);
         }
 
@@ -137,8 +131,7 @@ class FullyQualifiedScript
      * Checks the witness for it's last element, or whatever
      * the SignData happens to have. If SignData has a WS,
      * it will ensure that if chunks has a script, it matches WS.
-     * @param ScriptWitnessInterface $witness
-     * @param SignData $signData
+     *
      * @return Script|ScriptInterface|WitnessScript
      */
     public static function findWitnessScript(ScriptWitnessInterface $witness, SignData $signData)
@@ -146,18 +139,18 @@ class FullyQualifiedScript
         if (count($witness) > 0) {
             $witnessScript = new Script($witness->bottom());
             if ($signData->hasWitnessScript()) {
-                if (!$witnessScript->equals($signData->getWitnessScript())) {
+                if (! $witnessScript->equals($signData->getWitnessScript())) {
                     throw new ScriptQualificationError('Extracted witnessScript did not match sign data');
                 }
             }
         } else {
-            if (!$signData->hasWitnessScript()) {
+            if (! $signData->hasWitnessScript()) {
                 throw new ScriptQualificationError('Witness script not provided in sign data or witness');
             }
             $witnessScript = $signData->getWitnessScript();
         }
 
-        if (!($witnessScript instanceof WitnessScript)) {
+        if (! ($witnessScript instanceof WitnessScript)) {
             $witnessScript = new WitnessScript($witnessScript);
         }
 
@@ -171,30 +164,25 @@ class FullyQualifiedScript
      * from all this, before initializing the constructor
      * for final validation.
      *
-     * @param ScriptInterface $scriptPubKey
-     * @param ScriptInterface $scriptSig
-     * @param ScriptWitnessInterface $witness
-     * @param SignData|null $signData
-     * @param OutputClassifier|null $classifier
      * @return FullyQualifiedScript
      */
     public static function fromTxData(
         ScriptInterface $scriptPubKey,
         ScriptInterface $scriptSig,
         ScriptWitnessInterface $witness,
-        SignData $signData = null,
-        OutputClassifier $classifier = null
+        ?SignData $signData = null,
+        ?OutputClassifier $classifier = null
     ) {
-        $classifier = $classifier ?: new OutputClassifier();
-        $signData = $signData ?: new SignData();
+        $classifier = $classifier ?: new OutputClassifier;
+        $signData = $signData ?: new SignData;
 
         $wsData = null;
         $rsData = null;
         $solution = $spkData = $classifier->decode($scriptPubKey);
 
         $sigChunks = [];
-        if (!$scriptSig->isPushOnly($sigChunks)) {
-            throw new ScriptQualificationError("Invalid script signature - must be PUSHONLY.");
+        if (! $scriptSig->isPushOnly($sigChunks)) {
+            throw new ScriptQualificationError('Invalid script signature - must be PUSHONLY.');
         }
 
         if ($solution->getType() === ScriptType::P2SH) {
@@ -212,7 +200,6 @@ class FullyQualifiedScript
 
     /**
      * Was the FQS's scriptPubKey P2SH?
-     * @return bool
      */
     public function isP2SH(): bool
     {
@@ -221,7 +208,6 @@ class FullyQualifiedScript
 
     /**
      * Was the FQS's scriptPubKey, or redeemScript, P2WSH?
-     * @return bool
      */
     public function isP2WSH(): bool
     {
@@ -230,7 +216,6 @@ class FullyQualifiedScript
 
     /**
      * Returns the scriptPubKey.
-     * @return OutputData
      */
     public function scriptPubKey(): OutputData
     {
@@ -242,8 +227,6 @@ class FullyQualifiedScript
      * the spk/rs/ws. Essentially this is the script
      * that actually locks the coins (the CScript
      * passed into EvalScript in interpreter.cpp)
-     *
-     * @return OutputData
      */
     public function signScript(): OutputData
     {
@@ -253,7 +236,6 @@ class FullyQualifiedScript
     /**
      * Returns the signature hashing algorithm version.
      * Defaults to V0, unless script was segwit.
-     * @return int
      */
     public function sigVersion(): int
     {
@@ -263,13 +245,13 @@ class FullyQualifiedScript
     /**
      * Returns the redeemScript, if we had one.
      * Throws an exception otherwise.
-     * @return OutputData
+     *
      * @throws \RuntimeException
      */
     public function redeemScript(): OutputData
     {
-        if (null === $this->rsData) {
-            throw new \RuntimeException("No redeemScript for this script!");
+        if ($this->rsData === null) {
+            throw new \RuntimeException('No redeemScript for this script!');
         }
 
         return $this->rsData;
@@ -278,13 +260,13 @@ class FullyQualifiedScript
     /**
      * Returns the witnessScript, if we had one.
      * Throws an exception otherwise.
-     * @return OutputData
+     *
      * @throws \RuntimeException
      */
     public function witnessScript(): OutputData
     {
-        if (null === $this->wsData) {
-            throw new \RuntimeException("No witnessScript for this script!");
+        if ($this->wsData === null) {
+            throw new \RuntimeException('No witnessScript for this script!');
         }
 
         return $this->wsData;
@@ -295,8 +277,6 @@ class FullyQualifiedScript
      * argument to EvalScript in interpreter.cpp)
      * into a scriptSig and witness structure. These
      * are suitable for directly encoding in a transaction.
-     * @param Stack $stack
-     * @return SigValues
      */
     public function encodeStack(Stack $stack): SigValues
     {
@@ -313,7 +293,7 @@ class FullyQualifiedScript
         if ($solution->getType() === ScriptType::P2WKH) {
             $witness = $stack->all();
             $scriptSigChunks = [];
-        } else if ($solution->getType() === ScriptType::P2WSH) {
+        } elseif ($solution->getType() === ScriptType::P2WSH) {
             $witness = $stack->all();
             $witness[] = $this->wsData->getScript()->getBuffer();
             $scriptSigChunks = [];
@@ -329,16 +309,11 @@ class FullyQualifiedScript
         );
     }
 
-    /**
-     * @param ScriptInterface $scriptSig
-     * @param ScriptWitnessInterface $witness
-     * @return Stack
-     */
     public function extractStack(ScriptInterface $scriptSig, ScriptWitnessInterface $witness): Stack
     {
         $sigChunks = [];
-        if (!$scriptSig->isPushOnly($sigChunks)) {
-            throw new \RuntimeException("Invalid signature script - must be push only");
+        if (! $scriptSig->isPushOnly($sigChunks)) {
+            throw new \RuntimeException('Invalid signature script - must be push only');
         }
 
         $solution = $this->spkData;
@@ -352,7 +327,7 @@ class FullyQualifiedScript
 
         if ($solution->getType() === ScriptType::P2WKH) {
             $sigChunks = $witness->all();
-        } else if ($solution->getType() === ScriptType::P2WSH) {
+        } elseif ($solution->getType() === ScriptType::P2WSH) {
             $sigChunks = $witness->all();
             $nChunks = count($sigChunks);
             if ($nChunks > 0 && $sigChunks[$nChunks - 1]->equals($this->wsData->getScript()->getBuffer())) {

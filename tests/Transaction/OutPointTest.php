@@ -13,17 +13,18 @@ class OutPointTest extends AbstractTestCase
 {
     /**
      * @expectedException InvalidHashLengthException
+     *
      * @expectedExceptionMessage OutPoint: hashPrevOut must be a 32-byte Buffer
      */
-    public function testInvalidHashSize()
+    public function test_invalid_hash_size()
     {
         $this->expectException(InvalidHashLengthException::class);
-        $this->expectExceptionMessage("OutPoint: hashPrevOut must be a 32-byte Buffer");
+        $this->expectExceptionMessage('OutPoint: hashPrevOut must be a 32-byte Buffer');
 
         new OutPoint(new Buffer('', 8), 1);
     }
 
-    public function testOutPoint()
+    public function test_out_point()
     {
         $txid = new Buffer('a', 32);
         $vout = 10;
@@ -32,7 +33,7 @@ class OutPointTest extends AbstractTestCase
         $this->assertEquals($vout, $outpoint->getVout());
     }
 
-    public function testCompare()
+    public function test_compare()
     {
         $txidA = Buffer::hex('41', 32);
         $txidB = Buffer::hex('42', 32);

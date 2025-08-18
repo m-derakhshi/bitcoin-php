@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . "/../vendor/autoload.php";
+require __DIR__.'/../vendor/autoload.php';
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 
 $ec = Bitcoin::getEcAdapter();
-$random = new Random();
+$random = new Random;
 $privKeyFactory = new PrivateKeyFactory($ec);
 $privateKey = $privKeyFactory->generateCompressed($random);
 

@@ -24,16 +24,14 @@ class P2shScriptTest extends AbstractTestCase
     public function getCannotNestVectors()
     {
         return [
-            [new P2shScript(new Script(new Buffer())), "Cannot nest P2SH scripts."],
+            [new P2shScript(new Script(new Buffer)), 'Cannot nest P2SH scripts.'],
         ];
     }
 
     /**
-     * @param ScriptInterface $testScript
-     * @param string $exceptionMsg
      * @dataProvider getCannotNestVectors
      */
-    public function testCannotNestWitnessScripts(ScriptInterface $testScript, string $exceptionMsg)
+    public function test_cannot_nest_witness_scripts(ScriptInterface $testScript, string $exceptionMsg)
     {
         $this->expectException(P2shScriptException::class);
         $this->expectExceptionMessage($exceptionMsg);
@@ -41,15 +39,15 @@ class P2shScriptTest extends AbstractTestCase
         new P2shScript($testScript);
     }
 
-    public function testP2WSHForP2SHIsForbidden()
+    public function test_p2_wsh_for_p2_sh_is_forbidden()
     {
         $this->expectException(P2shScriptException::class);
-        $this->expectExceptionMessage("Cannot compute witness-script-hash for a P2shScript");
+        $this->expectExceptionMessage('Cannot compute witness-script-hash for a P2shScript');
 
-        (new P2shScript(new Script(new Buffer())))->getWitnessScriptHash();
+        (new P2shScript(new Script(new Buffer)))->getWitnessScriptHash();
     }
 
-    public function testNormalScriptHasSameBuffer()
+    public function test_normal_script_has_same_buffer()
     {
         $script = ScriptFactory::sequence([Opcodes::OP_0]);
         $p2shScript = new P2shScript($script);
@@ -62,7 +60,7 @@ class P2shScriptTest extends AbstractTestCase
         $this->assertEquals($expectedAddress, $p2shScript->getAddress()->getAddress());
     }
 
-    public function testConsumesWitnessScriptOutputScript()
+    public function test_consumes_witness_script_output_script()
     {
         $script = ScriptFactory::sequence([Opcodes::OP_0]);
 
@@ -81,6 +79,7 @@ class P2shScriptTest extends AbstractTestCase
         $scriptHash = $script->getScriptHash();
         $witnessScript = new WitnessScript($script);
         $wpScriptHash = $witnessScript->getWitnessProgram()->getScript()->getScriptHash();
+
         return [
             [$script, $script, $scriptHash],
             [$witnessScript, $witnessScript->getOutputScript(), $wpScriptHash],
@@ -88,12 +87,9 @@ class P2shScriptTest extends AbstractTestCase
     }
 
     /**
-     * @param ScriptInterface $script
-     * @param ScriptInterface $expectedP2SH
-     * @param BufferInterface $expectedScriptHash
      * @dataProvider getOutputScriptAndAddressVectors
      */
-    public function testOutputScriptAndAddress(ScriptInterface $script, ScriptInterface $expectedP2SH, BufferInterface $expectedScriptHash)
+    public function test_output_script_and_address(ScriptInterface $script, ScriptInterface $expectedP2SH, BufferInterface $expectedScriptHash)
     {
         $p2shScript = new P2shScript($script);
         $this->assertTrue($p2shScript->equals($expectedP2SH));

@@ -9,9 +9,9 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class BitcoinTestnetTest extends AbstractTestCase
 {
-    public function testBitcoinTestnetNetwork()
+    public function test_bitcoin_testnet_network()
     {
-        $network = new BitcoinTestnet();
+        $network = new BitcoinTestnet;
         $this->assertEquals('6f', $network->getAddressByte());
         $this->assertEquals('c4', $network->getP2shByte());
         $this->assertEquals('ef', $network->getPrivByte());
@@ -19,6 +19,6 @@ class BitcoinTestnetTest extends AbstractTestCase
         $this->assertEquals('043587cf', $network->getHDPubByte());
         $this->assertEquals('0709110b', $network->getNetMagicBytes());
         $this->assertEquals('tb', $network->getSegwitBech32Prefix());
-        $this->assertEquals("Bitcoin Signed Message", $network->getSignedMessageMagic());
+        $this->assertEquals('Bitcoin Signed Message', $network->getSignedMessageMagic());
     }
 }

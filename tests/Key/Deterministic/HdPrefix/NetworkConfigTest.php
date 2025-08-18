@@ -14,29 +14,29 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class NetworkConfigTest extends AbstractTestCase
 {
-    public function testGetNetwork()
+    public function test_get_network()
     {
         $network = NetworkFactory::bitcoin();
         $config = new NetworkConfig($network, []);
         $this->assertEquals($network, $config->getNetwork());
     }
 
-    public function testGetConfigForUnknownScriptType()
+    public function test_get_config_for_unknown_script_type()
     {
         $network = NetworkFactory::bitcoin();
         $config = new NetworkConfig($network, []);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Script type not configured for network");
+        $this->expectExceptionMessage('Script type not configured for network');
 
         $config->getConfigForScriptType(ScriptType::P2WKH);
     }
 
-    public function testGetConfigByScriptType()
+    public function test_get_config_by_script_type()
     {
-        $pubPrefix = "04b24746";
-        $privPrefix = "04b2430c";
-        $factory = new P2wpkhScriptDataFactory();
+        $pubPrefix = '04b24746';
+        $privPrefix = '04b2430c';
+        $factory = new P2wpkhScriptDataFactory;
         $prefix = new ScriptPrefix($factory, $privPrefix, $pubPrefix);
 
         $network = NetworkFactory::bitcoin();
@@ -46,10 +46,10 @@ class NetworkConfigTest extends AbstractTestCase
         $this->assertEquals($prefixConfig, $prefix);
     }
 
-    public function testGetConfigByPrefix()
+    public function test_get_config_by_prefix()
     {
-        $factory = new P2wpkhScriptDataFactory();
-        $prefix = new ScriptPrefix($factory, "04b2430c", "04b24746");
+        $factory = new P2wpkhScriptDataFactory;
+        $prefix = new ScriptPrefix($factory, '04b2430c', '04b24746');
 
         $network = NetworkFactory::bitcoin();
         $config = new NetworkConfig($network, [$prefix]);
@@ -61,44 +61,44 @@ class NetworkConfigTest extends AbstractTestCase
         $this->assertEquals($prefixConfig, $prefix);
     }
 
-    public function testGetConfigForUnknownPrefix()
+    public function test_get_config_for_unknown_prefix()
     {
         $network = NetworkFactory::bitcoin();
         $config = new NetworkConfig($network, []);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Prefix not configured for network");
+        $this->expectExceptionMessage('Prefix not configured for network');
 
-        $config->getConfigForPrefix("abababab");
+        $config->getConfigForPrefix('abababab');
     }
 
-    public function testInvalidArrayIsRejected()
+    public function test_invalid_array_is_rejected()
     {
         $network = NetworkFactory::bitcoin();
 
-        $pubPrefix = "04b24746";
-        $privPrefix = "04b2430c";
-        $factory = new P2wpkhScriptDataFactory();
+        $pubPrefix = '04b24746';
+        $privPrefix = '04b2430c';
+        $factory = new P2wpkhScriptDataFactory;
         $prefix = new ScriptPrefix($factory, $privPrefix, $pubPrefix);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("expecting array of NetworkPrefixConfig");
+        $this->expectExceptionMessage('expecting array of NetworkPrefixConfig');
 
         new NetworkConfig($network, [
             $prefix,
-            $network
+            $network,
         ]);
     }
 
-    public function testCheckForPublicPrefixOverwriting()
+    public function test_check_for_public_prefix_overwriting()
     {
         $network = NetworkFactory::bitcoin();
 
-        $prefix1 = new ScriptPrefix(new P2wpkhScriptDataFactory(), "aaaaaaaa", "bbbbbbbb");
-        $prefix2 = new ScriptPrefix(new P2pkhScriptDataFactory(), "abababab", "bbbbbbbb");
+        $prefix1 = new ScriptPrefix(new P2wpkhScriptDataFactory, 'aaaaaaaa', 'bbbbbbbb');
+        $prefix2 = new ScriptPrefix(new P2pkhScriptDataFactory, 'abababab', 'bbbbbbbb');
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("A BIP32 prefix for pubkeyhash conflicts with the public BIP32 prefix of witness_v0_keyhash");
+        $this->expectExceptionMessage('A BIP32 prefix for pubkeyhash conflicts with the public BIP32 prefix of witness_v0_keyhash');
 
         new NetworkConfig($network, [
             $prefix1,
@@ -106,15 +106,15 @@ class NetworkConfigTest extends AbstractTestCase
         ]);
     }
 
-    public function testCheckForPrivatePrefixOverwriting()
+    public function test_check_for_private_prefix_overwriting()
     {
         $network = NetworkFactory::bitcoin();
 
-        $prefix1 = new ScriptPrefix(new P2wpkhScriptDataFactory(), "aaaaaaaa", "ffffbbbb");
-        $prefix2 = new ScriptPrefix(new P2pkhScriptDataFactory(), "aaaaaaaa", "ddddbbbb");
+        $prefix1 = new ScriptPrefix(new P2wpkhScriptDataFactory, 'aaaaaaaa', 'ffffbbbb');
+        $prefix2 = new ScriptPrefix(new P2pkhScriptDataFactory, 'aaaaaaaa', 'ddddbbbb');
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("A BIP32 prefix for pubkeyhash conflicts with the private BIP32 prefix of witness_v0_keyhash");
+        $this->expectExceptionMessage('A BIP32 prefix for pubkeyhash conflicts with the private BIP32 prefix of witness_v0_keyhash');
 
         new NetworkConfig($network, [
             $prefix1,
@@ -122,15 +122,15 @@ class NetworkConfigTest extends AbstractTestCase
         ]);
     }
 
-    public function testCheckForScriptTypeOverwriting()
+    public function test_check_for_script_type_overwriting()
     {
         $network = NetworkFactory::bitcoin();
 
-        $prefix1 = new ScriptPrefix(new P2pkhScriptDataFactory(), "abcdef12", "34567890");
-        $prefix2 = new ScriptPrefix(new P2pkhScriptDataFactory(), "aaaaaaaa", "bbbbbbbb");
+        $prefix1 = new ScriptPrefix(new P2pkhScriptDataFactory, 'abcdef12', '34567890');
+        $prefix2 = new ScriptPrefix(new P2pkhScriptDataFactory, 'aaaaaaaa', 'bbbbbbbb');
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("The script type pubkeyhash has a conflict");
+        $this->expectExceptionMessage('The script type pubkeyhash has a conflict');
 
         new NetworkConfig($network, [
             $prefix1,

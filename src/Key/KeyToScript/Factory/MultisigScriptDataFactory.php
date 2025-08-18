@@ -28,7 +28,7 @@ class MultisigScriptDataFactory extends KeyToScriptDataFactory
      */
     private $sortKeys;
 
-    public function __construct(int $numSigners, int $numKeys, bool $sortKeys, PublicKeySerializerInterface $pubKeySerializer = null)
+    public function __construct(int $numSigners, int $numKeys, bool $sortKeys, ?PublicKeySerializerInterface $pubKeySerializer = null)
     {
         $this->numSigners = $numSigners;
         $this->numKeys = $numKeys;
@@ -36,22 +36,15 @@ class MultisigScriptDataFactory extends KeyToScriptDataFactory
         parent::__construct($pubKeySerializer);
     }
 
-    /**
-     * @return string
-     */
     public function getScriptType(): string
     {
         return ScriptType::MULTISIG;
     }
 
-    /**
-     * @param PublicKeyInterface ...$keys
-     * @return ScriptAndSignData
-     */
     protected function convertKeyToScriptData(PublicKeyInterface ...$keys): ScriptAndSignData
     {
         if (count($keys) !== $this->numKeys) {
-            throw new \InvalidArgumentException("Incorrect number of keys");
+            throw new \InvalidArgumentException('Incorrect number of keys');
         }
 
         $keyBuffers = [];
@@ -61,7 +54,7 @@ class MultisigScriptDataFactory extends KeyToScriptDataFactory
 
         return new ScriptAndSignData(
             ScriptFactory::scriptPubKey()->multisigKeyBuffers($this->numSigners, $keyBuffers, $this->sortKeys),
-            new SignData()
+            new SignData
         );
     }
 }

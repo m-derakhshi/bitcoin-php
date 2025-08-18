@@ -13,7 +13,7 @@ use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 
 class ConsensusTest extends ScriptCheckTestBase
 {
-    public function testGetNativeConsensus()
+    public function test_get_native_consensus()
     {
         $this->assertInstanceOf(NativeConsensus::class, ScriptFactory::getNativeConsensus());
     }
@@ -25,14 +25,14 @@ class ConsensusTest extends ScriptCheckTestBase
             : NativeConsensus::class;
     }
 
-    public function testGetBitcoinConsensus()
+    public function test_get_bitcoin_consensus()
     {
         if ($this->getExpectedAdapter() === BitcoinConsensus::class) {
             $this->assertInstanceOf(BitcoinConsensus::class, ScriptFactory::getBitcoinConsensus());
         }
     }
 
-    public function testDefaultAdapter()
+    public function test_default_adapter()
     {
         $this->assertInstanceOf($this->getExpectedAdapter(), ScriptFactory::consensus());
     }
@@ -45,9 +45,9 @@ class ConsensusTest extends ScriptCheckTestBase
         $adapters = $this->getConsensusAdapters($this->getEcAdapters());
         $vectors = [];
         foreach ($this->prepareTestData() as $fixture) {
-            list ($flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest) = $fixture;
+            [$flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest] = $fixture;
             foreach ($adapters as $consensusFixture) {
-                list ($consensus) = $consensusFixture;
+                [$consensus] = $consensusFixture;
 
                 if ($consensus instanceof BitcoinConsensus) {
                     // Some conditions are untestable because recent libbitcoinconsensus
@@ -67,17 +67,9 @@ class ConsensusTest extends ScriptCheckTestBase
     }
 
     /**
-     * @param ConsensusInterface $consensus
-     * @param int $flags
-     * @param bool $expectedResult
-     * @param ScriptWitnessInterface $scriptWitness
-     * @param ScriptInterface $scriptSig
-     * @param ScriptInterface $scriptPubKey
-     * @param int $amount
-     * @param string $strTest
      * @dataProvider prepareConsensusTests
      */
-    public function testScript(
+    public function test_script(
         ConsensusInterface $consensus,
         int $flags,
         bool $expectedResult,

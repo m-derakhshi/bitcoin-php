@@ -29,10 +29,6 @@ class ScriptWitnessSerializer
         $this->varint = Types::varint();
     }
 
-    /**
-     * @param Parser $parser
-     * @return ScriptWitnessInterface
-     */
     public function fromParser(Parser $parser): ScriptWitnessInterface
     {
         $size = $this->varint->read($parser);
@@ -44,10 +40,6 @@ class ScriptWitnessSerializer
         return new ScriptWitness(...$entries);
     }
 
-    /**
-     * @param ScriptWitnessInterface $witness
-     * @return BufferInterface
-     */
     public function serialize(ScriptWitnessInterface $witness): BufferInterface
     {
         $binary = $this->varint->write($witness->count());

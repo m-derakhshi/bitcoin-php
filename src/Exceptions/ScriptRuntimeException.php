@@ -10,8 +10,8 @@ class ScriptRuntimeException extends \Exception
     private $failureFlag;
 
     /**
-     * @param int|string $failureFlag
-     * @param string $message
+     * @param  int|string  $failureFlag
+     * @param  string  $message
      */
     public function __construct($failureFlag, $message)
     {

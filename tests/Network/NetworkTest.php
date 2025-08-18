@@ -12,7 +12,7 @@ use BitWasp\Buffertools\Buffer;
 
 class NetworkTest extends AbstractTestCase
 {
-    public function testFactoryPresets()
+    public function test_factory_presets()
     {
         $p2sh = new ScriptHashAddress(Buffer::hex('3399bc19f2b20473d417e31472c92947b59f95f8'));
         $p2pk = new PayToPubKeyHashAddress(Buffer::hex('06f1b66ffe49df7fce684df16c62f59dc9adbd3f'));

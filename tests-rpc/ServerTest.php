@@ -16,8 +16,8 @@ class ServerTest extends AbstractTestCase
         parent::__construct($name, $data, $dataName);
 
         static $rpcFactory = null;
-        if (null === $rpcFactory) {
-            $rpcFactory = new RegtestBitcoinFactory();
+        if ($rpcFactory === null) {
+            $rpcFactory = new RegtestBitcoinFactory;
         }
         $this->rpcFactory = $rpcFactory;
     }
@@ -25,11 +25,11 @@ class ServerTest extends AbstractTestCase
     /**
      * Check tests are being run against regtest
      */
-    public function testIfRegtest()
+    public function test_if_regtest()
     {
         $server = $this->rpcFactory->startBitcoind();
 
-        $result = $server->makeRpcRequest("getblockchaininfo");
+        $result = $server->makeRpcRequest('getblockchaininfo');
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey('result', $result);
         $this->assertArrayHasKey('chain', $result['result']);
@@ -38,18 +38,18 @@ class ServerTest extends AbstractTestCase
         $server->destroy();
     }
 
-    public function testStartStop()
+    public function test_start_stop()
     {
         $bitcoind = $this->rpcFactory->startBitcoind();
 
         // First bitcoind, generate block
-        $result = $bitcoind->request("generate", [1]);
-        $this->assertInternalType("array", $result['result']);
+        $result = $bitcoind->request('generate', [1]);
+        $this->assertInternalType('array', $result['result']);
         $this->assertEquals(64, strlen($result['result'][0]));
 
         // First bitcoind, get block height - 1
-        $info = $bitcoind->request("getblockchaininfo");
-        $this->assertInternalType("array", $info['result']);
+        $info = $bitcoind->request('getblockchaininfo');
+        $this->assertInternalType('array', $info['result']);
         $this->assertEquals(1, $info['result']['blocks']);
 
         // Destroy that instance
@@ -59,8 +59,8 @@ class ServerTest extends AbstractTestCase
         // new bitcoind, 0 blocks
         $bitcoind = $this->rpcFactory->startBitcoind();
 
-        $info = $bitcoind->request("getblockchaininfo");
-        $this->assertInternalType("array", $info['result']);
+        $info = $bitcoind->request('getblockchaininfo');
+        $this->assertInternalType('array', $info['result']);
         $this->assertEquals(0, $info['result']['blocks']);
 
         $bitcoind->destroy();

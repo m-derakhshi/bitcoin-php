@@ -9,9 +9,9 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class EnglishWordListTest extends AbstractTestCase
 {
-    public function testGetWordList()
+    public function test_get_word_list()
     {
-        $wl = new EnglishWordList();
+        $wl = new EnglishWordList;
         $this->assertEquals(1626, count($wl));
         $this->assertEquals(1626, count($wl->getWords()));
     }
@@ -19,18 +19,18 @@ class EnglishWordListTest extends AbstractTestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testUnknownWord()
+    public function test_unknown_word()
     {
-        $wl = new EnglishWordList();
+        $wl = new EnglishWordList;
         $wl->getWord(101010101);
     }
 
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testExceptionOutOfRange()
+    public function test_exception_out_of_range()
     {
-        $wl = new EnglishWordList();
+        $wl = new EnglishWordList;
 
         $word = $wl->getIndex('just');
         $this->assertInternalType('integer', $word);

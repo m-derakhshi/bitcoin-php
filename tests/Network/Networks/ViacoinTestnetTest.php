@@ -9,9 +9,9 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class ViacoinTestnetTest extends AbstractTestCase
 {
-    public function testViacoinTestnetNetwork()
+    public function test_viacoin_testnet_network()
     {
-        $network = new ViacoinTestnet();
+        $network = new ViacoinTestnet;
         $this->assertEquals('7f', $network->getAddressByte());
         $this->assertEquals('c4', $network->getP2shByte());
         $this->assertEquals('ff', $network->getPrivByte());
@@ -19,6 +19,6 @@ class ViacoinTestnetTest extends AbstractTestCase
         $this->assertEquals('043587cf', $network->getHDPubByte());
         $this->assertEquals('92efc5a9', $network->getNetMagicBytes());
         $this->assertEquals('tvia', $network->getSegwitBech32Prefix());
-        $this->assertEquals("Viacoin Signed Message", $network->getSignedMessageMagic());
+        $this->assertEquals('Viacoin Signed Message', $network->getSignedMessageMagic());
     }
 }

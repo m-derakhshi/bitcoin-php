@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class BlockPowError extends \Exception
-{
-
-}
+class BlockPowError extends \Exception {}

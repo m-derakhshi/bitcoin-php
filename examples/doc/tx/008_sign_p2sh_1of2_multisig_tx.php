@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
-require __DIR__ . "/../../../vendor/autoload.php";
+require __DIR__.'/../../../vendor/autoload.php';
 
 /**
  * This example shows a user in a 1-of-2 multisig
@@ -27,15 +27,14 @@ require __DIR__ . "/../../../vendor/autoload.php";
  * because unsigned transactions don't have the redeemScript
  * inside them yet.
  */
-
-$privKeyFactory = new PrivateKeyFactory();
-$pubKeyFactory = new PublicKeyFactory();
+$privKeyFactory = new PrivateKeyFactory;
+$pubKeyFactory = new PublicKeyFactory;
 $privateKey1 = $privKeyFactory->fromWif('5Hwig3iZrm6uxS6Ch1egmJGyC89Q76X5tgVgtbEcLTPTx3aW5Zi');
 
 // Our public key
 $publicKey1 = $privateKey1->getPublicKey();
 // Other users public key
-$publicKey2 = $pubKeyFactory->fromHex("02108445281ade9d8f6b7d8bb1825ca40bedb67bca8cdc3aa6603b9b6f831b9e0c");
+$publicKey2 = $pubKeyFactory->fromHex('02108445281ade9d8f6b7d8bb1825ca40bedb67bca8cdc3aa6603b9b6f831b9e0c');
 
 // The redeemScript needs to be known when spending
 $redeemScript = new P2shScript(
@@ -43,12 +42,12 @@ $redeemScript = new P2shScript(
 );
 
 $spendFromAddress = $redeemScript->getAddress();
-$addressCreator = new AddressCreator();
+$addressCreator = new AddressCreator;
 $sendToAddress = $addressCreator->fromString('1DUzqgG31FvNubNL6N1FVdzPbKYWZG2Mb6');
 echo "Spend from {$spendFromAddress->getAddress()}\n";
 echo "Send to {$sendToAddress->getAddress()}\n";
 
-$addressCreator = new AddressCreator();
+$addressCreator = new AddressCreator;
 $transaction = TransactionFactory::build()
     ->input('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1', 0)
     ->payToAddress(1500000, $sendToAddress)
@@ -56,9 +55,8 @@ $transaction = TransactionFactory::build()
     ->get();
 
 $txOut = new TransactionOutput(1501000, $redeemScript->getOutputScript());
-$signData = (new SignData())
-    ->p2sh($redeemScript)
-;
+$signData = (new SignData)
+    ->p2sh($redeemScript);
 
 $signer = new Signer($transaction);
 $input = $signer->input(0, $txOut, $signData);
@@ -68,4 +66,4 @@ $signed = $signer->get();
 
 echo "txid: {$signed->getTxId()->getHex()}\n";
 echo "raw: {$signed->getHex()}\n";
-echo "input valid? " . ($input->verify() ? "true" : "false") . PHP_EOL;
+echo 'input valid? '.($input->verify() ? 'true' : 'false').PHP_EOL;

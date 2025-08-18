@@ -9,21 +9,11 @@ use Mdanter\Ecc\Util\NumberSize;
 
 class Math extends GmpMath
 {
-
-    /**
-     * @param \GMP $integer
-     * @return bool
-     */
     public function isEven(\GMP $integer): bool
     {
         return $this->cmp($this->mod($integer, gmp_init(2)), gmp_init(0)) === 0;
     }
 
-    /**
-     * @param \GMP $int
-     * @param \GMP $otherInt
-     * @return \GMP
-     */
     public function bitwiseOr(\GMP $int, \GMP $otherInt): \GMP
     {
         return gmp_or($int, $otherInt);
@@ -32,10 +22,6 @@ class Math extends GmpMath
     /**
      * Similar to gmp_div_qr, return a tuple containing the
      * result and the remainder
-     *
-     * @param \GMP $dividend
-     * @param \GMP $divisor
-     * @return array
      */
     public function divQr(\GMP $dividend, \GMP $divisor): array
     {
@@ -43,14 +29,14 @@ class Math extends GmpMath
         $div = $this->div($dividend, $divisor);
         // $remainder = n - (n / q) * q
         $remainder = $this->sub($dividend, $this->mul($div, $divisor));
+
         return [$div, $remainder];
     }
 
     /**
-     * @param int $compact
-     * @param bool|false $isNegative
-     * @param bool|false $isOverflow
-     * @return \GMP
+     * @param  int  $compact
+     * @param  bool|false  $isNegative
+     * @param  bool|false  $isOverflow
      */
     public function decodeCompact($compact, &$isNegative, &$isOverflow): \GMP
     {
@@ -60,7 +46,7 @@ class Math extends GmpMath
 
         $compact = gmp_init($compact, 10);
         $size = $this->rightShift($compact, 24);
-        $word = $this->bitwiseAnd($compact, gmp_init(0x007fffff, 10));
+        $word = $this->bitwiseAnd($compact, gmp_init(0x007FFFFF, 10));
         if ($this->cmp($size, gmp_init(3)) <= 0) {
             $positions = (int) $this->toString($this->mul(gmp_init(8, 10), $this->sub(gmp_init(3, 10), $size)));
             $word = $this->rightShift($word, $positions);
@@ -74,31 +60,23 @@ class Math extends GmpMath
         $zero = gmp_init(0);
         $isNegative = ($this->cmp($word, $zero) !== 0) && ($this->cmp($this->bitwiseAnd($compact, gmp_init(0x00800000)), $zero) === 1);
         $isOverflow = $this->cmp($word, $zero) !== 0 && (
-                ($this->cmp($size, gmp_init(34, 10)) > 0)
-                || ($this->cmp($word, gmp_init(0xff, 10)) > 0 && $this->cmp($size, gmp_init(33, 10)) > 0)
-                || ($this->cmp($word, gmp_init(0xffff, 10)) > 0 && $this->cmp($size, gmp_init(32, 10)) > 0)
-            );
+            ($this->cmp($size, gmp_init(34, 10)) > 0)
+            || ($this->cmp($word, gmp_init(0xFF, 10)) > 0 && $this->cmp($size, gmp_init(33, 10)) > 0)
+            || ($this->cmp($word, gmp_init(0xFFFF, 10)) > 0 && $this->cmp($size, gmp_init(32, 10)) > 0)
+        );
 
         return $word;
     }
 
-    /**
-     * @param \GMP $integer
-     * @return \GMP
-     */
     public function getLow64(\GMP $integer): \GMP
     {
         $bits = gmp_strval($integer, 2);
         $bits = substr($bits, 0, 64);
         $bits = str_pad($bits, 64, '0', STR_PAD_LEFT);
+
         return gmp_init($bits, 2);
     }
 
-    /**
-     * @param \GMP $int
-     * @param int $byteSize
-     * @return string
-     */
     public function fixedSizeInt(\GMP $int, int $byteSize): string
     {
         $two = gmp_init(2);
@@ -114,14 +92,9 @@ class Math extends GmpMath
         return $x;
     }
 
-    /**
-     * @param \GMP $integer
-     * @param bool $fNegative
-     * @return \GMP
-     */
     public function encodeCompact(\GMP $integer, bool $fNegative): \GMP
     {
-        if (!is_bool($fNegative)) {
+        if (! is_bool($fNegative)) {
             throw new \InvalidArgumentException('CompactInteger::read() - flag must be boolean!');
         }
 
@@ -139,7 +112,7 @@ class Math extends GmpMath
         }
 
         $compact = $this->bitwiseOr($compact, $this->leftShift(gmp_init($size, 10), 24));
-        if ($fNegative && $this->cmp($this->bitwiseAnd($compact, gmp_init(0x007fffff, 10)), gmp_init(0, 10)) > 0) { /// ?
+        if ($fNegative && $this->cmp($this->bitwiseAnd($compact, gmp_init(0x007FFFFF, 10)), gmp_init(0, 10)) > 0) { // / ?
             $compact = $this->bitwiseOr($compact, gmp_init(0x00800000, 10));
         }
 

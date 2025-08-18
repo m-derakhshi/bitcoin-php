@@ -18,21 +18,21 @@ class DerSignatureSerializerTest extends AbstractTestCase
 {
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $adapter
+     *
      * @expectedException \Exception
      */
-    public function testFromParserFailure(EcAdapterInterface $adapter)
+    public function test_from_parser_failure(EcAdapterInterface $adapter)
     {
         /** @var DerSignatureSerializerInterface $serializer */
         $serializer = EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $adapter);
-        $serializer->parse(new Buffer());
+        $serializer->parse(new Buffer);
     }
 
-    public function testPhpeccIsConsistent()
+    public function test_phpecc_is_consistent()
     {
         $r = 1;
         $s = 1;
-        $adapter = EcAdapterFactory::getPhpEcc(new Math(), EccFactory::getSecgCurves()->generator256k1());
+        $adapter = EcAdapterFactory::getPhpEcc(new Math, EccFactory::getSecgCurves()->generator256k1());
         $signature = new PhpeccSignature($adapter, gmp_init($r), gmp_init($s));
         /** @var DerSignatureSerializerInterface $serializer */
         $serializer = EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $adapter);

@@ -20,12 +20,11 @@ use BitWasp\Buffertools\Buffer;
 class InputSignerTest extends AbstractTestCase
 {
     /**
-     * @param array $signDataArr
      * @return SignData
      */
     private function decodeSignData(array $signDataArr)
     {
-        $signData = new SignData();
+        $signData = new SignData;
         if (isset($signDataArr['redeemScript'])) {
             $signData->p2sh(ScriptFactory::fromHex($signDataArr['redeemScript']));
         }
@@ -35,11 +34,11 @@ class InputSignerTest extends AbstractTestCase
         if (isset($signDataArr['signaturePolicy'])) {
             $signData->signaturePolicy($signDataArr['signaturePolicy']);
         }
+
         return $signData;
     }
 
     /**
-     * @param array $txOutArr
      * @return TransactionOutput
      */
     private function decodeTxOut(array $txOutArr)
@@ -56,9 +55,9 @@ class InputSignerTest extends AbstractTestCase
         $vectors = [];
         $ec = Bitcoin::getEcAdapter();
         foreach ($fixtures as $fixture) {
-            $txb = new TxBuilder();
+            $txb = new TxBuilder;
             if (isset($fixture['inputs'])) {
-                $witnesses = array_fill(0, count($fixture['inputs']), new ScriptWitness());
+                $witnesses = array_fill(0, count($fixture['inputs']), new ScriptWitness);
                 foreach ($fixture['inputs'] as $i => $input) {
                     $txb->input(new Buffer('', 32), 0, ScriptFactory::fromHex($input['scriptSig']));
                     if (isset($input['witness'])) {
@@ -77,15 +76,12 @@ class InputSignerTest extends AbstractTestCase
     }
 
     /**
-     * @param EcAdapterInterface $ecAdapter
-     * @param TransactionInterface $tx
-     * @param TransactionOutput $txOut
-     * @param SignData $signData
-     * @param string $exception
-     * @param string $exceptionMsg
+     * @param  string  $exception
+     * @param  string  $exceptionMsg
+     *
      * @dataProvider getVectors
      */
-    public function testInvalidSolveSignData($description, EcAdapterInterface $ecAdapter, TransactionInterface $tx, TransactionOutput $txOut, SignData $signData, $exception, $exceptionMsg)
+    public function test_invalid_solve_sign_data($description, EcAdapterInterface $ecAdapter, TransactionInterface $tx, TransactionOutput $txOut, SignData $signData, $exception, $exceptionMsg)
     {
         $checker = new Checker($ecAdapter, $tx, 0, $txOut->getValue());
         try {
@@ -94,6 +90,7 @@ class InputSignerTest extends AbstractTestCase
         } catch (\Exception $caught) {
             $this->assertInstanceOf($exception, $caught);
             $this->assertEquals($exceptionMsg, $caught->getMessage());
+
             return;
         }
 

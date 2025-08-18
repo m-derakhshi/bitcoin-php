@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__.'/../vendor/autoload.php';
 
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
@@ -9,16 +9,16 @@ use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
 use BitWasp\Bitcoin\Mnemonic\MnemonicFactory;
 
 // Generate a mnemonic
-$random = new Random();
+$random = new Random;
 $entropy = $random->bytes(Bip39Mnemonic::MAX_ENTROPY_BYTE_LEN);
 
 $bip39 = MnemonicFactory::bip39();
-$seedGenerator = new Bip39SeedGenerator();
+$seedGenerator = new Bip39SeedGenerator;
 $mnemonic = $bip39->entropyToMnemonic($entropy);
 
 // Derive a seed from mnemonic/password
 $seed = $seedGenerator->getSeed($mnemonic, 'password');
-echo $seed->getHex() . "\n";
+echo $seed->getHex()."\n";
 
-$hdFactory = new HierarchicalKeyFactory();
+$hdFactory = new HierarchicalKeyFactory;
 $bip32 = $hdFactory->fromEntropy($seed);

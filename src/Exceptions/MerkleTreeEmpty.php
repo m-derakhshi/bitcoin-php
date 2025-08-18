@@ -2,6 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class MerkleTreeEmpty extends \Exception
-{
-}
+class MerkleTreeEmpty extends \Exception {}

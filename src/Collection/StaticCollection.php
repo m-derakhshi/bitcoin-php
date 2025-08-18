@@ -21,17 +21,12 @@ abstract class StaticCollection
      */
     protected $position = 0;
 
-    /**
-     * @return array
-     */
     public function all(): array
     {
         return $this->set;
     }
 
     /**
-     * @param  int  $start
-     * @param  int  $length
      * @return self
      */
     public function slice(int $start, int $length)
@@ -46,17 +41,11 @@ abstract class StaticCollection
         return new static(...$sliced);
     }
 
-    /**
-     * @return int
-     */
     public function count(): int
     {
         return count($this->set);
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function bottom(): BufferInterface
     {
         if (count($this->set) === 0) {
@@ -66,9 +55,6 @@ abstract class StaticCollection
         return $this->offsetGet(count($this) - 1);
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function top(): BufferInterface
     {
         if (count($this->set) === 0) {
@@ -78,49 +64,31 @@ abstract class StaticCollection
         return $this->offsetGet(0);
     }
 
-    /**
-     * @return bool
-     */
     public function isNull(): bool
     {
         return count($this->set) === 0;
     }
 
-    /**
-     * @return void
-     */
-    public function rewind():void
+    public function rewind(): void
     {
         $this->position = 0;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function current(): BufferInterface
     {
         return $this->set[$this->position];
     }
 
-    /**
-     * @return int
-     */
     public function key(): int
     {
         return $this->position;
     }
 
-    /**
-     * @return void
-     */
-    public function next():void
+    public function next(): void
     {
-        ++$this->position;
+        $this->position++;
     }
 
-    /**
-     * @return bool
-     */
     public function valid(): bool
     {
         return isset($this->set[$this->position]);
@@ -128,7 +96,6 @@ abstract class StaticCollection
 
     /**
      * @param  int  $offset
-     * @return bool
      */
     public function offsetExists($offset): bool
     {

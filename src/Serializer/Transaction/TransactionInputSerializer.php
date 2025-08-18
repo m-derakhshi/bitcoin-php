@@ -37,33 +37,25 @@ class TransactionInputSerializer
 
     /**
      * TransactionInputSerializer constructor.
-     * @param OutPointSerializerInterface $outPointSerializer
-     * @param Opcodes|null $opcodes
      */
-    public function __construct(OutPointSerializerInterface $outPointSerializer, Opcodes $opcodes = null)
+    public function __construct(OutPointSerializerInterface $outPointSerializer, ?Opcodes $opcodes = null)
     {
         $this->outpointSerializer = $outPointSerializer;
         $this->varstring = Types::varstring();
         $this->uint32le = Types::uint32le();
-        $this->opcodes = $opcodes ?: new Opcodes();
+        $this->opcodes = $opcodes ?: new Opcodes;
     }
 
-    /**
-     * @param TransactionInputInterface $input
-     * @return BufferInterface
-     */
     public function serialize(TransactionInputInterface $input): BufferInterface
     {
         return new Buffer(
-            $this->outpointSerializer->serialize($input->getOutPoint())->getBinary() .
-            $this->varstring->write($input->getScript()->getBuffer()) .
+            $this->outpointSerializer->serialize($input->getOutPoint())->getBinary().
+            $this->varstring->write($input->getScript()->getBuffer()).
             $this->uint32le->write($input->getSequence())
         );
     }
 
     /**
-     * @param Parser $parser
-     * @return TransactionInputInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
@@ -77,8 +69,6 @@ class TransactionInputSerializer
     }
 
     /**
-     * @param BufferInterface $string
-     * @return TransactionInputInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      * @throws \Exception
      */

@@ -10,10 +10,10 @@ use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\NetworkConfig;
 use BitWasp\Bitcoin\Key\Deterministic\Slip132\Slip132;
 use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
-use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;
 use BitWasp\Bitcoin\Key\KeyToScript\KeyToScriptHelper;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
 use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\Base58ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -27,25 +27,25 @@ class Bip44KeyAndAddressTest extends AbstractTestCase
      * hd pub / priv bytes.
      *
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $adapter
+     *
      * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
      * @throws \Exception
      */
-    public function testBip44WithExplicitFactory(EcAdapterInterface $adapter)
+    public function test_bip44_with_explicit_factory(EcAdapterInterface $adapter)
     {
         // This test shows that when we specify the P2PKH
         // ScriptDataFactory, the traditional serializer
         // still works, because the prefixes are actually
         // those from the Networks hdpub / hdpriv bytes
 
-        $addrCreator = new AddressCreator();
-        $bip39 = new Bip39SeedGenerator();
+        $addrCreator = new AddressCreator;
+        $bip39 = new Bip39SeedGenerator;
         $btc = NetworkFactory::bitcoin();
-        $registry = new BitcoinRegistry();
+        $registry = new BitcoinRegistry;
         $slip132 = new Slip132(new KeyToScriptHelper($adapter));
         $prefix = $slip132->p2pkh($registry);
 
-        $ent = $bip39->getSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about");
+        $ent = $bip39->getSeed('abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about');
 
         $hkFactory = new HierarchicalKeyFactory($adapter);
         $root = $hkFactory->fromEntropy($ent, $prefix->getScriptDataFactory());
@@ -53,19 +53,19 @@ class Bip44KeyAndAddressTest extends AbstractTestCase
         $account = $root->derivePath("44'/0'/0'");
 
         $this->assertEquals(
-            "xprv9xpXFhFpqdQK3TmytPBqXtGSwS3DLjojFhTGht8gwAAii8py5X6pxeBnQ6ehJiyJ6nDjWGJfZ95WxByFXVkDxHXrqu53WCRGypk2ttuqncb",
+            'xprv9xpXFhFpqdQK3TmytPBqXtGSwS3DLjojFhTGht8gwAAii8py5X6pxeBnQ6ehJiyJ6nDjWGJfZ95WxByFXVkDxHXrqu53WCRGypk2ttuqncb',
             $account->toExtendedPrivateKey($btc)
         );
 
         $this->assertEquals(
-            "xpub6BosfCnifzxcFwrSzQiqu2DBVTshkCXacvNsWGYJVVhhawA7d4R5WSWGFNbi8Aw6ZRc1brxMyWMzG3DSSSSoekkudhUd9yLb6qx39T9nMdj",
+            'xpub6BosfCnifzxcFwrSzQiqu2DBVTshkCXacvNsWGYJVVhhawA7d4R5WSWGFNbi8Aw6ZRc1brxMyWMzG3DSSSSoekkudhUd9yLb6qx39T9nMdj',
             $account->toExtendedPublicKey($btc)
         );
 
-        $firstAddress = $account->derivePath("0/0");
+        $firstAddress = $account->derivePath('0/0');
 
         $this->assertEquals(
-            "1LqBGSKuX5yYUonjxT5qGfpUsXKYYWeabA",
+            '1LqBGSKuX5yYUonjxT5qGfpUsXKYYWeabA',
             $firstAddress->getAddress($addrCreator)->getAddress($btc)
         );
     }
@@ -75,17 +75,18 @@ class Bip44KeyAndAddressTest extends AbstractTestCase
      * can serialize this fine. This necessary to adhere to old behaviour.
      *
      * @see https://github.com/satoshilabs/slips/blob/master/slip-0132.md#bitcoin-test-vectors
+     *
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $adapter
+     *
      * @throws \Exception
      */
-    public function testBip44WithDefaultFactory(EcAdapterInterface $adapter)
+    public function test_bip44_with_default_factory(EcAdapterInterface $adapter)
     {
-        $addrCreator = new AddressCreator();
-        $bip39 = new Bip39SeedGenerator();
+        $addrCreator = new AddressCreator;
+        $bip39 = new Bip39SeedGenerator;
         $btc = NetworkFactory::bitcoin();
 
-        $ent = $bip39->getSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about");
+        $ent = $bip39->getSeed('abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about');
 
         $hkFactory = new HierarchicalKeyFactory($adapter);
         $root = $hkFactory->fromEntropy($ent);
@@ -93,19 +94,19 @@ class Bip44KeyAndAddressTest extends AbstractTestCase
         $account = $root->derivePath("44'/0'/0'");
 
         $this->assertEquals(
-            "xprv9xpXFhFpqdQK3TmytPBqXtGSwS3DLjojFhTGht8gwAAii8py5X6pxeBnQ6ehJiyJ6nDjWGJfZ95WxByFXVkDxHXrqu53WCRGypk2ttuqncb",
+            'xprv9xpXFhFpqdQK3TmytPBqXtGSwS3DLjojFhTGht8gwAAii8py5X6pxeBnQ6ehJiyJ6nDjWGJfZ95WxByFXVkDxHXrqu53WCRGypk2ttuqncb',
             $account->toExtendedPrivateKey($btc)
         );
 
         $this->assertEquals(
-            "xpub6BosfCnifzxcFwrSzQiqu2DBVTshkCXacvNsWGYJVVhhawA7d4R5WSWGFNbi8Aw6ZRc1brxMyWMzG3DSSSSoekkudhUd9yLb6qx39T9nMdj",
+            'xpub6BosfCnifzxcFwrSzQiqu2DBVTshkCXacvNsWGYJVVhhawA7d4R5WSWGFNbi8Aw6ZRc1brxMyWMzG3DSSSSoekkudhUd9yLb6qx39T9nMdj',
             $account->toExtendedPublicKey($btc)
         );
 
-        $firstAddress = $account->derivePath("0/0");
+        $firstAddress = $account->derivePath('0/0');
 
         $this->assertEquals(
-            "1LqBGSKuX5yYUonjxT5qGfpUsXKYYWeabA",
+            '1LqBGSKuX5yYUonjxT5qGfpUsXKYYWeabA',
             $firstAddress->getAddress($addrCreator)->getAddress($btc)
         );
     }
@@ -117,18 +118,19 @@ class Bip44KeyAndAddressTest extends AbstractTestCase
      * serializing our key.
      *
      * @see https://github.com/satoshilabs/slips/blob/master/slip-0132.md#bitcoin-test-vectors
+     *
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $adapter
+     *
      * @throws \Exception
      */
-    public function testBip44WithConfig(EcAdapterInterface $adapter)
+    public function test_bip44_with_config(EcAdapterInterface $adapter)
     {
-        $addrCreator = new AddressCreator();
-        $bip39 = new Bip39SeedGenerator();
+        $addrCreator = new AddressCreator;
+        $bip39 = new Bip39SeedGenerator;
         $btc = NetworkFactory::bitcoin();
-        $registry = new BitcoinRegistry();
+        $registry = new BitcoinRegistry;
 
-        $ent = $bip39->getSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about");
+        $ent = $bip39->getSeed('abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about');
 
         $slip132 = new Slip132(new KeyToScriptHelper($adapter));
         $prefix = $slip132->p2pkh($registry);
@@ -136,7 +138,7 @@ class Bip44KeyAndAddressTest extends AbstractTestCase
         $config = new GlobalPrefixConfig([
             new NetworkConfig($btc, [
                 $prefix,
-            ])
+            ]),
         ]);
         $serializer = new Base58ExtendedKeySerializer(
             new ExtendedKeySerializer($adapter, $config)
@@ -148,19 +150,19 @@ class Bip44KeyAndAddressTest extends AbstractTestCase
         $account = $root->derivePath("44'/0'/0'");
 
         $this->assertEquals(
-            "xprv9xpXFhFpqdQK3TmytPBqXtGSwS3DLjojFhTGht8gwAAii8py5X6pxeBnQ6ehJiyJ6nDjWGJfZ95WxByFXVkDxHXrqu53WCRGypk2ttuqncb",
+            'xprv9xpXFhFpqdQK3TmytPBqXtGSwS3DLjojFhTGht8gwAAii8py5X6pxeBnQ6ehJiyJ6nDjWGJfZ95WxByFXVkDxHXrqu53WCRGypk2ttuqncb',
             $serializer->serialize($btc, $account)
         );
 
         $this->assertEquals(
-            "xpub6BosfCnifzxcFwrSzQiqu2DBVTshkCXacvNsWGYJVVhhawA7d4R5WSWGFNbi8Aw6ZRc1brxMyWMzG3DSSSSoekkudhUd9yLb6qx39T9nMdj",
+            'xpub6BosfCnifzxcFwrSzQiqu2DBVTshkCXacvNsWGYJVVhhawA7d4R5WSWGFNbi8Aw6ZRc1brxMyWMzG3DSSSSoekkudhUd9yLb6qx39T9nMdj',
             $serializer->serialize($btc, $account->withoutPrivateKey())
         );
 
-        $firstAddress = $account->derivePath("0/0");
+        $firstAddress = $account->derivePath('0/0');
 
         $this->assertEquals(
-            "1LqBGSKuX5yYUonjxT5qGfpUsXKYYWeabA",
+            '1LqBGSKuX5yYUonjxT5qGfpUsXKYYWeabA',
             $firstAddress->getAddress($addrCreator)->getAddress($btc)
         );
     }

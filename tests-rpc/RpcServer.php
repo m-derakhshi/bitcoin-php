@@ -18,6 +18,7 @@ use Nbobtc\Http\Client;
 class RpcServer
 {
     const ERROR_STARTUP = -28;
+
     const ERROR_TX_MEMPOOL_CONFLICT = -26;
 
     /**
@@ -51,20 +52,15 @@ class RpcServer
     private $softforks = false;
 
     private $defaultOptions = [
-        "daemon" => 1,
-        "server" => 1,
-        "regtest" => 1,
+        'daemon' => 1,
+        'server' => 1,
+        'regtest' => 1,
     ];
 
     private $options = [];
 
     /**
      * RpcServer constructor.
-     * @param $bitcoind
-     * @param $dataDir
-     * @param NetworkInterface $network
-     * @param RpcCredential $credential
-     * @param array $options
      */
     public function __construct(string $bitcoind, string $dataDir, NetworkInterface $network, RpcCredential $credential, array $options = [])
     {
@@ -75,17 +71,11 @@ class RpcServer
         $this->options = array_merge($options, $this->defaultOptions);
     }
 
-    /**
-     * @return string
-     */
     private function getPidFile(): string
     {
         return "{$this->dataDir}/regtest/bitcoind.pid";
     }
 
-    /**
-     * @return string
-     */
     private function getConfigFile(): string
     {
         return "{$this->dataDir}/bitcoin.conf";
@@ -96,14 +86,11 @@ class RpcServer
         return (int) $seconds * 1000000;
     }
 
-    /**
-     * @param RpcCredential $rpcCredential
-     */
     private function writeConfigToFile(RpcCredential $rpcCredential)
     {
-        $fd = fopen($this->getConfigFile(), "w");
-        if (!$fd) {
-            throw new \RuntimeException("Failed to open bitcoin.conf for writing");
+        $fd = fopen($this->getConfigFile(), 'w');
+        if (! $fd) {
+            throw new \RuntimeException('Failed to open bitcoin.conf for writing');
         }
 
         $config = array_merge(
@@ -115,8 +102,8 @@ class RpcServer
             return "{$key}={$value}";
         }, $config, array_keys($config)));
 
-        if (!fwrite($fd, $iniConfig)) {
-            throw new \RuntimeException("Failed to write to bitcoin.conf");
+        if (! fwrite($fd, $iniConfig)) {
+            throw new \RuntimeException('Failed to write to bitcoin.conf');
         }
 
         fclose($fd);
@@ -134,7 +121,7 @@ class RpcServer
         $this->writeConfigToFile($this->credential);
         $res = 0;
         $out = '';
-        $result = exec(sprintf("%s -datadir=%s", $this->bitcoind, $this->dataDir), $out, $res);
+        $result = exec(sprintf('%s -datadir=%s', $this->bitcoind, $this->dataDir), $out, $res);
 
         if ($res !== 0) {
             throw new \RuntimeException("Failed to start bitcoind: {$this->dataDir}\n");
@@ -147,12 +134,12 @@ class RpcServer
         $conn = $this->getClient();
         do {
             try {
-                $result = json_decode($conn->sendCommand(new Command("getblockchaininfo"))->getBody()->getContents(), true);
+                $result = json_decode($conn->sendCommand(new Command('getblockchaininfo'))->getBody()->getContents(), true);
                 if ($result['error'] === null) {
                     $connected = true;
                 } else {
                     if ($result['error']['code'] !== self::ERROR_STARTUP) {
-                        throw new \RuntimeException("Unexpected error code during startup");
+                        throw new \RuntimeException('Unexpected error code during startup');
                     }
 
                     // 0.2 seconds sleep
@@ -164,18 +151,16 @@ class RpcServer
             }
 
             if (microtime(true) > $start + $limit) {
-                throw new \RuntimeException("Timeout elapsed, never made connection to bitcoind");
+                throw new \RuntimeException('Timeout elapsed, never made connection to bitcoind');
             }
-        } while (!$connected);
+        } while (! $connected);
     }
 
-    /**
-     * @return Client
-     */
     private function getClient(): Client
     {
         $client = new Client($this->credential->getDsn());
-        $client->withDriver(new CurlDriver());
+        $client->withDriver(new CurlDriver);
+
         return $client;
     }
 
@@ -190,7 +175,7 @@ class RpcServer
 
         while ($bestHeight < 150 || $chainInfo['result']['bip9_softforks']['segwit']['status'] !== 'active') {
             // ought to finish in 1!
-            $this->makeRpcRequest("generate", [435]);
+            $this->makeRpcRequest('generate', [435]);
             $chainInfo = $this->makeRpcRequest('getblockchaininfo');
             $bestHeight = $chainInfo['result']['blocks'];
         }
@@ -199,19 +184,17 @@ class RpcServer
     }
 
     /**
-     * @param int $value
-     * @param ScriptInterface $script
      * @return Utxo
      */
     public function fundOutput(int $value, ScriptInterface $script)
     {
         $this->activateSoftforks();
 
-        $builder = new TxBuilder();
+        $builder = new TxBuilder;
         $builder->output($value, $script);
         $hex = $builder->get()->getHex();
 
-        $result = $this->makeRpcRequest('fundrawtransaction', [$hex, ['feeRate'=>0.0001]]);
+        $result = $this->makeRpcRequest('fundrawtransaction', [$hex, ['feeRate' => 0.0001]]);
         $unsigned = $result['result']['hex'];
         $result = $this->makeRpcRequest('signrawtransaction', [$unsigned]);
         $signedHex = $result['result']['hex'];
@@ -225,25 +208,22 @@ class RpcServer
         }
 
         if ($outIdx === -1) {
-            throw new \RuntimeException("Sanity check failed, should have found the output we funded");
+            throw new \RuntimeException('Sanity check failed, should have found the output we funded');
         }
 
         $result = $this->makeRpcRequest('sendrawtransaction', [$signedHex]);
         $txid = $result['result'];
-        $this->makeRpcRequest("generate", [1]);
+        $this->makeRpcRequest('generate', [1]);
 
         return new Utxo(new OutPoint(Buffer::hex($txid), $outIdx), new TransactionOutput($value, $script));
     }
 
-    /**
-     * @param string $src
-     */
     private function recursiveDelete(string $src)
     {
         $dir = opendir($src);
-        while (false !== ( $file = readdir($dir))) {
-            if (( $file != '.' ) && ( $file != '..' )) {
-                $full = $src . '/' . $file;
+        while (false !== ($file = readdir($dir))) {
+            if (($file != '.') && ($file != '..')) {
+                $full = $src.'/'.$file;
                 if (is_dir($full)) {
                     $this->recursiveDelete($full);
                 } else {
@@ -261,7 +241,7 @@ class RpcServer
     public function destroy()
     {
         if ($this->isRunning()) {
-            $this->request("stop");
+            $this->request('stop');
 
             do {
                 usleep($this->secondsToMicro(0.02));
@@ -271,51 +251,36 @@ class RpcServer
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isRunning(): bool
     {
         return file_exists($this->getPidFile());
     }
 
-    /**
-     * @return Client
-     */
     public function makeClient(): Client
     {
-        if (!$this->isRunning()) {
-            throw new \RuntimeException("No client, server not running");
+        if (! $this->isRunning()) {
+            throw new \RuntimeException('No client, server not running');
         }
 
-        if (null === $this->client) {
+        if ($this->client === null) {
             $this->client = $this->getClient();
         }
 
         return $this->client;
     }
 
-    /**
-     * @param string $method
-     * @param array $params
-     * @return array
-     */
     public function request(string $method, array $params = []): array
     {
         $unsorted = $this->makeClient()->sendCommand(new Command($method, $params));
         $jsonResult = $unsorted->getBody()->getContents();
         $json = json_decode($jsonResult, true);
-        if (false === $json) {
-            throw new \RuntimeException("Invalid JSON from server");
+        if ($json === false) {
+            throw new \RuntimeException('Invalid JSON from server');
         }
+
         return $json;
     }
 
-    /**
-     * @param string $method
-     * @param array $params
-     * @return array
-     */
     public function makeRpcRequest(string $method, array $params = []): array
     {
         return $this->request($method, $params);

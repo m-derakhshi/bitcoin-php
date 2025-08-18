@@ -14,6 +14,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializer
 class EcSerializer
 {
     const PATH_PHPECC = 'BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\\';
+
     const PATH_SECP256K1 = 'BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\\';
 
     /**
@@ -33,7 +34,7 @@ class EcSerializer
         'Serializer\Key\PrivateKeySerializer',
         'Serializer\Key\PublicKeySerializer',
         'Serializer\Signature\CompactSignatureSerializer',
-        'Serializer\Signature\DerSignatureSerializer'
+        'Serializer\Signature\DerSignatureSerializer',
     ];
 
     /**
@@ -51,14 +52,10 @@ class EcSerializer
      */
     private static $cache = [];
 
-    /**
-     * @param string $interface
-     * @return string
-     */
     public static function getImplRelPath(string $interface): string
     {
-        if (0 === count(self::$map)) {
-            if (!in_array($interface, self::$serializerInterface, true)) {
+        if (count(self::$map) === 0) {
+            if (! in_array($interface, self::$serializerInterface, true)) {
                 throw new \InvalidArgumentException('Interface not known');
             }
 
@@ -78,26 +75,19 @@ class EcSerializer
         return self::$map[$interface];
     }
 
-    /**
-     * @return array
-     */
     public static function getImplPaths(): array
     {
         return [
             'BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter' => 'BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\\',
-            'BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter' => 'BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\\'
+            'BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter' => 'BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\\',
         ];
     }
 
-    /**
-     * @param EcAdapterInterface $adapter
-     * @return string
-     */
     public static function getAdapterImplPath(EcAdapterInterface $adapter): string
     {
         $paths = static::getImplPaths();
         $class = get_class($adapter);
-        if (!isset($paths[$class])) {
+        if (! isset($paths[$class])) {
             throw new \RuntimeException('Unknown EcAdapter');
         }
 
@@ -105,23 +95,21 @@ class EcSerializer
     }
 
     /**
-     * @param string $interface
-     * @param bool $useCache
-     * @param EcAdapterInterface $adapter
+     * @param  bool  $useCache
      * @return mixed
      */
-    public static function getSerializer(string $interface, $useCache = true, EcAdapterInterface $adapter = null)
+    public static function getSerializer(string $interface, $useCache = true, ?EcAdapterInterface $adapter = null)
     {
-        if (null === $adapter) {
+        if ($adapter === null) {
             $adapter = Bitcoin::getEcAdapter();
         }
 
-        $key = get_class($adapter) . ":" . $interface;
+        $key = get_class($adapter).':'.$interface;
         if (array_key_exists($key, self::$cache)) {
             return self::$cache[$key];
         }
 
-        $classPath = self::getAdapterImplPath($adapter) . self::getImplRelPath($interface);
+        $classPath = self::getAdapterImplPath($adapter).self::getImplRelPath($interface);
         $class = new $classPath($adapter);
 
         if ($useCache && self::$useCache) {

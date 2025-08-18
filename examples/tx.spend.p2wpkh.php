@@ -1,20 +1,20 @@
 <?php
 
-require __DIR__ . "/../vendor/autoload.php";
+require __DIR__.'/../vendor/autoload.php';
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface as I;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 
 // Setup network and private key to segnet
-$privKeyFactory = new PrivateKeyFactory();
-$key = $privKeyFactory->fromHexCompressed("4242424242424242424242424242424242424242424242424242424242424242");
+$privKeyFactory = new PrivateKeyFactory;
+$key = $privKeyFactory->fromHexCompressed('4242424242424242424242424242424242424242424242424242424242424242');
 
 // scriptPubKey is P2WKH
 $program = ScriptFactory::scriptPubKey()->p2wkh($key->getPubKeyHash());
@@ -27,7 +27,7 @@ $txOut = new TransactionOutput(99900000, $program);
 $dest = new PayToPubKeyHashAddress($key->getPublicKey()->getPubKeyHash());
 
 // Create unsigned transaction
-$tx = (new TxBuilder())
+$tx = (new TxBuilder)
     ->spendOutPoint($outpoint)
     ->payToAddress(99850000, $dest)
     ->get();
@@ -39,8 +39,8 @@ $input->sign($key);
 $signed = $signer->get();
 
 // Check our signature is correct
-echo "Script validation result: " . ($input->verify(I::VERIFY_P2SH | I::VERIFY_WITNESS) ? "yay\n" : "nay\n");
+echo 'Script validation result: '.($input->verify(I::VERIFY_P2SH | I::VERIFY_WITNESS) ? "yay\n" : "nay\n");
 
 echo PHP_EOL;
-echo "Witness serialized transaction: " . $signed->getHex() . PHP_EOL. PHP_EOL;
-echo "Base serialized transaction: " . $signed->getBaseSerialization()->getHex() . PHP_EOL;
+echo 'Witness serialized transaction: '.$signed->getHex().PHP_EOL.PHP_EOL;
+echo 'Base serialized transaction: '.$signed->getBaseSerialization()->getHex().PHP_EOL;

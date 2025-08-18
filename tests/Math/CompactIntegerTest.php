@@ -19,139 +19,134 @@ class CompactIntegerTest extends AbstractTestCase
                 gmp_init('0'),
                 gmp_init(0),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x00123456),
                 gmp_init(0),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x01003456),
                 gmp_init(0),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x03000000),
                 gmp_init(0),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x04000000),
                 gmp_init(0),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x0923456),
                 gmp_init(0),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x01803456),
                 gmp_init(0),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x02800056),
                 gmp_init(0),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x03800000),
                 gmp_init(0),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x04800000),
                 gmp_init(0),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x01123456),
                 gmp_init(0x01120000),
                 false,
-                false
+                false,
             ],
             [
                 $math,
-                gmp_init(0x01fedcba),
-                gmp_init(0x01fe0000),
+                gmp_init(0x01FEDCBA),
+                gmp_init(0x01FE0000),
                 true,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x02123456),
                 gmp_init(0x02123400),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x03123456),
                 gmp_init(0x03123456),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x04123456),
                 gmp_init(0x04123456),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x04923456),
                 gmp_init(0x04923456),
                 true,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x05009234),
                 gmp_init(0x05009234),
                 false,
-                false
+                false,
             ],
             [
                 $math,
                 gmp_init(0x20123456),
                 gmp_init(0x20123456),
                 false,
-                false
-            ]
+                false,
+            ],
         ];
     }
 
     /**
-     * @param Math $math
-     * @param \GMP $int
-     * @param \GMP $eInt
-     * @param bool $eNegative
-     * @param bool $eOverflow
      * @dataProvider getTestVectors
      */
-    public function testCases(Math $math, \GMP $int, \GMP $eInt, bool $eNegative, bool $eOverflow)
+    public function test_cases(Math $math, \GMP $int, \GMP $eInt, bool $eNegative, bool $eOverflow)
     {
         $negative = false;
         $overflow = false;
@@ -162,9 +157,9 @@ class CompactIntegerTest extends AbstractTestCase
         $this->assertEquals($eOverflow, $overflow);
     }
 
-    public function testOverflow()
+    public function test_overflow()
     {
-        $math = new Math();
+        $math = new Math;
         $negative = false;
         $overflow = false;
         $math->decodeCompact($math->hexDec('0xff123456'), $negative, $overflow);

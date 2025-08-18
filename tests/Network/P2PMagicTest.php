@@ -9,9 +9,9 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class P2PMagicTest extends AbstractTestCase
 {
-    public function testGetP2PMagic()
+    public function test_get_p2_p_magic()
     {
-        $bitcoin = new Bitcoin();
-        $this->assertEquals("d9b4bef9", $bitcoin->getNetMagicBytes());
+        $bitcoin = new Bitcoin;
+        $this->assertEquals('d9b4bef9', $bitcoin->getNetMagicBytes());
     }
 }

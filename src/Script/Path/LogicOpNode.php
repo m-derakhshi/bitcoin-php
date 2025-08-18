@@ -23,10 +23,8 @@ class LogicOpNode
 
     /**
      * MASTNode constructor.
-     * @param LogicOpNode|null $parent
-     * @param bool|null $value
      */
-    public function __construct(LogicOpNode $parent = null, bool $value = null)
+    public function __construct(?LogicOpNode $parent = null, ?bool $value = null)
     {
         $this->parent = $parent;
         $this->value = $value;
@@ -52,21 +50,16 @@ class LogicOpNode
             if ($value === null) {
                 return [[]];
             }
+
             return [$value];
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isRoot(): bool
     {
         return $this->parent == null;
     }
 
-    /**
-     * @return bool
-     */
     public function hasChildren(): bool
     {
         return count($this->children) > 0;
@@ -88,21 +81,15 @@ class LogicOpNode
         return $this->value;
     }
 
-    /**
-     * @param int $value
-     * @return LogicOpNode
-     */
     public function getChild(int $value): LogicOpNode
     {
-        if (!array_key_exists($value, $this->children)) {
-            throw new \RuntimeException("Child not found");
+        if (! array_key_exists($value, $this->children)) {
+            throw new \RuntimeException('Child not found');
         }
+
         return $this->children[$value];
     }
 
-    /**
-     * @return array
-     */
     public function split(): array
     {
         if (count($this->children) > 0) {
@@ -113,6 +100,7 @@ class LogicOpNode
         foreach ($children as $child) {
             $this->children[] = $child;
         }
+
         return $children;
     }
 }

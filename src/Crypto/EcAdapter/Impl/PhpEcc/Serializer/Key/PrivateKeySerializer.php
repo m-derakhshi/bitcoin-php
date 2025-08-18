@@ -18,27 +18,17 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      */
     private $ecAdapter;
 
-    /**
-     * @param EcAdapter $ecAdapter
-     */
     public function __construct(EcAdapter $ecAdapter)
     {
         $this->ecAdapter = $ecAdapter;
     }
 
-    /**
-     * @param PrivateKeyInterface $privateKey
-     * @return BufferInterface
-     */
     public function serialize(PrivateKeyInterface $privateKey): BufferInterface
     {
         return Buffer::int(gmp_strval($privateKey->getSecret(), 10), 32);
     }
 
     /**
-     * @param Parser $parser
-     * @param bool $compressed
-     * @return PrivateKeyInterface
      * @throws \Exception
      */
     public function fromParser(Parser $parser, bool $compressed): PrivateKeyInterface
@@ -47,9 +37,6 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     }
 
     /**
-     * @param BufferInterface $buffer
-     * @param bool $compressed
-     * @return PrivateKeyInterface
      * @throws \Exception
      */
     public function parse(BufferInterface $buffer, bool $compressed): PrivateKeyInterface

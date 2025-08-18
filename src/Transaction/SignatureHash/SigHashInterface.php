@@ -35,11 +35,6 @@ interface SigHashInterface
      * spend $txOut, and are signing $inputToSign. The SigHashType defaults to
      * SIGHASH_ALL, though SIGHASH_SINGLE, SIGHASH_NONE, SIGHASH_ANYONECANPAY
      * can be used.
-     *
-     * @param ScriptInterface $txOutScript
-     * @param int $inputToSign
-     * @param int $sighashType
-     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function calculate(
         ScriptInterface $txOutScript,

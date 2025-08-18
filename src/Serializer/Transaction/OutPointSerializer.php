@@ -30,34 +30,28 @@ class OutPointSerializer implements OutPointSerializerInterface
     }
 
     /**
-     * @param OutPointInterface $outpoint
-     * @return BufferInterface
      * @throws \Exception
      */
     public function serialize(OutPointInterface $outpoint): BufferInterface
     {
         return new Buffer(
-            $this->txid->write($outpoint->getTxId()) .
+            $this->txid->write($outpoint->getTxId()).
             $this->vout->write($outpoint->getVout())
         );
     }
 
     /**
-     * @param Parser $parser
-     * @return OutPointInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public function fromParser(Parser $parser): OutPointInterface
     {
         return new OutPoint(
             new Buffer(strrev($parser->readBytes(32)->getBinary()), 32),
-            unpack("V", $parser->readBytes(4)->getBinary())[1]
+            unpack('V', $parser->readBytes(4)->getBinary())[1]
         );
     }
 
     /**
-     * @param BufferInterface $data
-     * @return OutPointInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public function parse(BufferInterface $data): OutPointInterface

@@ -14,15 +14,15 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class ScriptFactoryTest extends AbstractTestCase
 {
-    public function testScriptPubKey()
+    public function test_script_pub_key()
     {
         $outputScripts = ScriptFactory::scriptPubKey();
         $this->assertInstanceOf(OutputScriptFactory::class, $outputScripts);
     }
 
-    public function testMultisig()
+    public function test_multisig()
     {
-        $factory = new PrivateKeyFactory();
+        $factory = new PrivateKeyFactory;
         $pk1 = $factory->fromHexUncompressed('9999999999999999999999999999999999999999999999999999999999999999');
         $pk2 = $factory->fromHexUncompressed('abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234');
 
@@ -40,7 +40,7 @@ class ScriptFactoryTest extends AbstractTestCase
         $this->assertNotEquals($sorted->getBinary(), $redeemScript->getBinary());
     }
 
-    public function testCreate()
+    public function test_create()
     {
         $script = ScriptFactory::create(null);
         $this->assertInstanceOf(ScriptCreator::class, $script);

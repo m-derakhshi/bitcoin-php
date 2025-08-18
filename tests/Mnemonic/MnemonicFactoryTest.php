@@ -11,12 +11,12 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class MnemonicFactoryTest extends AbstractTestCase
 {
-    public function testGetElectrum()
+    public function test_get_electrum()
     {
         $this->assertInstanceOf(ElectrumMnemonic::class, MnemonicFactory::electrum());
     }
 
-    public function testGetBip39()
+    public function test_get_bip39()
     {
         $this->assertInstanceOf(Bip39Mnemonic::class, MnemonicFactory::bip39());
     }

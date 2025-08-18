@@ -46,24 +46,24 @@ class TransactionSerializer implements TransactionSerializerInterface
      */
     protected $witnessSerializer;
 
-    public function __construct(TransactionInputSerializer $inputSerializer = null, TransactionOutputSerializer $outputSerializer = null, ScriptWitnessSerializer $witnessSerializer = null)
+    public function __construct(?TransactionInputSerializer $inputSerializer = null, ?TransactionOutputSerializer $outputSerializer = null, ?ScriptWitnessSerializer $witnessSerializer = null)
     {
         $this->int32le = Types::int32le();
         $this->uint32le = Types::uint32le();
         $this->varint = Types::varint();
 
         if ($inputSerializer === null || $outputSerializer === null) {
-            $opcodes = new Opcodes();
-            if (!$inputSerializer) {
-                $inputSerializer = new TransactionInputSerializer(new OutPointSerializer(), $opcodes);
+            $opcodes = new Opcodes;
+            if (! $inputSerializer) {
+                $inputSerializer = new TransactionInputSerializer(new OutPointSerializer, $opcodes);
             }
-            if (!$outputSerializer) {
+            if (! $outputSerializer) {
                 $outputSerializer = new TransactionOutputSerializer($opcodes);
             }
         }
 
-        if (!$witnessSerializer) {
-            $witnessSerializer = new ScriptWitnessSerializer();
+        if (! $witnessSerializer) {
+            $witnessSerializer = new ScriptWitnessSerializer;
         }
 
         $this->inputSerializer = $inputSerializer;
@@ -71,10 +71,6 @@ class TransactionSerializer implements TransactionSerializerInterface
         $this->witnessSerializer = $witnessSerializer;
     }
 
-    /**
-     * @param Parser $parser
-     * @return TransactionInterface
-     */
     public function fromParser(Parser $parser): TransactionInterface
     {
         $version = (int) $this->int32le->read($parser);
@@ -125,33 +121,24 @@ class TransactionSerializer implements TransactionSerializerInterface
         return new Transaction($version, $vin, $vout, $vwit, $lockTime);
     }
 
-    /**
-     * @param BufferInterface $data
-     * @return TransactionInterface
-     */
     public function parse(BufferInterface $data): TransactionInterface
     {
         return $this->fromParser(new Parser($data));
     }
 
-    /**
-     * @param TransactionInterface $transaction
-     * @param int $opt
-     * @return BufferInterface
-     */
     public function serialize(TransactionInterface $transaction, int $opt = 0): BufferInterface
     {
-        $parser = new Parser();
+        $parser = new Parser;
         $parser->appendBinary($this->int32le->write($transaction->getVersion()));
 
         $flags = 0;
-        $allowWitness = !($opt & self::NO_WITNESS);
+        $allowWitness = ! ($opt & self::NO_WITNESS);
         if ($allowWitness && $transaction->hasWitness()) {
             $flags |= 1;
         }
 
         if ($flags) {
-            $parser->appendBinary(pack("CC", 0, $flags));
+            $parser->appendBinary(pack('CC', 0, $flags));
         }
 
         $parser->appendBinary($this->varint->write(count($transaction->getInputs())));

@@ -25,14 +25,13 @@ class BloomFilterTest extends AbstractTestCase
      */
     private $pubKeyFactory;
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->pubKeyFactory = new PublicKeyFactory();
+        $this->pubKeyFactory = new PublicKeyFactory;
         parent::setUp();
     }
 
     /**
-     * @param BufferInterface $hex
      * @return BloomFilter
      */
     private function parseFilter(BufferInterface $hex)
@@ -42,6 +41,7 @@ class BloomFilterTest extends AbstractTestCase
 
     /**
      * @return BloomFilter
+     *
      * @throws \Exception
      */
     private function getEmptyFilterVector()
@@ -51,6 +51,7 @@ class BloomFilterTest extends AbstractTestCase
 
     /**
      * @return BloomFilter
+     *
      * @throws \Exception
      */
     private function getFullFilterVector()
@@ -59,7 +60,6 @@ class BloomFilterTest extends AbstractTestCase
     }
 
     /**
-     * @param PublicKeyInterface $publicKey
      * @return \BitWasp\Bitcoin\Transaction\TransactionInterface
      */
     private function getPayToPubkeyTxVector(PublicKeyInterface $publicKey)
@@ -71,7 +71,6 @@ class BloomFilterTest extends AbstractTestCase
     }
 
     /**
-     * @param PublicKeyInterface $publicKey
      * @return \BitWasp\Bitcoin\Transaction\TransactionInterface
      */
     private function getPayToMultisigTxVector(PublicKeyInterface $publicKey)
@@ -82,16 +81,16 @@ class BloomFilterTest extends AbstractTestCase
             ->get();
     }
 
-    public function testBasics()
+    public function test_basics()
     {
-        $math = new Math();
+        $math = new Math;
         $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 0, $flags);
 
         $buff = [
             Buffer::hex('99108ad8ed9bb6274d3980bab5a85c048f0950c8'),
             Buffer::hex('b5a2c786d9ef4658287ced5914b37a1b4aa32eee'),
-            Buffer::hex('b9300670b4c5366e95b2699e8b18bc75e5f729c5')
+            Buffer::hex('b9300670b4c5366e95b2699e8b18bc75e5f729c5'),
         ];
 
         $bytes = Buffer::hex('a9030f7dbeb53a6ec0c2a1908b18b4c5eb67c2c1');
@@ -105,40 +104,40 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertEquals('03614e9b050000000000000001', $filter->getBuffer()->getHex());
     }
 
-    public function testEmptyContains()
+    public function test_empty_contains()
     {
-        $math = new Math();
+        $math = new Math;
         $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 0, $flags);
-        $this->assertFalse($filter->containsData(new Buffer()));
+        $this->assertFalse($filter->containsData(new Buffer));
     }
 
-    public function testEmptyAcceptableSize()
+    public function test_empty_acceptable_size()
     {
-        $math = new Math();
+        $math = new Math;
         $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 0, $flags);
         $this->assertTrue($filter->hasAcceptableSize());
     }
 
-    public function testEmptyRelevantAndUpdateTx()
+    public function test_empty_relevant_and_update_tx()
     {
-        $math = new Math();
+        $math = new Math;
         $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 0, $flags);
-        $this->assertFalse($filter->isRelevantAndUpdate(new Transaction()));
+        $this->assertFalse($filter->isRelevantAndUpdate(new Transaction));
     }
 
-    public function testBasics2()
+    public function test_basics2()
     {
-        $math = new Math();
+        $math = new Math;
         $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 2147483649, $flags);
 
         $buff = [
             Buffer::hex('99108ad8ed9bb6274d3980bab5a85c048f0950c8'),
             Buffer::hex('b5a2c786d9ef4658287ced5914b37a1b4aa32eee'),
-            Buffer::hex('b9300670b4c5366e95b2699e8b18bc75e5f729c5')
+            Buffer::hex('b9300670b4c5366e95b2699e8b18bc75e5f729c5'),
         ];
 
         $bytes = Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141');
@@ -150,14 +149,14 @@ class BloomFilterTest extends AbstractTestCase
         }
 
         $this->assertEquals('03ce4299050000000100008001', $filter->getBuffer()->getHex());
-        $parser = new BloomFilterSerializer();
+        $parser = new BloomFilterSerializer;
         $parse = $parser->parse($filter->getBuffer());
         $this->assertEquals($filter, $parse);
     }
 
-    public function testFlagChecks()
+    public function test_flag_checks()
     {
-        $math = new Math();
+        $math = new Math;
         $flagsAll = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 2147483649, $flagsAll);
         $this->assertTrue($filter->isUpdateAll());
@@ -177,7 +176,7 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertFalse($filter->isUpdateAll());
     }
 
-    public function testForAFalsePositive()
+    public function test_for_a_false_positive()
     {
         /*
          * This test serves to ensure the behaviour of bloom filters.
@@ -186,22 +185,22 @@ class BloomFilterTest extends AbstractTestCase
          * 2 values are checked against the filter, which returns a definite no.
          */
 
-        $math = new Math();
+        $math = new Math;
         $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 2147483649, $flags);
 
         foreach ([
-                     Buffer::hex('99108ad8ed9bb6274d3980bab5a85c048f0950c8'),
-                     Buffer::hex('b5a2c786d9ef4658287ced5914b37a1b4aa32eee'),
-                     Buffer::hex('b9300670b4c5366e95b2699e8b18bc75e5f729c5')
-                 ] as $buf) {
+            Buffer::hex('99108ad8ed9bb6274d3980bab5a85c048f0950c8'),
+            Buffer::hex('b5a2c786d9ef4658287ced5914b37a1b4aa32eee'),
+            Buffer::hex('b9300670b4c5366e95b2699e8b18bc75e5f729c5'),
+        ] as $buf) {
             $filter->insertData($buf);
             $this->assertTrue($filter->containsData($buf));
         }
 
         $falsePositives = [
             Buffer::hex('a408413bbc084c4875f73149052cc343aa00d0c913fe54d7f6d3821d432fceef'),
-            Buffer::hex('f7ef30d3f2371e402a1533892155112fb14f783ac7d622e5f4648ad5b61161cf')
+            Buffer::hex('f7ef30d3f2371e402a1533892155112fb14f783ac7d622e5f4648ad5b61161cf'),
         ];
 
         foreach ($falsePositives as $buf) {
@@ -218,10 +217,10 @@ class BloomFilterTest extends AbstractTestCase
         }
     }
 
-    public function testInsertKey()
+    public function test_insert_key()
     {
         $pub = $this->pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
-        $math = new Math();
+        $math = new Math;
         $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 2, 0.001, 0, $flags);
 
@@ -232,7 +231,7 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertEquals('038fc16b080000000000000001', $filter->getBuffer()->getHex());
     }
 
-    public function testEmptyFilterNeverMatches()
+    public function test_empty_filter_never_matches()
     {
         $pubkey = $this->pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
         $spends = $this->getPayToPubkeyTxVector($pubkey);
@@ -241,7 +240,7 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertFalse($filter->isRelevantAndUpdate($spends));
     }
 
-    public function testFullFilterAlwaysRelevant()
+    public function test_full_filter_always_relevant()
     {
         $pubkey = $this->pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
         $tx = $this->getPayToPubkeyTxVector($pubkey);
@@ -249,13 +248,13 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
     }
 
-    public function testFullFilterAlwaysContainsData()
+    public function test_full_filter_always_contains_data()
     {
         $filter = $this->getFullFilterVector();
         $this->assertTrue($filter->containsData(new Buffer('totally unrelated')));
     }
 
-    public function testFullFilterNeverChanges()
+    public function test_full_filter_never_changes()
     {
         $filter = $this->getFullFilterVector();
         $serialized = $filter->getBinary();
@@ -266,7 +265,7 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertEquals($serialized, $serialized2);
     }
 
-    public function testTxMatchesPayToPubkey()
+    public function test_tx_matches_pay_to_pubkey()
     {
         $math = $this->safeMath();
         $pubkey = $this->pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
@@ -278,7 +277,7 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
     }
 
-    public function testTxMatchesPayToMultisig()
+    public function test_tx_matches_pay_to_multisig()
     {
         $math = $this->safeMath();
         $pubkey = $this->pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
@@ -290,9 +289,9 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
     }
 
-    public function testTxMatches()
+    public function test_tx_matches()
     {
-        $math = new Math();
+        $math = new Math;
         $hex = '01000000010b26e9b7735eb6aabdf358bab62f9816a21ba9ebdb719d5299e88607d722c190000000008b4830450220070aca44506c5cef3a16ed519d7c3c39f8aab192c4e1c90d065f37b8a4af6141022100a8e160b856c2d43d27d8fba71e5aef6405b8643ac4cb7cb3c462aced7f14711a0141046d11fee51b0e60666d5049a9101a72741df480b96ee26488a4d3466b95c9a40ac5eeef87e10a5cd336c19a84565f80fa6c547957b7700ff4dfbdefe76036c339ffffffff021bff3d11000000001976a91404943fdd508053c75000106d3bc6e2754dbcff1988ac2f15de00000000001976a914a266436d2965547608b9e15d9032a7b9d64fa43188ac00000000';
         $tx = TransactionFactory::fromHex($hex);
         $spends = implode(
@@ -301,7 +300,7 @@ class BloomFilterTest extends AbstractTestCase
                 function ($val) {
                     return str_pad(dechex($val), 2, '0', STR_PAD_LEFT);
                 },
-                [0x01, 0x00, 0x00, 0x00, 0x01, 0x6b, 0xff, 0x7f, 0xcd, 0x4f, 0x85, 0x65, 0xef, 0x40, 0x6d, 0xd5, 0xd6, 0x3d, 0x4f, 0xf9, 0x4f, 0x31, 0x8f, 0xe8, 0x20, 0x27, 0xfd, 0x4d, 0xc4, 0x51, 0xb0, 0x44, 0x74, 0x01, 0x9f, 0x74, 0xb4, 0x00, 0x00, 0x00, 0x00, 0x8c, 0x49, 0x30, 0x46, 0x02, 0x21, 0x00, 0xda, 0x0d, 0xc6, 0xae, 0xce, 0xfe, 0x1e, 0x06, 0xef, 0xdf, 0x05, 0x77, 0x37, 0x57, 0xde, 0xb1, 0x68, 0x82, 0x09, 0x30, 0xe3, 0xb0, 0xd0, 0x3f, 0x46, 0xf5, 0xfc, 0xf1, 0x50, 0xbf, 0x99, 0x0c, 0x02, 0x21, 0x00, 0xd2, 0x5b, 0x5c, 0x87, 0x04, 0x00, 0x76, 0xe4, 0xf2, 0x53, 0xf8, 0x26, 0x2e, 0x76, 0x3e, 0x2d, 0xd5, 0x1e, 0x7f, 0xf0, 0xbe, 0x15, 0x77, 0x27, 0xc4, 0xbc, 0x42, 0x80, 0x7f, 0x17, 0xbd, 0x39, 0x01, 0x41, 0x04, 0xe6, 0xc2, 0x6e, 0xf6, 0x7d, 0xc6, 0x10, 0xd2, 0xcd, 0x19, 0x24, 0x84, 0x78, 0x9a, 0x6c, 0xf9, 0xae, 0xa9, 0x93, 0x0b, 0x94, 0x4b, 0x7e, 0x2d, 0xb5, 0x34, 0x2b, 0x9d, 0x9e, 0x5b, 0x9f, 0xf7, 0x9a, 0xff, 0x9a, 0x2e, 0xe1, 0x97, 0x8d, 0xd7, 0xfd, 0x01, 0xdf, 0xc5, 0x22, 0xee, 0x02, 0x28, 0x3d, 0x3b, 0x06, 0xa9, 0xd0, 0x3a, 0xcf, 0x80, 0x96, 0x96, 0x8d, 0x7d, 0xbb, 0x0f, 0x91, 0x78, 0xff, 0xff, 0xff, 0xff, 0x02, 0x8b, 0xa7, 0x94, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x19, 0x76, 0xa9, 0x14, 0xba, 0xde, 0xec, 0xfd, 0xef, 0x05, 0x07, 0x24, 0x7f, 0xc8, 0xf7, 0x42, 0x41, 0xd7, 0x3b, 0xc0, 0x39, 0x97, 0x2d, 0x7b, 0x88, 0xac, 0x40, 0x94, 0xa8, 0x02, 0x00, 0x00, 0x00, 0x00, 0x19, 0x76, 0xa9, 0x14, 0xc1, 0x09, 0x32, 0x48, 0x3f, 0xec, 0x93, 0xed, 0x51, 0xf5, 0xfe, 0x95, 0xe7, 0x25, 0x59, 0xf2, 0xcc, 0x70, 0x43, 0xf9, 0x88, 0xac, 0x00, 0x00, 0x00, 0x00, 0x00]
+                [0x01, 0x00, 0x00, 0x00, 0x01, 0x6B, 0xFF, 0x7F, 0xCD, 0x4F, 0x85, 0x65, 0xEF, 0x40, 0x6D, 0xD5, 0xD6, 0x3D, 0x4F, 0xF9, 0x4F, 0x31, 0x8F, 0xE8, 0x20, 0x27, 0xFD, 0x4D, 0xC4, 0x51, 0xB0, 0x44, 0x74, 0x01, 0x9F, 0x74, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x8C, 0x49, 0x30, 0x46, 0x02, 0x21, 0x00, 0xDA, 0x0D, 0xC6, 0xAE, 0xCE, 0xFE, 0x1E, 0x06, 0xEF, 0xDF, 0x05, 0x77, 0x37, 0x57, 0xDE, 0xB1, 0x68, 0x82, 0x09, 0x30, 0xE3, 0xB0, 0xD0, 0x3F, 0x46, 0xF5, 0xFC, 0xF1, 0x50, 0xBF, 0x99, 0x0C, 0x02, 0x21, 0x00, 0xD2, 0x5B, 0x5C, 0x87, 0x04, 0x00, 0x76, 0xE4, 0xF2, 0x53, 0xF8, 0x26, 0x2E, 0x76, 0x3E, 0x2D, 0xD5, 0x1E, 0x7F, 0xF0, 0xBE, 0x15, 0x77, 0x27, 0xC4, 0xBC, 0x42, 0x80, 0x7F, 0x17, 0xBD, 0x39, 0x01, 0x41, 0x04, 0xE6, 0xC2, 0x6E, 0xF6, 0x7D, 0xC6, 0x10, 0xD2, 0xCD, 0x19, 0x24, 0x84, 0x78, 0x9A, 0x6C, 0xF9, 0xAE, 0xA9, 0x93, 0x0B, 0x94, 0x4B, 0x7E, 0x2D, 0xB5, 0x34, 0x2B, 0x9D, 0x9E, 0x5B, 0x9F, 0xF7, 0x9A, 0xFF, 0x9A, 0x2E, 0xE1, 0x97, 0x8D, 0xD7, 0xFD, 0x01, 0xDF, 0xC5, 0x22, 0xEE, 0x02, 0x28, 0x3D, 0x3B, 0x06, 0xA9, 0xD0, 0x3A, 0xCF, 0x80, 0x96, 0x96, 0x8D, 0x7D, 0xBB, 0x0F, 0x91, 0x78, 0xFF, 0xFF, 0xFF, 0xFF, 0x02, 0x8B, 0xA7, 0x94, 0x0E, 0x00, 0x00, 0x00, 0x00, 0x19, 0x76, 0xA9, 0x14, 0xBA, 0xDE, 0xEC, 0xFD, 0xEF, 0x05, 0x07, 0x24, 0x7F, 0xC8, 0xF7, 0x42, 0x41, 0xD7, 0x3B, 0xC0, 0x39, 0x97, 0x2D, 0x7B, 0x88, 0xAC, 0x40, 0x94, 0xA8, 0x02, 0x00, 0x00, 0x00, 0x00, 0x19, 0x76, 0xA9, 0x14, 0xC1, 0x09, 0x32, 0x48, 0x3F, 0xEC, 0x93, 0xED, 0x51, 0xF5, 0xFE, 0x95, 0xE7, 0x25, 0x59, 0xF2, 0xCC, 0x70, 0x43, 0xF9, 0x88, 0xAC, 0x00, 0x00, 0x00, 0x00, 0x00]
             )
         );
         $spendTx = TransactionFactory::fromHex($spends);
@@ -344,7 +343,7 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertFalse($filter->isRelevantAndUpdate($tx));
     }
 
-    public function testIsEmpty()
+    public function test_is_empty()
     {
         $emptyFilter = $this->getEmptyFilterVector();
         $this->assertFalse($emptyFilter->isFull());

@@ -15,21 +15,20 @@ class CompactSignatureSerializerTest extends AbstractTestCase
 {
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
+     *
      * @expectedException \Exception
      */
-    public function testFromParserFailure(EcAdapterInterface $ecAdapter)
+    public function test_from_parser_failure(EcAdapterInterface $ecAdapter)
     {
         /** @var CompactSignatureSerializerInterface $serializer */
         $serializer = EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter);
-        $serializer->parse(new Buffer());
+        $serializer->parse(new Buffer);
     }
 
     /**
      * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function testValidRecovery(EcAdapterInterface $ecAdapter)
+    public function test_valid_recovery(EcAdapterInterface $ecAdapter)
     {
         $r = str_pad('', 64, '4');
         $s = str_pad('', 64, '5');
@@ -39,7 +38,7 @@ class CompactSignatureSerializerTest extends AbstractTestCase
         $math = $ecAdapter->getMath();
         for ($c = 1; $c < 5; $c++) {
             $t = $c + 27;
-            $test = Buffer::hex($math->decHex((string) $t) . $r . $s);
+            $test = Buffer::hex($math->decHex((string) $t).$r.$s);
             $parsed = $serializer->parse($test);
             $this->assertInstanceOf(CompactSignatureInterface::class, $parsed);
         }

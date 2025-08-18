@@ -23,8 +23,6 @@ class ScriptAndSignData
 
     /**
      * ScriptAndSignData constructor.
-     * @param ScriptInterface $scriptPubKey
-     * @param SignData $signData
      */
     public function __construct(ScriptInterface $scriptPubKey, SignData $signData)
     {
@@ -32,26 +30,16 @@ class ScriptAndSignData
         $this->signData = $signData;
     }
 
-    /**
-     * @return ScriptInterface
-     */
     public function getScriptPubKey(): ScriptInterface
     {
         return $this->scriptPubKey;
     }
 
-    /**
-     * @param BaseAddressCreator $creator
-     * @return Address
-     */
     public function getAddress(BaseAddressCreator $creator): Address
     {
         return $creator->fromOutputScript($this->scriptPubKey);
     }
 
-    /**
-     * @return SignData
-     */
     public function getSignData(): SignData
     {
         return $this->signData;

@@ -14,15 +14,15 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class PayToPubKeyHashTest extends AbstractTestCase
 {
-    public function testMethods()
+    public function test_methods()
     {
-        $factory = new PrivateKeyFactory();
-        $priv = $factory->generateUncompressed(new Random());
+        $factory = new PrivateKeyFactory;
+        $priv = $factory->generateUncompressed(new Random);
         $pub = $priv->getPublicKey();
         $keyHash = $pub->getPubKeyHash();
         $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($keyHash);
 
-        $classifier = new OutputClassifier();
+        $classifier = new OutputClassifier;
         $this->assertEquals(ScriptType::P2PKH, $classifier->classify($script));
 
         $info = PayToPubkeyHash::fromScript($script);
@@ -30,7 +30,7 @@ class PayToPubKeyHashTest extends AbstractTestCase
         $this->assertEquals(1, $info->getKeyCount());
         $this->assertTrue($info->checkInvolvesKey($pub));
 
-        $otherpriv = $factory->generateUncompressed(new Random());
+        $otherpriv = $factory->generateUncompressed(new Random);
         $otherpub = $otherpriv->getPublicKey();
         $this->assertFalse($info->checkInvolvesKey($otherpub));
 

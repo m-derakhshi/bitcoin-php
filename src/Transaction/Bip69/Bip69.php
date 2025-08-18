@@ -13,20 +13,16 @@ use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 class Bip69
 {
     /**
-     * @param TransactionInputInterface[] $vTxin
+     * @param  TransactionInputInterface[]  $vTxin
      * @return TransactionInputInterface[]
      */
     public function sortInputs(array $vTxin): array
     {
         usort($vTxin, [$this, 'compareInputs']);
+
         return $vTxin;
     }
 
-    /**
-     * @param TransactionInputInterface $vin1
-     * @param TransactionInputInterface $vin2
-     * @return int
-     */
     public function compareInputs(TransactionInputInterface $vin1, TransactionInputInterface $vin2): int
     {
         $outpoint1 = $vin1->getOutPoint();
@@ -38,20 +34,16 @@ class Bip69
     }
 
     /**
-     * @param TransactionOutputInterface[] $vTxout
+     * @param  TransactionOutputInterface[]  $vTxout
      * @return TransactionOutputInterface[]
      */
     public function sortOutputs(array $vTxout): array
     {
         usort($vTxout, [$this, 'compareOutputs']);
+
         return $vTxout;
     }
 
-    /**
-     * @param TransactionOutputInterface $vout1
-     * @param TransactionOutputInterface $vout2
-     * @return int
-     */
     public function compareOutputs(TransactionOutputInterface $vout1, TransactionOutputInterface $vout2): int
     {
         $value = $vout1->getValue() - $vout2->getValue();
@@ -59,10 +51,6 @@ class Bip69
         return ($value !== 0) ? $value : strcmp($vout1->getScript()->getBinary(), $vout2->getScript()->getBinary());
     }
 
-    /**
-     * @param TransactionInterface $tx
-     * @return bool
-     */
     public function check(TransactionInterface $tx): bool
     {
         $inputs = $tx->getInputs();
@@ -72,9 +60,9 @@ class Bip69
     }
 
     /**
-     * @param TransactionInputInterface[] $inputs
-     * @param ScriptWitnessInterface[] $witnesses
-     * @return array
+     * @param  TransactionInputInterface[]  $inputs
+     * @param  ScriptWitnessInterface[]  $witnesses
+     *
      * @throws \Exception
      */
     public function sortInputsAndWitness(array $inputs, array $witnesses): array
@@ -93,14 +81,10 @@ class Bip69
         return [$inputs, $vWitness];
     }
 
-    /**
-     * @param TransactionInterface $tx
-     * @return TransactionInterface
-     */
     public function mutate(TransactionInterface $tx): TransactionInterface
     {
         if (count($tx->getWitnesses()) > 0) {
-            list ($vTxin, $vWit) = $this->sortInputsAndWitness($tx->getInputs(), $tx->getWitnesses());
+            [$vTxin, $vWit] = $this->sortInputsAndWitness($tx->getInputs(), $tx->getWitnesses());
         } else {
             $vTxin = $this->sortInputs($tx->getInputs());
             $vWit = [];

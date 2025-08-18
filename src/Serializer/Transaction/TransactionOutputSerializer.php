@@ -32,30 +32,23 @@ class TransactionOutputSerializer
 
     /**
      * TransactionOutputSerializer constructor.
-     * @param Opcodes|null $opcodes
      */
-    public function __construct(Opcodes $opcodes = null)
+    public function __construct(?Opcodes $opcodes = null)
     {
         $this->uint64le = Types::uint64le();
         $this->varstring = Types::varstring();
-        $this->opcodes = $opcodes ?: new Opcodes();
+        $this->opcodes = $opcodes ?: new Opcodes;
     }
 
-    /**
-     * @param TransactionOutputInterface $output
-     * @return BufferInterface
-     */
     public function serialize(TransactionOutputInterface $output): BufferInterface
     {
         return new Buffer(
-            $this->uint64le->write($output->getValue()) .
+            $this->uint64le->write($output->getValue()).
             $this->varstring->write($output->getScript()->getBuffer())
         );
     }
 
     /**
-     * @param Parser $parser
-     * @return TransactionOutputInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public function fromParser(Parser $parser): TransactionOutputInterface
@@ -67,8 +60,6 @@ class TransactionOutputSerializer
     }
 
     /**
-     * @param BufferInterface $string
-     * @return TransactionOutputInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public function parse(BufferInterface $string): TransactionOutputInterface

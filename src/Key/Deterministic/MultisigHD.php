@@ -41,10 +41,8 @@ class MultisigHD
 
     /**
      * MultisigHD constructor.
-     * @param ScriptDataFactory $scriptDataFactory
-     * @param HierarchicalKey ...$keys
      */
-    public function __construct(ScriptDataFactory $scriptDataFactory, HierarchicalKey... $keys)
+    public function __construct(ScriptDataFactory $scriptDataFactory, HierarchicalKey ...$keys)
     {
         if (count($keys) < 1) {
             throw new \RuntimeException('Must have at least one HierarchicalKey for Multisig HD Script');
@@ -77,34 +75,22 @@ class MultisigHD
         return $this->keys;
     }
 
-    /**
-     * @return ScriptDataFactory
-     */
     public function getScriptDataFactory(): ScriptDataFactory
     {
         return $this->scriptFactory;
     }
 
-    /**
-     * @return ScriptAndSignData
-     */
     public function getScriptAndSignData(): ScriptAndSignData
     {
         return $this->scriptAndSignData;
     }
 
-    /**
-     * @param BaseAddressCreator $addressCreator
-     * @return Address
-     */
     public function getAddress(BaseAddressCreator $addressCreator): Address
     {
         return $this->getScriptAndSignData()->getAddress($addressCreator);
     }
 
     /**
-     * @param int $sequence
-     * @return MultisigHD
      * @throws InvalidDerivationException
      */
     public function deriveChild(int $sequence): MultisigHD
@@ -124,13 +110,11 @@ class MultisigHD
     /**
      * Decodes a BIP32 path into actual 32bit sequence numbers and derives the child key
      *
-     * @param string $path
-     * @return MultisigHD
      * @throws \Exception
      */
     public function derivePath(string $path): MultisigHD
     {
-        $sequences = new HierarchicalKeySequence();
+        $sequences = new HierarchicalKeySequence;
         $parts = $sequences->decodeRelative($path);
         $numParts = count($parts);
 
@@ -142,7 +126,7 @@ class MultisigHD
                 if ($i === $numParts - 1) {
                     throw new InvalidDerivationException($e->getMessage());
                 } else {
-                    throw new InvalidDerivationException("Invalid derivation for non-terminal index: cannot use this path!");
+                    throw new InvalidDerivationException('Invalid derivation for non-terminal index: cannot use this path!');
                 }
             }
         }

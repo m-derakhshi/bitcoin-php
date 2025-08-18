@@ -35,11 +35,6 @@ class BlockSerializer implements BlockSerializerInterface
      */
     private $txSerializer;
 
-    /**
-     * @param Math $math
-     * @param BlockHeaderSerializer $headerSerializer
-     * @param TransactionSerializerInterface $txSerializer
-     */
     public function __construct(Math $math, BlockHeaderSerializer $headerSerializer, TransactionSerializerInterface $txSerializer)
     {
         $this->math = $math;
@@ -49,8 +44,6 @@ class BlockSerializer implements BlockSerializerInterface
     }
 
     /**
-     * @param Parser $parser
-     * @return BlockInterface
      * @throws ParserOutOfRange
      */
     public function fromParser(Parser $parser): BlockInterface
@@ -62,6 +55,7 @@ class BlockSerializer implements BlockSerializerInterface
             for ($i = 0; $i < $nTx; $i++) {
                 $vTx[] = $this->txSerializer->fromParser($parser);
             }
+
             return new Block($this->math, $header, ...$vTx);
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
@@ -69,8 +63,6 @@ class BlockSerializer implements BlockSerializerInterface
     }
 
     /**
-     * @param BufferInterface $buffer
-     * @return BlockInterface
      * @throws ParserOutOfRange
      */
     public function parse(BufferInterface $buffer): BlockInterface
@@ -78,10 +70,6 @@ class BlockSerializer implements BlockSerializerInterface
         return $this->fromParser(new Parser($buffer));
     }
 
-    /**
-     * @param BlockInterface $block
-     * @return BufferInterface
-     */
     public function serialize(BlockInterface $block): BufferInterface
     {
         $parser = new Parser($this->headerSerializer->serialize($block->getHeader()));

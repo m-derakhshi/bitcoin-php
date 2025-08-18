@@ -12,20 +12,20 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class GlobalPrefixConfigTest extends AbstractTestCase
 {
-    public function testInvalidArray()
+    public function test_invalid_array()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("expecting array of NetworkPrefixConfig");
+        $this->expectExceptionMessage('expecting array of NetworkPrefixConfig');
 
         new GlobalPrefixConfig([
-            Bitcoin::getNetwork()
+            Bitcoin::getNetwork(),
         ]);
     }
 
-    public function testDuplicateNetworksNotAllowed()
+    public function test_duplicate_networks_not_allowed()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("multiple configs for network");
+        $this->expectExceptionMessage('multiple configs for network');
 
         new GlobalPrefixConfig([
             new NetworkConfig(NetworkFactory::bitcoin(), []),
@@ -33,7 +33,7 @@ class GlobalPrefixConfigTest extends AbstractTestCase
         ]);
     }
 
-    public function testMultipleNetworksWorks()
+    public function test_multiple_networks_works()
     {
         $btc = NetworkFactory::bitcoin();
         $btcConfig = new NetworkConfig($btc, []);
@@ -48,7 +48,7 @@ class GlobalPrefixConfigTest extends AbstractTestCase
         $this->assertSame($tbtcConfig, $config->getNetworkConfig($tbtc));
     }
 
-    public function testUnknownNetwork()
+    public function test_unknown_network()
     {
         $btc = NetworkFactory::bitcoin();
         $btcConfig = new NetworkConfig($btc, []);
@@ -58,7 +58,7 @@ class GlobalPrefixConfigTest extends AbstractTestCase
         ]);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Network not registered with GlobalHdPrefixConfig");
+        $this->expectExceptionMessage('Network not registered with GlobalHdPrefixConfig');
 
         $config->getNetworkConfig($tbtc);
     }

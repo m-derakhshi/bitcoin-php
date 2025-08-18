@@ -10,9 +10,9 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class ParamsTest extends AbstractTestCase
 {
-    public function testParams()
+    public function test_params()
     {
-        $math = new Math();
+        $math = new Math;
         $params = new Params($math);
         $this->assertEquals(486604799, $params->powBitsLimit());
         $this->assertEquals('26959946667150639794667015087019630673637144422540572481103610249215', $params->powTargetLimit());

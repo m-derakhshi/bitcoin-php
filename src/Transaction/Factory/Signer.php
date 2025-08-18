@@ -68,10 +68,8 @@ class Signer
 
     /**
      * TxWitnessSigner constructor.
-     * @param TransactionInterface $tx
-     * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(TransactionInterface $tx, EcAdapterInterface $ecAdapter = null)
+    public function __construct(TransactionInterface $tx, ?EcAdapterInterface $ecAdapter = null)
     {
         $this->tx = $tx;
         $this->ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
@@ -81,59 +79,55 @@ class Signer
     }
 
     /**
-     * @param CheckerCreatorBase $checker
      * @return $this
+     *
      * @throws SignerException
      */
     public function setCheckerCreator(CheckerCreatorBase $checker)
     {
         if (count($this->signatureCreator) === 0) {
             $this->checkerCreator = $checker;
+
             return $this;
         } else {
-            throw new SignerException("Cannot change CheckerCreator after inputs have been parsed");
+            throw new SignerException('Cannot change CheckerCreator after inputs have been parsed');
         }
     }
 
     /**
-     * @param bool $setting
      * @return $this
      */
     public function padUnsignedMultisigs(bool $setting)
     {
         $this->padUnsignedMultisigs = $setting;
+
         return $this;
     }
 
     /**
-     * @param bool $setting
      * @return $this
      */
     public function tolerateInvalidPublicKey(bool $setting)
     {
         $this->tolerateInvalidPublicKey = $setting;
+
         return $this;
     }
 
     /**
-     * @param bool $setting
      * @return $this
      */
     public function allowComplexScripts(bool $setting)
     {
         $this->allowComplexScripts = $setting;
+
         return $this;
     }
 
     /**
-     * @param int $nIn
-     * @param PrivateKeyInterface $key
-     * @param TransactionOutputInterface $txOut
-     * @param SignData $signData
-     * @param int $sigHashType
      * @return $this
      */
-    public function sign(int $nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, SignData $signData = null, int $sigHashType = SigHash::ALL)
+    public function sign(int $nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, ?SignData $signData = null, int $sigHashType = SigHash::ALL)
     {
         $input = $this->input($nIn, $txOut, $signData);
         foreach ($input->getSteps() as $idx => $step) {
@@ -143,19 +137,13 @@ class Signer
         return $this;
     }
 
-    /**
-     * @param int $nIn
-     * @param TransactionOutputInterface $txOut
-     * @param SignData|null $signData
-     * @return InputSignerInterface
-     */
-    public function input(int $nIn, TransactionOutputInterface $txOut, SignData $signData = null): InputSignerInterface
+    public function input(int $nIn, TransactionOutputInterface $txOut, ?SignData $signData = null): InputSignerInterface
     {
-        if (null === $signData) {
-            $signData = new SignData();
+        if ($signData === null) {
+            $signData = new SignData;
         }
 
-        if (!isset($this->signatureCreator[$nIn])) {
+        if (! isset($this->signatureCreator[$nIn])) {
             $checker = $this->checkerCreator->create($this->tx, $nIn, $txOut);
             $input = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData, $checker, $this->sigSerializer, $this->pubKeySerializer);
             $input->padUnsignedMultisigs($this->padUnsignedMultisigs);
@@ -169,9 +157,6 @@ class Signer
         return $this->signatureCreator[$nIn];
     }
 
-    /**
-     * @return TransactionInterface
-     */
     public function get(): TransactionInterface
     {
         $mutable = TransactionFactory::mutate($this->tx);

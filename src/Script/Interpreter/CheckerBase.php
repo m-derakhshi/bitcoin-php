@@ -65,14 +65,8 @@ abstract class CheckerBase
 
     /**
      * Checker constructor.
-     * @param EcAdapterInterface $ecAdapter
-     * @param TransactionInterface $transaction
-     * @param int $nInput
-     * @param int $amount
-     * @param TransactionSignatureSerializer|null $sigSerializer
-     * @param PublicKeySerializerInterface|null $pubKeySerializer
      */
-    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction, int $nInput, int $amount, TransactionSignatureSerializer $sigSerializer = null, PublicKeySerializerInterface $pubKeySerializer = null)
+    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction, int $nInput, int $amount, ?TransactionSignatureSerializer $sigSerializer = null, ?PublicKeySerializerInterface $pubKeySerializer = null)
     {
         $this->sigSerializer = $sigSerializer ?: new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $ecAdapter));
         $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
@@ -82,22 +76,13 @@ abstract class CheckerBase
         $this->amount = $amount;
     }
 
-    /**
-     * @param ScriptInterface $script
-     * @param int $hashType
-     * @param int $sigVersion
-     * @return BufferInterface
-     */
     abstract public function getSigHash(ScriptInterface $script, int $hashType, int $sigVersion): BufferInterface;
 
-    /**
-     * @param BufferInterface $signature
-     * @return bool
-     */
     public function isValidSignatureEncoding(BufferInterface $signature): bool
     {
         try {
             TransactionSignature::isDERSignature($signature);
+
             return true;
         } catch (SignatureNotCanonical $e) {
             /* In any case, we will return false outside this block */
@@ -107,14 +92,12 @@ abstract class CheckerBase
     }
 
     /**
-     * @param BufferInterface $signature
-     * @return bool
      * @throws ScriptRuntimeException
      * @throws \Exception
      */
     public function isLowDerSignature(BufferInterface $signature): bool
     {
-        if (!$this->isValidSignatureEncoding($signature)) {
+        if (! $this->isValidSignatureEncoding($signature)) {
             throw new ScriptRuntimeException(Interpreter::VERIFY_DERSIG, 'Signature with incorrect encoding');
         }
 
@@ -126,23 +109,16 @@ abstract class CheckerBase
         return $this->adapter->validateSignatureElement($s, true);
     }
 
-    /**
-     * @param int $hashType
-     * @return bool
-     */
     public function isDefinedHashtype(int $hashType): bool
     {
         $nHashType = $hashType & (~($this->sigHashOptionalBits));
 
-        return !(($nHashType < SigHash::ALL) || ($nHashType > SigHash::SINGLE));
+        return ! (($nHashType < SigHash::ALL) || ($nHashType > SigHash::SINGLE));
     }
 
     /**
      * Determine whether the sighash byte appended to the signature encodes
      * a valid sighash type.
-     *
-     * @param BufferInterface $signature
-     * @return bool
      */
     public function isDefinedHashtypeSignature(BufferInterface $signature): bool
     {
@@ -151,13 +127,13 @@ abstract class CheckerBase
         }
 
         $binary = $signature->getBinary();
+
         return $this->isDefinedHashtype(ord(substr($binary, -1)));
     }
 
     /**
-     * @param BufferInterface $signature
-     * @param int $flags
      * @return $this
+     *
      * @throws \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
      */
     public function checkSignatureEncoding(BufferInterface $signature, int $flags)
@@ -166,11 +142,11 @@ abstract class CheckerBase
             return $this;
         }
 
-        if (($flags & (Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_LOW_S | Interpreter::VERIFY_STRICTENC)) !== 0 && !$this->isValidSignatureEncoding($signature)) {
+        if (($flags & (Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_LOW_S | Interpreter::VERIFY_STRICTENC)) !== 0 && ! $this->isValidSignatureEncoding($signature)) {
             throw new ScriptRuntimeException(Interpreter::VERIFY_DERSIG, 'Signature with incorrect encoding');
-        } else if (($flags & Interpreter::VERIFY_LOW_S) !== 0 && !$this->isLowDerSignature($signature)) {
+        } elseif (($flags & Interpreter::VERIFY_LOW_S) !== 0 && ! $this->isLowDerSignature($signature)) {
             throw new ScriptRuntimeException(Interpreter::VERIFY_LOW_S, 'Signature s element was not low');
-        } else if (($flags & Interpreter::VERIFY_STRICTENC) !== 0 && !$this->isDefinedHashtypeSignature($signature)) {
+        } elseif (($flags & Interpreter::VERIFY_STRICTENC) !== 0 && ! $this->isDefinedHashtypeSignature($signature)) {
             throw new ScriptRuntimeException(Interpreter::VERIFY_STRICTENC, 'Signature with invalid hashtype');
         }
 
@@ -178,14 +154,13 @@ abstract class CheckerBase
     }
 
     /**
-     * @param BufferInterface $publicKey
-     * @param int $flags
      * @return $this
+     *
      * @throws \Exception
      */
     public function checkPublicKeyEncoding(BufferInterface $publicKey, int $flags)
     {
-        if (($flags & Interpreter::VERIFY_STRICTENC) !== 0 && !PublicKey::isCompressedOrUncompressed($publicKey)) {
+        if (($flags & Interpreter::VERIFY_STRICTENC) !== 0 && ! PublicKey::isCompressedOrUncompressed($publicKey)) {
             throw new ScriptRuntimeException(Interpreter::VERIFY_STRICTENC, 'Public key with incorrect encoding');
         }
 
@@ -193,12 +168,8 @@ abstract class CheckerBase
     }
 
     /**
-     * @param ScriptInterface $script
-     * @param BufferInterface $sigBuf
-     * @param BufferInterface $keyBuf
-     * @param int $sigVersion
-     * @param int $flags
      * @return bool
+     *
      * @throws ScriptRuntimeException
      */
     public function checkSig(ScriptInterface $script, BufferInterface $sigBuf, BufferInterface $keyBuf, int $sigVersion, int $flags)
@@ -209,7 +180,7 @@ abstract class CheckerBase
 
         try {
             $cacheCheck = "{$script->getBinary()}{$sigVersion}{$keyBuf->getBinary()}{$sigBuf->getBinary()}";
-            if (!isset($this->sigCache[$cacheCheck])) {
+            if (! isset($this->sigCache[$cacheCheck])) {
                 $txSignature = $this->sigSerializer->parse($sigBuf);
                 $publicKey = $this->pubKeySerializer->parse($keyBuf);
 
@@ -225,17 +196,13 @@ abstract class CheckerBase
         }
     }
 
-    /**
-     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $scriptLockTime
-     * @return bool
-     */
     public function checkLockTime(\BitWasp\Bitcoin\Script\Interpreter\Number $scriptLockTime): bool
     {
         $input = $this->transaction->getInput($this->nInput);
         $nLockTime = $scriptLockTime->getInt();
         $txLockTime = $this->transaction->getLockTime();
 
-        if (!(($txLockTime < Locktime::BLOCK_MAX && $nLockTime < Locktime::BLOCK_MAX) ||
+        if (! (($txLockTime < Locktime::BLOCK_MAX && $nLockTime < Locktime::BLOCK_MAX) ||
             ($txLockTime >= Locktime::BLOCK_MAX && $nLockTime >= Locktime::BLOCK_MAX))
         ) {
             return false;
@@ -252,10 +219,6 @@ abstract class CheckerBase
         return true;
     }
 
-    /**
-     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $sequence
-     * @return bool
-     */
     public function checkSequence(\BitWasp\Bitcoin\Script\Interpreter\Number $sequence): bool
     {
         $txSequence = $this->transaction->getInput($this->nInput)->getSequence();
@@ -271,7 +234,7 @@ abstract class CheckerBase
 
         $txToSequenceMasked = $txSequence & $mask;
         $nSequenceMasked = $sequence->getInt() & $mask;
-        if (!(($txToSequenceMasked < TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG && $nSequenceMasked < TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG) ||
+        if (! (($txToSequenceMasked < TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG && $nSequenceMasked < TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG) ||
             ($txToSequenceMasked >= TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG && $nSequenceMasked >= TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG))
         ) {
             return false;

@@ -10,9 +10,13 @@ use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 interface InterpreterInterface
 {
     const MAX_SCRIPT_ELEMENT_SIZE = 520;
+
     const SCRIPT_ERR_BAD_OPCODE = '';
+
     const SCRIPT_ERR_PUSH_SIZE = '';
+
     const SCRIPT_ERR_OP_COUNT = '';
+
     const SCRIPT_ERR_MINIMALDATA = '';
 
     const VERIFY_NONE = 0;
@@ -44,6 +48,7 @@ interface InterpreterInterface
     // In addition, whenever a stack element is interpreted as a number, it must be of minimal length (BIP62 rule 4).
     // (softfork safe)
     const VERIFY_MINIMALDATA = 1 << 6;
+
     // Discourage use of NOPs reserved for upgrades (NOP1-10)
     //
     // Provided so that nodes can avoid accepting or mining transactions
@@ -80,29 +85,20 @@ interface InterpreterInterface
     //
     // See BIP112 for details.
 
+    const SIGHASH_ALL = 0x1;
 
+    const SIGHASH_NONE = 0x2;
 
-    const SIGHASH_ALL          = 0x1;
-    const SIGHASH_NONE         = 0x2;
-    const SIGHASH_SINGLE       = 0x3;
+    const SIGHASH_SINGLE = 0x3;
+
     const SIGHASH_ANYONECANPAY = 0x80;
 
     /**
-     * @param ScriptInterface $scriptSig
-     * @param ScriptInterface $scriptPubKey
-     * @param int $flags
-     * @param CheckerBase $checker
-     * @param ScriptWitnessInterface|null $witness
      * @return bool
      */
-    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, int $flags, CheckerBase $checker, ScriptWitnessInterface $witness = null);
+    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, int $flags, CheckerBase $checker, ?ScriptWitnessInterface $witness = null);
 
     /**
-     * @param ScriptInterface $script
-     * @param Stack $stack
-     * @param int $sigVersion
-     * @param int $flags
-     * @param CheckerBase $checker
      * @return bool
      */
     public function evaluate(ScriptInterface $script, Stack $stack, int $sigVersion, int $flags, CheckerBase $checker);

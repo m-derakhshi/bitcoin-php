@@ -9,13 +9,7 @@ use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
 interface UtxoInterface
 {
-    /**
-     * @return OutPointInterface
-     */
     public function getOutPoint(): OutPointInterface;
 
-    /**
-     * @return TransactionOutputInterface
-     */
     public function getOutput(): TransactionOutputInterface;
 }

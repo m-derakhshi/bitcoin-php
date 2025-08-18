@@ -32,7 +32,7 @@ abstract class AbstractTestCase extends TestCase
      */
     public static function getSecp256k1Context()
     {
-        if (null === self::$secp256k1Context) {
+        if (self::$secp256k1Context === null) {
             self::$secp256k1Context = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY | SECP256K1_CONTEXT_SIGN);
         }
 
@@ -40,9 +40,9 @@ abstract class AbstractTestCase extends TestCase
     }
 
     /**
-     * @param callable|\Closure $closure
-     * @param string $error - exception FQDN
-     * @param null $errorMessage - optional, assert exception matches this error message
+     * @param  callable|\Closure  $closure
+     * @param  string  $error  - exception FQDN
+     * @param  null  $errorMessage  - optional, assert exception matches this error message
      */
     public function assertThrows($closure, $error, $errorMessage = null)
     {
@@ -53,7 +53,7 @@ abstract class AbstractTestCase extends TestCase
             $err = $e;
         }
 
-        $this->assertInstanceOf($error, $err, 'should have thrown exception ' . $error);
+        $this->assertInstanceOf($error, $err, 'should have thrown exception '.$error);
 
         if (is_string($errorMessage)) {
             $this->assertEquals($errorMessage, $err->getMessage());
@@ -61,37 +61,38 @@ abstract class AbstractTestCase extends TestCase
     }
 
     /**
-     * @param string $file
+     * @param  string  $file
      * @return string
      */
     public function dataPath($file)
     {
-        return __DIR__ . '/Data/' . $file;
+        return __DIR__.'/Data/'.$file;
     }
 
     /**
-     * @param string $filename
+     * @param  string  $filename
      * @return string
      */
     public function dataFile($filename)
     {
         $contents = file_get_contents($this->dataPath($filename));
-        if (false === $contents) {
-            throw new \RuntimeException('Failed to data file ' . $filename);
+        if ($contents === false) {
+            throw new \RuntimeException('Failed to data file '.$filename);
         }
+
         return $contents;
     }
 
     /**
-     * @param string $name
+     * @param  string  $name
      * @return array
      */
     public function jsonDataFile($name)
     {
         $contents = $this->dataFile($name);
         $decoded = json_decode($contents, true);
-        if (false === $decoded || json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException('Invalid JSON file ' . $name);
+        if ($decoded === false || json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException('Invalid JSON file '.$name);
         }
 
         return $decoded;
@@ -104,22 +105,17 @@ abstract class AbstractTestCase extends TestCase
     {
         $blocks = $this->dataFile('180blocks');
         $a = explode("\n", $blocks);
+
         return array_filter($a, 'strlen');
     }
 
-    /**
-     * @param int $i
-     * @return BlockInterface
-     */
     public function getBlock(int $i): BlockInterface
     {
         $blocks = $this->getBlocks();
+
         return BlockFactory::fromHex($blocks[$i]);
     }
 
-    /**
-     * @return Block
-     */
     public function getGenesisBlock(): Block
     {
         return $this->getBlock(0);
@@ -142,12 +138,12 @@ abstract class AbstractTestCase extends TestCase
     }
 
     /**
-     * @param string $flagStr
+     * @param  string  $flagStr
      * @return int
      */
     public function getInterpreterFlags($flagStr)
     {
-        $array = explode(",", $flagStr);
+        $array = explode(',', $flagStr);
         $int = 0;
         foreach ($array as $activeFlag) {
             $f = constant(InterpreterInterface::class."::$activeFlag");
@@ -162,24 +158,24 @@ abstract class AbstractTestCase extends TestCase
      */
     public function calcMapScriptFlags()
     {
-        if (null === $this->scriptFlagNames) {
+        if ($this->scriptFlagNames === null) {
             $this->scriptFlagNames = [
-                "NONE" => Interpreter::VERIFY_NONE,
-                "P2SH" => Interpreter::VERIFY_P2SH,
-                "STRICTENC" => Interpreter::VERIFY_STRICTENC,
-                "DERSIG" => Interpreter::VERIFY_DERSIG,
-                "LOW_S" => Interpreter::VERIFY_LOW_S,
-                "SIGPUSHONLY" => Interpreter::VERIFY_SIGPUSHONLY,
-                "MINIMALDATA" => Interpreter::VERIFY_MINIMALDATA,
-                "NULLDUMMY" => Interpreter::VERIFY_NULL_DUMMY,
-                "DISCOURAGE_UPGRADABLE_NOPS" => Interpreter::VERIFY_DISCOURAGE_UPGRADABLE_NOPS,
-                "CLEANSTACK" => Interpreter::VERIFY_CLEAN_STACK,
-                "CHECKLOCKTIMEVERIFY" => Interpreter::VERIFY_CHECKLOCKTIMEVERIFY,
-                "CHECKSEQUENCEVERIFY" => Interpreter::VERIFY_CHECKSEQUENCEVERIFY,
-                "WITNESS" => Interpreter::VERIFY_WITNESS,
-                "DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM" => Interpreter::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM,
-                "MINIMALIF" => Interpreter::VERIFY_MINIMALIF,
-                "NULLFAIL" => Interpreter::VERIFY_NULLFAIL,
+                'NONE' => Interpreter::VERIFY_NONE,
+                'P2SH' => Interpreter::VERIFY_P2SH,
+                'STRICTENC' => Interpreter::VERIFY_STRICTENC,
+                'DERSIG' => Interpreter::VERIFY_DERSIG,
+                'LOW_S' => Interpreter::VERIFY_LOW_S,
+                'SIGPUSHONLY' => Interpreter::VERIFY_SIGPUSHONLY,
+                'MINIMALDATA' => Interpreter::VERIFY_MINIMALDATA,
+                'NULLDUMMY' => Interpreter::VERIFY_NULL_DUMMY,
+                'DISCOURAGE_UPGRADABLE_NOPS' => Interpreter::VERIFY_DISCOURAGE_UPGRADABLE_NOPS,
+                'CLEANSTACK' => Interpreter::VERIFY_CLEAN_STACK,
+                'CHECKLOCKTIMEVERIFY' => Interpreter::VERIFY_CHECKLOCKTIMEVERIFY,
+                'CHECKSEQUENCEVERIFY' => Interpreter::VERIFY_CHECKSEQUENCEVERIFY,
+                'WITNESS' => Interpreter::VERIFY_WITNESS,
+                'DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM' => Interpreter::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM,
+                'MINIMALIF' => Interpreter::VERIFY_MINIMALIF,
+                'NULLFAIL' => Interpreter::VERIFY_NULLFAIL,
             ];
         }
 
@@ -187,7 +183,7 @@ abstract class AbstractTestCase extends TestCase
     }
 
     /**
-     * @param string $string
+     * @param  string  $string
      * @return int
      */
     public function getScriptFlagsFromString($string)
@@ -198,10 +194,10 @@ abstract class AbstractTestCase extends TestCase
         }
 
         $flags = 0;
-        $words = explode(",", $string);
+        $words = explode(',', $string);
         foreach ($words as $word) {
-            if (!isset($mapFlagNames[$word])) {
-                throw new \RuntimeException('Unknown verification flag: ' . $word);
+            if (! isset($mapFlagNames[$word])) {
+                throw new \RuntimeException('Unknown verification flag: '.$word);
             }
 
             $flags |= $mapFlagNames[$word];
@@ -215,7 +211,7 @@ abstract class AbstractTestCase extends TestCase
      */
     public function safeMath()
     {
-        return new Math();
+        return new Math;
     }
 
     /**
@@ -233,6 +229,7 @@ abstract class AbstractTestCase extends TestCase
     {
         $math = $this->safeMath();
         $generator = $this->safeGenerator();
-        return extension_loaded('secp256k1') ? EcAdapterFactory::getSecp256k1($math, $generator): new PhpEccAdapter($math, $generator);
+
+        return extension_loaded('secp256k1') ? EcAdapterFactory::getSecp256k1($math, $generator) : new PhpEccAdapter($math, $generator);
     }
 }

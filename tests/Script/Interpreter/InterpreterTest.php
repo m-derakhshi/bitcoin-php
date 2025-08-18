@@ -20,52 +20,46 @@ use BitWasp\Buffertools\Buffer;
 
 class InterpreterTest extends AbstractTestCase
 {
-
     public function getScripts()
     {
         $flags = Interpreter::VERIFY_NONE;
         $vectors[] = [
             $flags,
-            new Script(new Buffer()),
-            ScriptFactory::create()->push(Buffer::hex($this->dataFile("10010bytes.hex")))->getScript(),
-            false
+            new Script(new Buffer),
+            ScriptFactory::create()->push(Buffer::hex($this->dataFile('10010bytes.hex')))->getScript(),
+            false,
         ];
 
         return $vectors;
     }
 
-
     /**
-     * @param int $flags
-     * @param ScriptInterface $scriptSig
-     * @param ScriptInterface $scriptPubKey
-     * @param bool $result
      * @dataProvider getScripts
      */
-    public function testScript(int $flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, bool $result)
+    public function test_script(int $flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, bool $result)
     {
         $ec = Bitcoin::getEcAdapter();
         $i = new Interpreter($ec);
 
-        $stack = new Stack();
-        $checker = new Checker($ec, new Transaction(), 0, 0);
+        $stack = new Stack;
+        $checker = new Checker($ec, new Transaction, 0, 0);
         $i->evaluate($scriptSig, $stack, 0, $flags, $checker);
         $testResult = $i->evaluate($scriptPubKey, $stack, 0, $flags, $checker);
 
-        $this->assertEquals($result, $testResult, ScriptFactory::fromHex($scriptSig->getHex() . $scriptPubKey->getHex())->getScriptParser()->getHumanReadable());
+        $this->assertEquals($result, $testResult, ScriptFactory::fromHex($scriptSig->getHex().$scriptPubKey->getHex())->getScriptParser()->getHumanReadable());
     }/**/
 
-    public function testVerifyOnScriptSigFail()
+    public function test_verify_on_script_sig_fail()
     {
         $ec = Bitcoin::getEcAdapter();
         $f = 0;
         $i = new Interpreter($ec);
         $script = ScriptFactory::create()->opcode(Opcodes::OP_RETURN)->getScript();
 
-        $this->assertFalse($i->verify($script, new Script, $f, new Checker($ec, new Transaction(), 0, 0)));
+        $this->assertFalse($i->verify($script, new Script, $f, new Checker($ec, new Transaction, 0, 0)));
     }
 
-    public function testVerifyOnScriptPubKeyFail()
+    public function test_verify_on_script_pub_key_fail()
     {
         $f = 0;
         $ec = Bitcoin::getEcAdapter();
@@ -73,20 +67,20 @@ class InterpreterTest extends AbstractTestCase
         $i = new Interpreter($ec);
         $true = new Script(Buffer::hex('0101'));
         $false = ScriptFactory::create()->opcode(Opcodes::OP_RETURN)->getScript();
-        $this->assertFalse($i->verify($true, $false, $f, new Checker($ec, new Transaction(), 0, 0)));
+        $this->assertFalse($i->verify($true, $false, $f, new Checker($ec, new Transaction, 0, 0)));
     }
 
-    public function testVerifyEmptyAfterExec()
+    public function test_verify_empty_after_exec()
     {
         $f = 0;
         $ec = Bitcoin::getEcAdapter();
 
         $i = new Interpreter(Bitcoin::getEcAdapter());
-        $empty = new Script();
-        $this->assertFalse($i->verify($empty, $empty, $f, new Checker($ec, new Transaction(), 0, 0)));
+        $empty = new Script;
+        $this->assertFalse($i->verify($empty, $empty, $f, new Checker($ec, new Transaction, 0, 0)));
     }
 
-    public function testVerifyNotFalse()
+    public function test_verify_not_false()
     {
         $true = new Script(Buffer::hex('0101'));
         $false = new Script(Buffer::hex('0100'));
@@ -95,23 +89,23 @@ class InterpreterTest extends AbstractTestCase
 
         $f = 0;
         $i = new Interpreter(Bitcoin::getEcAdapter());
-        $this->assertFalse($i->verify($true, $false, $f, new Checker($ec, new Transaction(), 0, 0)));
+        $this->assertFalse($i->verify($true, $false, $f, new Checker($ec, new Transaction, 0, 0)));
     }
 
-    public function testP2shwithEmptyStack()
+    public function test_p2shwith_empty_stack()
     {
         $ec = Bitcoin::getEcAdapter();
 
-        $p2sh = new Script();
+        $p2sh = new Script;
         $output = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($p2sh->getBuffer()));
-        $scriptSig = new Script();
+        $scriptSig = new Script;
 
         $f = InterpreterInterface::VERIFY_P2SH;
         $i = new Interpreter(Bitcoin::getEcAdapter());
-        $this->assertFalse($i->verify($scriptSig, $output, $f, new Checker($ec, new Transaction(), 0, 0)));
+        $this->assertFalse($i->verify($scriptSig, $output, $f, new Checker($ec, new Transaction, 0, 0)));
     }
 
-    public function testInvalidPayToScriptHash()
+    public function test_invalid_pay_to_script_hash()
     {
         $ec = Bitcoin::getEcAdapter();
         $p2sh = ScriptFactory::create()->opcode(Opcodes::OP_RETURN)->getScript();
@@ -120,10 +114,10 @@ class InterpreterTest extends AbstractTestCase
 
         $f = InterpreterInterface::VERIFY_P2SH;
         $i = new Interpreter($ec);
-        $this->assertFalse($i->verify($scriptSig, $scriptPubKey, $f, new Checker($ec, new Transaction(), 0, 0)));
+        $this->assertFalse($i->verify($scriptSig, $scriptPubKey, $f, new Checker($ec, new Transaction, 0, 0)));
     }
 
-    public function testVerifyScriptsigMustBePushOnly()
+    public function test_verify_scriptsig_must_be_push_only()
     {
         $ec = Bitcoin::getEcAdapter();
         $p2sh = ScriptFactory::create()->opcode(Opcodes::OP_1)->push(Buffer::hex('41414141'))->opcode(Opcodes::OP_DEPTH)->getScript();
@@ -132,40 +126,40 @@ class InterpreterTest extends AbstractTestCase
 
         $f = InterpreterInterface::VERIFY_P2SH;
         $i = new Interpreter($ec);
-        $this->assertFalse($i->verify($scriptSig, $scriptPubKey, $f, new Checker($ec, new Transaction(), 0, 0)));
+        $this->assertFalse($i->verify($scriptSig, $scriptPubKey, $f, new Checker($ec, new Transaction, 0, 0)));
     }
 
-    public function testCheckMinimalPush()
+    public function test_check_minimal_push()
     {
         $valid = [
             [0, Buffer::hex('')],
             [81, Buffer::hex('01')],
             [79, Buffer::hex('81')],
             [5, Buffer::hex('0102030405')],
-            [0x4c, new Buffer('', 76)],
-            [0x4c, new Buffer('', 78)],
-            [0x4c, new Buffer('', 255)],
-            [0x4d, new Buffer('', 256)],
-            [0x4d, new Buffer('', 65535)],
-            [0x4e, new Buffer('', 65536)],
+            [0x4C, new Buffer('', 76)],
+            [0x4C, new Buffer('', 78)],
+            [0x4C, new Buffer('', 255)],
+            [0x4D, new Buffer('', 256)],
+            [0x4D, new Buffer('', 65535)],
+            [0x4E, new Buffer('', 65536)],
         ];
 
         $invalid = [
             [0x81, new Buffer('')],
             [01, Buffer::hex('0102030405')],
-            [0x4d, new Buffer('', 74)],
-            [0x4e, new Buffer('', 255)],
-            [0x4d, new Buffer('', 255)]
+            [0x4D, new Buffer('', 74)],
+            [0x4E, new Buffer('', 255)],
+            [0x4D, new Buffer('', 255)],
         ];
 
         $i = new Interpreter(Bitcoin::getEcAdapter());
         foreach ($valid as $t) {
-            list ($opcode, $buffer) = $t;
+            [$opcode, $buffer] = $t;
             $this->assertTrue($i->checkMinimalPush($opcode, $buffer));
         }
 
         foreach ($invalid as $t) {
-            list ($opcode, $buffer) = $t;
+            [$opcode, $buffer] = $t;
             $this->assertFalse($i->checkMinimalPush($opcode, $buffer));
         }
     }

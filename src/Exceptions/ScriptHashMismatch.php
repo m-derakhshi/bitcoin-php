@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class ScriptHashMismatch extends ScriptQualificationError
-{
-
-}
+class ScriptHashMismatch extends ScriptQualificationError {}

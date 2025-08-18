@@ -35,6 +35,7 @@
     "ext-bitcoinconsensus": "The bitcoinconsensus library for safest possible script verification"
   },
   "require-dev": {
+    "laravel/pint": "^1.13",
     "ext-json": "*",
     "phpunit/phpunit": "*",
     "squizlabs/php_codesniffer": "^2.0.0",

@@ -51,20 +51,14 @@ class TxSigHashSerializer
      */
     private $hashNone = false;
 
-    /**
-     * @param TransactionInterface $tx
-     * @param ScriptInterface $scriptCode
-     * @param int $nIn
-     * @param int $nHashTypeIn
-     */
     public function __construct(TransactionInterface $tx, ScriptInterface $scriptCode, int $nIn, int $nHashTypeIn)
     {
         $this->tx = $tx;
         $this->scriptCode = $scriptCode;
         $this->nIn = $nIn;
-        $this->anyoneCanPay = !!($nHashTypeIn & SigHash::ANYONECANPAY);
+        $this->anyoneCanPay = (bool) ($nHashTypeIn & SigHash::ANYONECANPAY);
 
-        $bits = $nHashTypeIn & 0x1f;
+        $bits = $nHashTypeIn & 0x1F;
         $this->hashSingle = $bits === SigHash::SINGLE;
         $this->hashNone = $bits === SigHash::NONE;
 
@@ -72,9 +66,6 @@ class TxSigHashSerializer
         $this->bs32le = Types::bytestringle(32);
     }
 
-    /**
-     * @return string
-     */
     private function serializeScript(): string
     {
         $script = $this->scriptCode;
@@ -107,10 +98,6 @@ class TxSigHashSerializer
         return $out;
     }
 
-    /**
-     * @param int $nInput
-     * @return string
-     */
     public function serializeInput(int $nInput): string
     {
         if ($this->anyoneCanPay) {
@@ -119,7 +106,7 @@ class TxSigHashSerializer
 
         $txIn = $this->tx->getInput($nInput);
         $outpoint = $txIn->getOutPoint();
-        $out = $this->bs32le->write($outpoint->getTxId()) . pack('V', $outpoint->getVout());
+        $out = $this->bs32le->write($outpoint->getTxId()).pack('V', $outpoint->getVout());
 
         if ($nInput !== $this->nIn) {
             // script length is zero
@@ -137,26 +124,19 @@ class TxSigHashSerializer
         return $out;
     }
 
-    /**
-     * @param int $nOutput
-     * @return string
-     */
     public function serializeOutput(int $nOutput): string
     {
         if ($this->hashSingle && $nOutput != $this->nIn) {
-            $out = pack('P', -1) . "\x00";
+            $out = pack('P', -1)."\x00";
         } else {
             $txOut = $this->tx->getOutput($nOutput);
             $scriptBuf = $txOut->getScript()->getBuffer();
-            $out = pack('P', $txOut->getValue()) . $this->varint->write($scriptBuf->getSize()) . $scriptBuf->getBinary();
+            $out = pack('P', $txOut->getValue()).$this->varint->write($scriptBuf->getSize()).$scriptBuf->getBinary();
         }
 
         return $out;
     }
 
-    /**
-     * @return string
-     */
     public function serializeTransaction(): string
     {
         $data = Types::int32le()->write($this->tx->getVersion());
@@ -174,6 +154,7 @@ class TxSigHashSerializer
         }
 
         $data .= pack('V', $this->tx->getLockTime());
+
         return $data;
     }
 }

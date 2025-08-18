@@ -2,7 +2,4 @@
 
 namespace BitWasp\Bitcoin\Exceptions;
 
-class BlockPrevNotFound extends \Exception
-{
-
-}
+class BlockPrevNotFound extends \Exception {}

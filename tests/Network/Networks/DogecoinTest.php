@@ -9,15 +9,15 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class DogecoinTest extends AbstractTestCase
 {
-    public function testDogecoinNetwork()
+    public function test_dogecoin_network()
     {
-        $network = new Dogecoin();
+        $network = new Dogecoin;
         $this->assertEquals('1e', $network->getAddressByte());
         $this->assertEquals('16', $network->getP2shByte());
         $this->assertEquals('9e', $network->getPrivByte());
         $this->assertEquals('02fac398', $network->getHDPrivByte());
         $this->assertEquals('02facafd', $network->getHDPubByte());
         $this->assertEquals('c0c0c0c0', $network->getNetMagicBytes());
-        $this->assertEquals("Dogecoin Signed Message", $network->getSignedMessageMagic());
+        $this->assertEquals('Dogecoin Signed Message', $network->getSignedMessageMagic());
     }
 }

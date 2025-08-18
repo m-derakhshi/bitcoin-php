@@ -10,19 +10,18 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class DifficultyTest extends AbstractTestCase
 {
-
     public function getLowestBits()
     {
-        return 0x1d00ffff;
+        return 0x1D00FFFF;
     }
 
-    public function testGetWork()
+    public function test_get_work()
     {
         $vectors = [
             [
-                0x1d00ffff,
-                '4295032833'
-            ]
+                0x1D00FFFF,
+                '4295032833',
+            ],
         ];
 
         $math = $this->safeMath();
@@ -34,7 +33,7 @@ class DifficultyTest extends AbstractTestCase
         }
     }
 
-    public function testGetTarget()
+    public function test_get_target()
     {
         $json = json_decode($this->dataFile('difficulty.json'));
 

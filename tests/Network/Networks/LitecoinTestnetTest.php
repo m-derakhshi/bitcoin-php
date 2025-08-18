@@ -9,9 +9,9 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class LitecoinTestnetTest extends AbstractTestCase
 {
-    public function testLitecoinTestnetNetwork()
+    public function test_litecoin_testnet_network()
     {
-        $network = new LitecoinTestnet();
+        $network = new LitecoinTestnet;
         $this->assertEquals('6f', $network->getAddressByte());
         $this->assertEquals('3a', $network->getP2shByte());
         $this->assertEquals('ef', $network->getPrivByte());
@@ -19,6 +19,6 @@ class LitecoinTestnetTest extends AbstractTestCase
         $this->assertEquals('043587cf', $network->getHDPubByte());
         $this->assertEquals('f1c8d2fd', $network->getNetMagicBytes());
         $this->assertEquals('tltc', $network->getSegwitBech32Prefix());
-        $this->assertEquals("Litecoin Signed Message", $network->getSignedMessageMagic());
+        $this->assertEquals('Litecoin Signed Message', $network->getSignedMessageMagic());
     }
 }

@@ -6,7 +6,7 @@ namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Buffertools\BufferInterface;
 
-class Stack implements \Countable, \ArrayAccess, \Iterator
+class Stack implements \ArrayAccess, \Countable, \Iterator
 {
     /**
      * @var int
@@ -20,7 +20,8 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
 
     /**
      * Stack constructor.
-     * @param BufferInterface[] $values
+     *
+     * @param  BufferInterface[]  $values
      */
     public function __construct(array $values = [])
     {
@@ -37,36 +38,27 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
         return $this->values;
     }
 
-    /**
-     * @return BufferInterface
-     */
     public function current(): BufferInterface
     {
         return $this->values[$this->position];
     }
 
-    public function next():void
+    public function next(): void
     {
-        ++$this->position;
+        $this->position++;
     }
 
-    /**
-     * @return int
-     */
     public function key(): int
     {
         return $this->position;
     }
 
-    /**
-     * @return bool
-     */
     public function valid(): bool
     {
         return isset($this->values[$this->position]);
     }
 
-    public function rewind():void
+    public function rewind(): void
     {
         $this->position = 0;
     }
@@ -102,13 +94,14 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
 
     /**
      * @see \ArrayAccess::offsetGet()
-     * @param int $offset
+     *
+     * @param  int  $offset
      * @return \BitWasp\Buffertools\BufferInterface
      */
     public function offsetGet($offset)
     {
         $index = count($this) + $offset;
-        if (!isset($this->values[$index])) {
+        if (! isset($this->values[$index])) {
             throw new \RuntimeException('No value at this position');
         }
 
@@ -117,13 +110,15 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
 
     /**
      * @see \ArrayAccess::offsetSet()
-     * @param int $offset
-     * @param BufferInterface $value
+     *
+     * @param  int  $offset
+     * @param  BufferInterface  $value
+     *
      * @throws \InvalidArgumentException
      */
     public function offsetSet($offset, $value)
     {
-        if (!$value instanceof BufferInterface) {
+        if (! $value instanceof BufferInterface) {
             throw new \InvalidArgumentException;
         }
 
@@ -131,6 +126,7 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
         $index = $count + $offset;
         if (isset($this->values[$index])) {
             $this->values[$index] = $value;
+
             return;
         }
 
@@ -141,24 +137,26 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
 
     /**
      * @see \ArrayAccess::offsetExists()
-     * @param int $offset
-     * @return bool
+     *
+     * @param  int  $offset
      */
     public function offsetExists($offset): bool
     {
         $index = count($this) + $offset;
+
         return isset($this->values[$index]);
     }
 
     /**
      * @see \ArrayAccess::offsetUnset()
-     * @param int $offset
+     *
+     * @param  int  $offset
      */
     public function offsetUnset($offset)
     {
         $count = count($this);
         $index = $count + $offset;
-        if (!isset($this->values[$index])) {
+        if (! isset($this->values[$index])) {
             throw new \RuntimeException('Nothing at this position');
         }
 
@@ -166,8 +164,8 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
     }
 
     /**
-     * @param int $first
-     * @param int $second
+     * @param  int  $first
+     * @param  int  $second
      */
     public function swap($first, $second)
     {
@@ -178,8 +176,8 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
     }
 
     /**
-     * @param int $offset
-     * @param BufferInterface $value
+     * @param  int  $offset
+     * @param  BufferInterface  $value
      */
     public function add($offset, $value)
     {
@@ -209,6 +207,7 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
         }
 
         $value = array_pop($this->values);
+
         return $value;
     }
 
@@ -231,7 +230,7 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
     }
 
     /**
-     * @param int $length
+     * @param  int  $length
      * @return $this
      */
     public function resize($length)
