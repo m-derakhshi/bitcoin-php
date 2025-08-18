@@ -9,7 +9,7 @@ use BitWasp\Buffertools\BufferInterface;
 /**
  * @deprecated v2.0.0
  */
-abstract class StaticCollection implements CollectionInterface
+abstract class StaticCollection
 {
     /**
      * @var array
@@ -30,8 +30,8 @@ abstract class StaticCollection implements CollectionInterface
     }
 
     /**
-     * @param int $start
-     * @param int $length
+     * @param  int  $start
+     * @param  int  $length
      * @return self
      */
     public function slice(int $start, int $length)
@@ -42,6 +42,7 @@ abstract class StaticCollection implements CollectionInterface
         }
 
         $sliced = array_slice($this->set, $start, $length);
+
         return new static(...$sliced);
     }
 
@@ -61,7 +62,7 @@ abstract class StaticCollection implements CollectionInterface
         if (count($this->set) === 0) {
             throw new \RuntimeException('No bottom for empty collection');
         }
-        
+
         return $this->offsetGet(count($this) - 1);
     }
 
@@ -88,7 +89,7 @@ abstract class StaticCollection implements CollectionInterface
     /**
      * @return void
      */
-    public function rewind()
+    public function rewind():void
     {
         $this->position = 0;
     }
@@ -112,7 +113,7 @@ abstract class StaticCollection implements CollectionInterface
     /**
      * @return void
      */
-    public function next()
+    public function next():void
     {
         ++$this->position;
     }
@@ -126,16 +127,16 @@ abstract class StaticCollection implements CollectionInterface
     }
 
     /**
-     * @param int $offset
+     * @param  int  $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->set);
     }
 
     /**
-     * @param int $offset
+     * @param  int  $offset
      */
     public function offsetUnset($offset)
     {
@@ -143,12 +144,12 @@ abstract class StaticCollection implements CollectionInterface
     }
 
     /**
-     * @param int $offset
+     * @param  int  $offset
      * @return mixed
      */
     public function offsetGet($offset)
     {
-        if (!array_key_exists($offset, $this->set)) {
+        if (! array_key_exists($offset, $this->set)) {
             throw new \OutOfRangeException('Nothing found at this offset');
         }
 
@@ -156,8 +157,8 @@ abstract class StaticCollection implements CollectionInterface
     }
 
     /**
-     * @param int $offset
-     * @param mixed $value
+     * @param  int  $offset
+     * @param  mixed  $value
      */
     public function offsetSet($offset, $value)
     {

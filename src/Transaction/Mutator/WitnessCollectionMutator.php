@@ -26,7 +26,7 @@ class WitnessCollectionMutator extends AbstractCollectionMutator
     /**
      * @return InputMutator
      */
-    public function current()
+    public function current(): InputMutator
     {
         return $this->set->current();
     }

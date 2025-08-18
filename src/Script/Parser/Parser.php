@@ -169,7 +169,7 @@ class Parser implements \Iterator
     /**
      *
      */
-    public function rewind()
+    public function rewind():void
     {
         $this->execPtr = 0;
         $this->position = 0;
@@ -178,7 +178,7 @@ class Parser implements \Iterator
     /**
      * @return Operation
      */
-    public function current()
+    public function current(): Operation
     {
         if (isset($this->array[$this->execPtr])) {
             $exec = $this->array[$this->execPtr];
@@ -192,7 +192,7 @@ class Parser implements \Iterator
     /**
      * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->execPtr;
     }
@@ -200,7 +200,7 @@ class Parser implements \Iterator
     /**
      * @return Operation|null
      */
-    public function next()
+    public function next():void
     {
         $ptr = $this->execPtr;
         if (isset($this->array[$ptr])) {
@@ -214,7 +214,7 @@ class Parser implements \Iterator
     /**
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->array[$this->execPtr]) || $this->position < $this->end;
     }

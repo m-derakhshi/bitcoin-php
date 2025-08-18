@@ -38,7 +38,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
     /**
      *
      */
-    public function rewind()
+    public function rewind():void
     {
         if ($this->set instanceof \ArrayIterator) {
             $this->set->rewind();
@@ -62,7 +62,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
     /**
      * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->set->key();
     }
@@ -70,7 +70,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
     /**
      *
      */
-    public function next()
+    public function next():void
     {
         $this->set->next();
     }
@@ -78,7 +78,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
     /**
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->set->valid();
     }
@@ -87,7 +87,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
      * @param int $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->set->offsetExists($offset);
     }

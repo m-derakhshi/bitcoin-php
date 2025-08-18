@@ -40,12 +40,12 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
     /**
      * @return BufferInterface
      */
-    public function current()
+    public function current(): BufferInterface
     {
         return $this->values[$this->position];
     }
 
-    public function next()
+    public function next():void
     {
         ++$this->position;
     }
@@ -53,7 +53,7 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
     /**
      * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -61,12 +61,12 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
     /**
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->values[$this->position]);
     }
 
-    public function rewind()
+    public function rewind():void
     {
         $this->position = 0;
     }
@@ -144,7 +144,7 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
      * @param int $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         $index = count($this) + $offset;
         return isset($this->values[$index]);

@@ -15,7 +15,7 @@ interface StackInterface extends \ArrayAccess, \Iterator
      * @see \SplDoublyLinkedList::pop()
      * @return BufferInterface
      */
-    public function pop();
+    public function pop(): BufferInterface;
 
     /**
      * @see \SplDoublyLinkedList::push()
@@ -36,19 +36,19 @@ interface StackInterface extends \ArrayAccess, \Iterator
      * @see \SplDoublyLinkedList::bottom()
      * @return BufferInterface
      */
-    public function bottom();
+    public function bottom(): BufferInterface;
 
     /**
      * @see \SplDoublyLinkedList::top()
      * @return BufferInterface
      */
-    public function top();
+    public function top(): BufferInterface;
 
     /**
      * @see \SplDoublyLinkedList::isEmpty()
      * @return bool
      */
-    public function isEmpty();
+    public function isEmpty(): bool;
 
     /**
      * @see \SplDoublyLinkedList::prev()
@@ -60,7 +60,7 @@ interface StackInterface extends \ArrayAccess, \Iterator
      * @see \SplDoublyLinkedList::shift()
      * @return BufferInterface
      */
-    public function shift();
+    public function shift(): BufferInterface;
 
     /**
      * @see \SplDoublyLinkedList::unshift()
@@ -74,14 +74,14 @@ interface StackInterface extends \ArrayAccess, \Iterator
      * @param int $offset
      * @return BufferInterface
      */
-    public function offsetGet($offset);
+    public function offsetGet($offset): BufferInterface;
 
     /**
      * @see \ArrayAccess::offsetExists()
      * @param int $offset
      * @return bool
      */
-    public function offsetExists($offset);
+    public function offsetExists($offset): bool;
 
     /**
      * @see \ArrayAccess::offsetUnset()
@@ -103,14 +103,14 @@ interface StackInterface extends \ArrayAccess, \Iterator
      * @see \Iterator::current()
      * @return BufferInterface
      */
-    public function current();
+    public function current(): BufferInterface;
 
     /**
      * Move forward to next element
      * @see \Iterator::next()
      * @return void Any returned value is ignored.
      */
-    public function next();
+    public function next():void;
 
     /**
      * Return the key of the current element
@@ -124,18 +124,18 @@ interface StackInterface extends \ArrayAccess, \Iterator
      * @see \Iterator::valid()
      * @return boolean The return value will be casted to boolean and then evaluated.
      */
-    public function valid();
+    public function valid(): bool;
 
     /**
      * Rewind to the first element
      * @see \Iterator::rewind()
      * @return void
      */
-    public function rewind();
+    public function rewind():void;
 
     /**
      * @see \Countable::count()
      * @return int
      */
-    public function count();
+    public function count(): int;
 }
