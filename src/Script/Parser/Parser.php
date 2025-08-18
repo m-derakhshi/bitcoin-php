@@ -10,6 +10,7 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
+use ReturnTypeWillChange;
 
 class Parser implements \Iterator
 {
@@ -92,10 +93,7 @@ class Parser implements \Iterator
         return $size;
     }
 
-    /**
-     * @return Operation
-     */
-    private function doNext(int $ptr)
+    private function doNext(int $ptr): Operation
     {
         if ($this->position >= $this->end) {
             throw new \RuntimeException('Position exceeds end of script!');
@@ -178,10 +176,8 @@ class Parser implements \Iterator
         return $this->execPtr;
     }
 
-    /**
-     * @return Operation|null
-     */
-    public function next(): void
+    #[ReturnTypeWillChange]
+    public function next(): ?Operation
     {
         $ptr = $this->execPtr;
         if (isset($this->array[$ptr])) {
